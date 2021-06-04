@@ -62,7 +62,7 @@ class UserController extends Controller
     public function active($id)
     {
         $user = User::find($id);
-        if ($user && !$user->is_admin) {
+        if ($user && !$user->id === 1) {
             $user->active = !$user->active;
             $user->save();
             return redirect()->back()->with('status', 'success')->with('message', __('User status changed.'));
@@ -73,7 +73,7 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::find($id);
-        if ($user && !$user->is_admin) {
+        if ($user && !$user->id === 1) {
             $user->delete();
             return response()->json(['message' => 'success']);
         }
@@ -88,10 +88,13 @@ class UserController extends Controller
                 return '<input disabled type="checkbox" name="active" class="form-check-inline"' . ($user->active ? ' checked' : '') . '>';
             })
             ->addColumn('Action', function ($user) {
-                if (!$user->is_admin) {
-                    $btn = '<a href="' . route('users.active', $user->id) . '" class="btn btn-sm btn-success mr-2"><i class="fas fa-user-lock"></i></a>';
-                    $btn .= '<a href="#" data-url="' . route('users.destroy', $user->id) . '" class="btn btn-sm delete btn-danger"><i class="fas fa-trash"></i></a>';
-                    return $btn;
+                
+                if ($user->id != 1) {
+                    if(!$user->is_admin || auth()->id() == 1){
+                        $btn = '<a href="' . route('users.active', $user->id) . '" class="btn btn-sm btn-success mr-2"><i class="fas fa-user-lock"></i></a>';
+                        $btn .= '<a href="#" data-url="' . route('users.destroy', $user->id) . '" class="btn btn-sm delete btn-danger"><i class="fas fa-trash"></i></a>';
+                        return $btn;
+                    }
                 }
                 return '';
             })

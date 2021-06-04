@@ -5,15 +5,17 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <!--Icon-->
 <link rel="icon" type="image/png" href="{{asset('/bpotech.png')}}">
+<!-- Google Font: Source Sans Pro -->
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
 <!-- Font Awesome -->
 <link rel="stylesheet" href="{{ asset('AdminLTE/plugins/fontawesome-free/css/all.min.css') }}">
 <!-- Ionicons -->
 <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-@stack('head')
+
+<link rel="stylesheet" href="{{asset('AdminLTE/plugins/toastr/toastr.min.css')}}">
 <!-- overlayScrollbars -->
 <link rel="stylesheet" href="{{asset('AdminLTE/dist/css/adminlte.min.css')}}">
 <!-- custom css -->
 <link rel="stylesheet" href="{{asset('css/custom.css')}}">
-<!-- Google Font: Source Sans Pro -->
-<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
+@stack('head')

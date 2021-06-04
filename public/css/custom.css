@@ -140,6 +140,91 @@ table.dataTable > tbody > tr.child ul.dtr-details > li {
     display: none;
 }
 
+/* css drag-drop */
+.upload-zone {
+    margin: auto;
+    background: radial-gradient(ellipse at center,#17a2b8 0,#007bff 100%);
+    width: 100%;
+    height: 76%;
+    border: 5px dashed white;
+    text-align: center;
+    color: white;
+    z-index: 20;
+    transition: all 0.3s ease-out;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05), inset 0 0 .25em 0 rgba(0,0,0,0.25);
+}
+.upload-zone .btnCompression .active {
+    background: #17a2b8;
+    color: white;
+}
+.upload-zone i {
+    text-align: center;
+    font-size: 10em;
+    color: #fff;
+    margin-top: 50px;
+}
+.upload-zone .selectFile {
+    height: 50px;
+    margin: 20px auto;
+    position: relative;
+    width: 200px;
+}
+.upload-zone label, .upload-zone input {
+    cursor: pointer;
+    display: block;
+    height: 50px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    border-radius: 5px;
+}
+.upload-zone label {
+    background: #fff;
+    color: #17a2b8;
+    display: inline-block;
+    font-size: 1.2em;
+    line-height: 50px;
+    padding: 0;
+    text-align: center;
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-weight: 400;
+    box-shadow: 0 1px 1px gray;
+}
+.upload-zone input[type=file] {
+    opacity: 0;
+}
+.upload-zone.in {
+    color: white;
+    border-color: white;
+    background: radial-gradient(ellipse at center,#17a2b8 0,#007bff  100%);
+}
+.upload-zone.in i {
+    color: #fff;
+}
+.upload-zone.in label {
+    background: #fff;
+    color: #17a2b8;
+}
+.upload-zone.hover {
+    color: gray;
+    border-color: white;
+    background: #fff;
+    border: 5px dashed gray;
+}
+.upload-zone.hover i {
+    color: #17a2b8;
+}
+.upload-zone.hover label {
+    background: #fff;
+    color: #17a2b8;
+}
+.upload-zone.fade {
+    transition: all 0.3s ease-out;
+    opacity: 1;
+}
+
 @media only screen and (max-width: 992px) {
     .chart-wrapper {
         margin-bottom: 20px;

@@ -19,20 +19,38 @@
                 <!-- Add icons to the links using the .nav-icon class
                         with font-awesome or any other icon font library -->
                 <li class="nav-item">
-                    <a href="{{route('file-manager.index')}}"
-                        class="nav-link font-weight-light {{Request::is('file-manager*') ? 'active': ''}}">
-                        <i class="nav-icon fas fa-folder-open text-primary"></i>
+                    <a href="{{route('users.index')}}"
+                        class="nav-link font-weight-light {{Request::is('users*') ? 'active': ''}}">
+                        <i class="nav-icon fas fa-user text-danger"></i>
                         <p>
-                            {{__('Flie Manager')}}
+                            {{__('Users')}}
                         </p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('users.index')}}"
-                        class="nav-link font-weight-light {{Request::is('users*') ? 'active': ''}}">
-                        <i class="nav-icon fas fa-user text-success"></i>
+                    <a href="{{route('books.index')}}"
+                        class="nav-link font-weight-light {{Request::is('books*') ? 'active': ''}}">
+                        <i class="nav-icon fas fa-torah text-warning"></i>
                         <p>
-                            {{__('User')}}
+                            {{__('Books')}}
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{route('volumes.index')}}"
+                        class="nav-link font-weight-light {{Request::is('volumes*') ? 'active': ''}}">
+                        <i class="nav-icon  fas fa-file-archive text-info"></i>
+                        <p>
+                            {{__('Volumes')}}
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{route('file-manager.index')}}"
+                        class="nav-link font-weight-light {{Request::is('file-manager*') ? 'active': ''}}">
+                        <i class="nav-icon fas fa-folder-open text-primary"></i>
+                        <p>
+                            {{__('File Manager')}}
                         </p>
                     </a>
                 </li>

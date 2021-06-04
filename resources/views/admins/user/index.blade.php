@@ -60,7 +60,6 @@
     <script src="{{asset('/AdminLTE/plugins/datatables-responsive/js/dataTables.responsive.min.js')}}"></script>
     <script src="{{asset('/AdminLTE/plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
     <script src="{{asset('/AdminLTE/plugins/toastr/toastr.min.js')}}"></script>
-    <script src="{{asset('/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{asset('/js/admin/user.js')}}"></script>
 
     @if(session()->has('status'))

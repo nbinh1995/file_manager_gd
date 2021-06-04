@@ -2,7 +2,7 @@ $(document).ready(function(){
     let userTable = $('#user-table').DataTable({
         processing: true,
         serverSide: true,
-        responsive: true,
+        // responsive: true,
         searching: true,
         destroy: true,
         order: [[0, 'desc']],

@@ -184,8 +184,8 @@ return [
         App\Providers\ComposerServiceProvider::class,
         //google driver
         App\Providers\GoogleDriveServiceProvider::class,
-        // UniSharp\LaravelFilemanager\LaravelFilemanagerServiceProvider::class,
-        // Intervention\Image\ImageServiceProvider::class,
+        UniSharp\LaravelFilemanager\LaravelFilemanagerServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class,
     ],
 
     /*
@@ -235,7 +235,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class, //Yajra DataTables
-        // 'Image' => Intervention\Image\Facades\Image::class,
+        'Image' => Intervention\Image\Facades\Image::class,
     ],
 
 ];

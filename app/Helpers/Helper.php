@@ -1,7 +1,5 @@
 <?php
 
-
-
 if (!function_exists('getDirGoogleDrive')) {
 function getDirGoogleDrive($dir){
     $contents = $dir->where('type','dir')->map(function($item){
@@ -23,7 +21,7 @@ if (!function_exists('showHtmlDir')) {
     function showHtmlDir($dir,$html = ''){
         $html = '';
         foreach($dir as $item){
-            $html .='<option value="'.$item['path'].'">'.$item['level'].str_repeat("-", (int)$item['level']).$item['filename'].'</option>';
+            $html .='<option value="'.$item['path'].'">'.str_repeat("&#9552;", (int)$item['level']).'&#9569;'.$item['filename'].'</option>';
             if(count($item['child']) > 0){
                 $html.= showHtmlDir($item['child'],$html);
             }
