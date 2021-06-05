@@ -28,19 +28,15 @@ class BookController extends Controller
      */
     public function ajaxGetBooks()
     {
-        $eloquent = Book::select('id','filename','status');
+        $eloquent = Book::select('id','filename');
         return DataTables::eloquent($eloquent)
-            ->editColumn('status', function ($book) {
-                return '<span class="badge badge-primary">'.$book->status.'</span>';
-            })
             ->addColumn('Action', function ($book) {
                 if (auth()->user()->is_admin) {
                     $btn = '<button data-url="' . route('books.destroy', $book->id) . '" class="btn btn-sm delete btn-danger"><i class="fas fa-trash"></i></button>';
                 }
-
                 return $btn;
             })
-            ->rawColumns(['status', 'Action'])
+            ->rawColumns(['Action'])
             ->toJson();
     }
 
@@ -91,7 +87,7 @@ class BookController extends Controller
         if ($book instanceof Book) {
             $directory = $book->path;
             if($book->delete()){
-                Storage::deleteDirectory($directory);
+                Storage::disk(config('lfm.disk'))->deleteDirectory($directory);
                 return redirect()->route('books.index')->withFlashSuccess('The Book Deleted Success');
             }
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');

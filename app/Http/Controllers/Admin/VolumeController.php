@@ -31,7 +31,7 @@ class VolumeController extends Controller
                 }
                 return $btn;
             })
-            ->rawColumns(['Action', 'active'])
+            ->rawColumns(['Action', 'status'])
             ->toJson();
     }
 
@@ -43,23 +43,27 @@ class VolumeController extends Controller
         return view('admins.volume.create',compact('books'));
     }
 
-    public function store(Request $request){
-        dd($request->all());
+    public function store(Request $request)
+    {
         try{
             $data = [
                 'filename' => $request->filename,
                 'book_id' => $request->book_id
             ];
-            $data['path'] = Book::find($request->book_id)->path;
+            $data['path'] = Book::find($request->book_id)->path.'/'.$request->filename;
             $volume = Volume::create($data);
-            if($volume instanceof Book){
-                foreach(config('lfm.volume') as $filename ){
+            if($volume instanceof Volume){
+                foreach(config('lfm.vol') as $filename ){
                     Storage::disk(config('lfm.disk'))->makeDirectory($volume->path.'/'.$filename);
                 }
-                return redirect()->route('books.index')->withFlashSuccess('The Volume Added Success');
+                return redirect()->route('volumes.detail',['id' => $volume->id])->withFlashSuccess('The Volume Added Success');
             }
         }catch(\Exception $e){
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
+    }
+
+    public function detail($id){
+        return view('admins.volume.detail');
     }
 }

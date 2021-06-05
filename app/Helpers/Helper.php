@@ -29,4 +29,44 @@ if (!function_exists('showHtmlDir')) {
         return $html;
     }
 }
+if (!function_exists('showRawStatus')) {
+    function showPageStatus($page,$type){
+        $status = '';
+        $user = '';
+        $badge = '';
+        switch($type){
+            case 'clean':
+                $status = $page->clean;
+                $user = $page->cleanUser->username ?? '';
+            break;
+            case 'type': 
+                $status = $page->type;
+                $user = $page->typeUser->username ?? '';
+            break;
+            case 'sfx': 
+                $status = $page->sfx;
+                $user = $page->sfxUser->username ?? '';
+            break;
+            case 'check': 
+                $status = $page->check;
+                $user = $page->checkUser->username ?? '';
+            break;
+            default:
+            $status = $page->raw;
+            $user = $page->rawUser->username ?? '';
+        }
+        switch($status){
+            case 'doing':
+                $badge = '<span class="badge badge-warning">'.$user.'</span>';
+            break;
+            case 'done': 
+                $badge = '<span class="badge badge-success">'.$user.'</span>';
+            break;
+            default:
+            $badge = '<span class="badge badge-danger">Pending</span>';
+        }
+        return $badge;
+    }
+}
+
 ?>

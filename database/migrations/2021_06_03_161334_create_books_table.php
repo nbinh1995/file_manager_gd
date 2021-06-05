@@ -17,7 +17,7 @@ class CreateBooksTable extends Migration
             $table->increments('id');
             $table->string('filename')->unique();
             $table->text('path');
-            $table->enum('status',['pending','completed','cancel'])->default('pending');
+            $table->enum('status',['Pending','Completed','Cancel'])->default('Pending');
             $table->timestamps();
         });
     }

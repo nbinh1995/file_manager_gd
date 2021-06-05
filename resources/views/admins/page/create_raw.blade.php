@@ -1,6 +1,11 @@
+@php
+$dir = explode('/', $volume->path);
+array_splice($dir,0,1);
+$dir = '/'.implode('/',$dir).'/'.config('lfm.volume.raw');
+@endphp
 @extends('layouts.app')
-@section('title','CREATE VOLUME')
-@section('header_page','Create Volume')
+@section('title','CREATE RAW')
+@section('header_page','Create Raw')
 
 @push('head')
     <!-- Toastr -->
@@ -17,32 +22,23 @@
     {{-- <script src="{{ asset('AdminLTE/plugins/bootbox/bootbox.js')}}"></script> --}}
     <script src="{{asset('AdminLTE/plugins/select2/js/select2.min.js')}}"></script>
     <script src="{{asset('AdminLTE/plugins/axios/dist/axios.min.js')}}"></script>
-    <script src="{{asset('/js/admin/create_volume.js')}}"></script>
 @endpush
 
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12">
-                <form action="{{route('volumes.store')}}" method="POST">
+                <form action="{{route('pages.storeRaw',['volume' => $volume->id])}}" method="POST">
                     <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title">{{$dir}}</h6>
+                        </div>
                         <div class="card-body">
                                 {{csrf_field()}}
                                 <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-group">
-                                            <label >{{__('Chọn đường dẫn thư mục cần tạo')}}</label>
-                                                <select name="book_id"  class="form-control" id="select2">
-                                                    <option value=""></option>
-                                                    @foreach ($books as $book)
-                                                        <option value="{{$book->id}}">{{$book->filename}}</option>
-                                                    @endforeach
-                                                </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label >{{__('Tên thư mục được')}}</label>
-                                            <input type="text" name="filename" class="form-control" placeholder="Folder Name">
-                                        </div>
+                                    <div class="col-12">
+                                        <iframe src="/laravel-filemanager?dir={{urldecode($dir)}}"
+                                        style="width: 100%; height: 70vh; overflow: hidden; border: none;"></iframe>
                                     </div>
                                 </div>
                             

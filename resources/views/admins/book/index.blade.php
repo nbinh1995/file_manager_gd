@@ -26,7 +26,6 @@
                                             <tr>
                                                 <th>ID</th>
                                                 <th>Book Name</th>
-                                                <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
                                             </thead>
@@ -56,23 +55,10 @@
 @endsection
 
 @push('script')
-    <script src="{{asset('/AdminLTE/plugins/moment/moment.min.js')}}"></script>
     <script src="{{asset('/AdminLTE/plugins/datatables/jquery.dataTables.min.js')}}"></script>
     <script src="{{asset('/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
-    <script src="{{asset('/AdminLTE/plugins/datatables-responsive/js/dataTables.responsive.min.js')}}"></script>
-    <script src="{{asset('/AdminLTE/plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
     <script src="{{ asset('AdminLTE/plugins/sweetalert2/sweetalert2.all.min.js')}}"></script>
     <script src="{{asset('/js/admin/book.js')}}"></script>
-
-    @if(session()->has('status'))
-        <script>
-            @if(session()->get('status') === 'success')
-            toastr.success("{{session()->get('message')}}");
-            @else
-            toastr.error("{{session()->get('message')}}");
-            @endif
-        </script>
-    @endif
 @endpush
 
 @push('head')

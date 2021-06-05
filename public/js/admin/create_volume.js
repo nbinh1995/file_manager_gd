@@ -17,9 +17,7 @@ $(document).ready(function() {
     // $('#refresh-dir').on('click',function(){
     //     $(this).find('i').addClass('fa-spin');
     // });
-    // $('#lfm').filemanager('files');
-    var route_prefix = "/laravel-filemanager";
-    $('#lfm').filemanager('files', {prefix: route_prefix});
+   
     //drag -drop
     $("html").on("dragover", function (e) {
         e.preventDefault();

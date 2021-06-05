@@ -27,9 +27,10 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
     Route::group(['prefix' => 'users','middleware' => 'admin'], function () {
         Route::get('/', 'UserController@index')->name('users.index');
         Route::get('/create', 'UserController@create')->name('users.create');
-        Route::delete('/{id}', 'UserController@destroy')->name('users.destroy');
-        Route::get('/active/{id}', 'UserController@active')->name('users.active');
         Route::post('/', 'UserController@store')->name('users.store');
+        Route::get('/{id}/edit', 'UserController@edit')->name('users.edit');
+        Route::patch('/{id}/update', 'UserController@update')->name('users.update');
+        Route::delete('/{id}', 'UserController@destroy')->name('users.destroy');
     });
     Route::group(['prefix' => 'books','middleware' => 'admin','as'=>'books.'], function () {
         Route::get('/', 'BookController@index')->name('index');
@@ -41,20 +42,38 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
     });
     Route::group(['prefix' => 'volumes','middleware' => 'admin','as'=>'volumes.'], function () {
         Route::get('/', 'VolumeController@index')->name('index');
+        Route::get('/{id}/detail', 'VolumeController@detail')->name('detail');
         Route::get('/create', 'VolumeController@create')->name('create');
         Route::post('/store', 'VolumeController@store')->name('store');
         Route::get('/{id}/edit', 'VolumeController@edit')->name('edit');
         Route::put('/{id}/update', 'VolumeController@update')->name('update');
         Route::delete('/{id}/destroy', 'VolumeController@destroy')->name('destroy');
     });
-    Route::group(['prefix' => 'page','middleware' => 'admin'], function () {
-        Route::post('/store', 'PageController@store')->name('store');
-        Route::put('/{id}/update', 'PageController@update')->name('update');
-        Route::delete('/{id}/destroy', 'PageController@destroy')->name('destroy');
+    Route::group(['prefix' => 'pages','middleware' => 'admin', 'as' => 'pages.'], function () {
+        Route::get('/create-raw', 'PageController@createRaw')->name('createRaw');
+        Route::post('/store-raw', 'PageController@storeRaw')->name('storeRaw');
+        Route::get('/create-clean', 'PageController@createClean')->name('createClean');
+        Route::post('/store-clean', 'PageController@storeClean')->name('storeClean');
+        Route::get('/create-type', 'PageController@createType')->name('createType');
+        Route::post('/store-type', 'PageController@storeType')->name('storeType');
+        Route::get('/create-sfx', 'PageController@createSFX')->name('createSFX');
+        Route::post('/store-sfx', 'PageController@storeSFX')->name('storeSFX');
+        Route::get('/create-check', 'PageController@createCheck')->name('createCheck');
+        Route::post('/store-check', 'PageController@storeCheck')->name('storeCheck');
     });
     Route::group(['prefix' => 'file-manager','middleware' => 'admin','as'=>'file-manager.'], function () {
         Route::get('/', 'FileManagerController@index')->name('index');
         Route::get('/refresh-dir', 'FileManagerController@refreshDir')->name('refreshDir');
+        Route::get('/test',function(){
+            \Image::configure(array('driver' => 'imagick'));
+            $file = \Image::make('storage/files/shares/Truyen Doremon/Vol1/Raw/001.psd')->encode('png');
+            $file->save();
+            $type = $file->mime();
+            dd($type);
+            $response = \Response::make($file, 200);
+            $response->header("Content-Type", $type);
+            return $response; 
+        });
     });
     Route::group(['prefix' => 'ajax'], function () {
         Route::post('ajaxGetUsers', 'UserController@ajaxGetUsers')->name('ajaxGetUsers');

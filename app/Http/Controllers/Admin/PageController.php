@@ -4,83 +4,51 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use App\Models\Volume;
 use Illuminate\Http\Request;
+use PDO;
+use Yajra\DataTables\Facades\DataTables;
 
 class PageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
+    public function ajaxGetPages(){
+        $eloquent = Page::with(['rawUser','cleanUser','typeUser','sfxUser','checkUser']);
+        return DataTables::eloquent($eloquent)
+            ->editColumn('raw', function ($page) {
+                return showPageStatus($page,'raw');
+            })
+            ->editColumn('clean', function ($page) {
+                return showPageStatus($page,'clean');
+            })
+            ->editColumn('type', function ($page) {
+                return showPageStatus($page,'type');
+            })
+            ->editColumn('sfx', function ($page) {
+                return showPageStatus($page,'sfx');
+            })
+            ->editColumn('check', function ($page) {
+                return showPageStatus($page,'check');
+            })
+            ->addColumn('Action', function ($page) {
+                $btn = '<a href="' . route('volumes.detail', $page->id) . '" class="btn btn-sm btn-primary mr-2"><i class="far fa-eye"></i></a>';
+                if (auth()->user()->is_admin) {
+                    $btn .= '<a href="' . route('volumes.edit', $page->id) . '" class="btn btn-sm btn-warning mr-2"><i class="far fa-edit"></i></a>';
+                    $btn .= '<a href="#" data-url="' . route('volumes.destroy', $page->id) . '" class="btn btn-sm delete btn-danger"><i class="fas fa-trash"></i></a>';
+                }
+                return $btn;
+            })
+            ->rawColumns(['Action', 'status'])
+            ->toJson();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+    public function createRaw(Request $request){
+        $volume = Volume::find($request->volume);
+        
+        return view('admins.page.create_raw',compact('volume'));
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    public function storeRaw(Request  $request){
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Page  $page
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Page $page)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Page  $page
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Page $page)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Page  $page
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Page $page)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Page  $page
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Page $page)
-    {
-        //
     }
 }

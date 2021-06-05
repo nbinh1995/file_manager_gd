@@ -10,40 +10,34 @@
             <form action="{{ route('login') }}" method="post">
                 {{ csrf_field() }}
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="{{ __('Username') }}"
-                           value="{{ old('name') }}" name="name" autofocus>
+                    <input type="text" class="form-control" placeholder="{{ __('Email') }}"
+                           value="{{ old('email') }}" name="email" autofocus>
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-envelope"></span>
                         </div>
                     </div>
-                    @if ($errors->has('name'))
-                        @foreach ($errors->get('name') as $message)
-                            <label class="text-danger">{{ $message  }}</label>
+                    @if ($errors->has('email'))
+                        @foreach ($errors->get('email') as $message)
+                            <p class="text-danger text-sm">{{ $message  }}</p>
                         @endforeach
                     @endif
                 </div>
                 <div class="input-group mb-3">
-                    <input name="password" type="password" class="form-control" placeholder="{{ __('Password') }}"
+                    <input name="password" type="password" id="password" class="form-control" placeholder="{{ __('Password') }}"
                            value="{{ old('password') }}">
                     <div class="input-group-append">
                         <div class="input-group-text">
-                            <span class="fas fa-lock"></span>
+                            <span class="fas fa-lock"  id="show_pw" style="cursor: pointer"></span>
+                            <span class="fas fa-unlock" id="hide_pw" style="display: none;cursor: pointer"></span>
                         </div>
                     </div>
-                    @if ($errors->has('password'))
-                        <div class="text-danger" role="alert">
-                            @foreach ($errors->get('password') as $message)
-                                <strong>{{ $message  }}</strong>
-                            @endforeach
-                        </div>
-                    @endif
                 </div>
                 <div class="row">
                     <div class="col-8">
                         <div class="icheck-primary">
                             <label for="remember" class="link">
-                                <input type="checkbox" name="remember" id="remember"
+                                <input type="checkbox" name="remember" id="remember" checked
                                         {{ old('remember') ? 'checked' : '' }}>
                                 {{ __('Remember Me') }}
                             </label>
@@ -63,9 +57,6 @@
                     </a></div>
                 @endif
                 </p>
-                {{-- <p class="mb-0">
-                    <a href="register.html" class="text-center">Register a new membership</a>
-                </p> --}}
         </div>
         <!-- /.login-card-body -->
     </div>

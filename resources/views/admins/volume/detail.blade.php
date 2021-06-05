@@ -11,8 +11,8 @@
                         <div class="card-header">
                             <div class="row">
                                 <div class="col-12">
-                                    <a href="{{route('users.create')}}" class="btn btn-primary"><i
-                                                class="fas fa-plus-circle mr-2"></i>{{__('Add User')}}</a>
+                                    <a href="{{route('volumes.create')}}" class="btn btn-primary"><i
+                                                class="fas fa-plus-circle mr-2"></i>{{__('Add Raw')}}</a>
                                 </div>
                             </div>
                         </div>
@@ -21,16 +21,16 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="table-responsive">
-                                        <table id="user-table" class="table table-bordered table-striped">
+                                        <table id="pages-table" class="table table-bordered table-striped">
                                             <thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>UserName</th>
-                                                <th>Email</th>
-                                                <th>Role</th>
-                                                <th>Admin</th>
-                                                <th>Active</th>
-                                                <th>Last Login</th>
+                                                <th>File Name</th>
+                                                <th>Raw</th>
+                                                <th>Clean</th>
+                                                <th>Type</th>
+                                                <th>SFX</th>
+                                                <th>Check</th>
                                                 <th>Action</th>
                                             </tr>
                                             </thead>
@@ -53,21 +53,31 @@
         </div>
         <!-- /.container-fluid -->
     </div>
-    <form action=""  id="user-delete" method="POST">
-        {{ csrf_field() }}
-        {{ method_field('delete') }}
-    </form>
+
 @endsection
 
 @push('script')
+    <script src="{{asset('/AdminLTE/plugins/moment/moment.min.js')}}"></script>
     <script src="{{asset('/AdminLTE/plugins/datatables/jquery.dataTables.min.js')}}"></script>
     <script src="{{asset('/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
-    <script src="{{ asset('AdminLTE/plugins/sweetalert2/sweetalert2.all.min.js')}}"></script>
-    <script src="{{asset('/js/admin/user.js')}}"></script>
+    <script src="{{asset('/AdminLTE/plugins/datatables-responsive/js/dataTables.responsive.min.js')}}"></script>
+    <script src="{{asset('/AdminLTE/plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
+
+    <script src="{{asset('/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{asset('/js/admin/volume.js')}}"></script>
+
+    @if(session()->has('status'))
+        <script>
+            @if(session()->get('status') === 'success')
+            toastr.success("{{session()->get('message')}}");
+            @else
+            toastr.error("{{session()->get('message')}}");
+            @endif
+        </script>
+    @endif
 @endpush
 
 @push('head')
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
-    <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
 @endpush

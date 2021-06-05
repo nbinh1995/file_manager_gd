@@ -19,6 +19,27 @@
             toastr.error("{{session()->get('message')}}");
         </script>
     @endif
+    @if(session()->has('message_success'))
+    <script>
+        toastr.success("{{session()->get('message_success')}}");
+    </script>
+    @endif
+    <script>
+        var show_pw = document.getElementById('show_pw');
+        var hide_pw = document.getElementById('hide_pw');
+        var pw = document.getElementById('password');
+        show_pw.addEventListener('click',function(){
+            pw.type = 'text';
+            this.style.display = 'none';
+            hide_pw.style.display = 'block';
+        })
+
+        hide_pw.addEventListener('click',function(){
+            pw.type = 'password';
+            this.style.display = 'none';
+            show_pw.style.display = 'block';
+        })
+    </script>
 </body>
 
 </html>

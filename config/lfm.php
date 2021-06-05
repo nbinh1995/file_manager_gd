@@ -27,7 +27,21 @@ return [
      */
 
     'public_dir' => 'files/shares/',
-    'volume' => ['Raw','Clean','Type','SFX','Check'],
+    'vol' => [
+        'raw'=>'Raw',
+        'clear'=>'Clean',
+        'type'=>'Type',
+        'sfx'=>'SFX',
+        'check'=>'Check',
+        'old' => 'Old',
+    ],
+    'volume' => [
+        'raw'=>'Raw',
+        'clear'=>'Clean',
+        'type'=>'Type',
+        'sfx'=>'SFX',
+        'check'=>'Check'
+    ],
     'allow_private_folder'     => false,
 
     // Flexible way to customize client folders accessibility
@@ -53,11 +67,11 @@ return [
             'startup_view' => 'grid',
             'max_size'     => 1000000, // size in KB
             'valid_mime'   => [
-                'image/jpeg',
-                'image/pjpeg',
-                'image/png',
-                'image/gif',
-                'image/svg+xml',
+                // 'image/jpeg',
+                // 'image/pjpeg',
+                // 'image/png',
+                // 'image/gif',
+                // 'image/svg+xml',
             ],
         ],
         'image' => [
@@ -86,9 +100,9 @@ return [
 
     'rename_file'              => false,
 
-    'alphanumeric_filename'    => false,
+    'alphanumeric_filename'    => true,
 
-    'alphanumeric_directory'   => false,
+    'alphanumeric_directory'   => true,
 
     'should_validate_size'     => false,
 
@@ -140,6 +154,7 @@ return [
         'png'  => 'PNG Image',
         'ppt'  => 'Microsoft PowerPoint',
         'pptx' => 'Microsoft PowerPoint',
+        'psd' => 'Adobe Photoshop document',
     ],
 
     /*
@@ -155,5 +170,8 @@ return [
      */
     'php_ini_overrides'        => [
         'memory_limit' => '5000M',
+        'upload_max_filesize' => '5000M',
+        'post_max_size' => '5000M',
+        'max_file_uploads' => '500',
     ],
 ];

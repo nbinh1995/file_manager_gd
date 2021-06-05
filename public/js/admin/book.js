@@ -17,11 +17,10 @@ $(document).ready(function(){
         columns: [
             {data: 'id',  class: 'mw-50 text-truncate'},
             {data: 'filename', class: 'mw-160 text-truncate'},
-            {data: 'status', class: 'mw-160 text-truncate'},
             {data: 'Action', class: 'mw-160 text-truncate'},
         ],
         columnDefs: [
-            {targets: 3, searchable: false, orderable: false},
+            {targets: 2, searchable: false, orderable: false},
         ],
     });
 
@@ -34,7 +33,7 @@ $(document).ready(function(){
             cancelButtonText: 'No',
             icon: 'warning',
         }).then((result) => {
-            if (result) {
+            if (result.value) {
                 $("#book-delete").attr('action',$(this).attr('data-url'));
                 $("#book-delete").trigger('submit');
             }
