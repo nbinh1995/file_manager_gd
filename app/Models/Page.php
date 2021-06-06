@@ -11,22 +11,22 @@ class Page extends Model
     protected $guarded = [];
 
     public function rawUser(){
-        return $this->hasOne(User::class,'raw_id','id');
+        return $this->hasOne(User::class,'id','raw_id');
     }
 
     public function cleanUser(){
-        return $this->hasOne(User::class,'clean_id','id');
+        return $this->hasOne(User::class,'id','clean_id');
     }
 
     public function typeUser(){
-        return $this->hasOne(User::class,'type_id','id');
+        return $this->hasOne(User::class,'id','type_id');
     }
 
     public function sfxUser(){
-        return $this->hasOne(User::class,'sfx_id','id');
+        return $this->hasOne(User::class,'id','sfx_id');
     }
 
     public function checkUser(){
-        return $this->hasOne(User::class,'check_id','id');
+        return $this->hasOne(User::class,'id','check_id');
     }
 }

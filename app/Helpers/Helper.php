@@ -34,36 +34,42 @@ if (!function_exists('showRawStatus')) {
         $status = '';
         $user = '';
         $badge = '';
+        $hasDownFile = false;
         switch($type){
             case 'clean':
                 $status = $page->clean;
+                $hasDownFile = $page->raw === 'done' ? true : false;
                 $user = $page->cleanUser->username ?? '';
             break;
             case 'type': 
                 $status = $page->type;
+                $hasDownFile = $page->clean === 'done' ? true : false;
                 $user = $page->typeUser->username ?? '';
             break;
             case 'sfx': 
                 $status = $page->sfx;
+                $hasDownFile = $page->type === 'done' ? true : false;
                 $user = $page->sfxUser->username ?? '';
             break;
             case 'check': 
                 $status = $page->check;
+                $hasDownFile = $page->sfx === 'done' ? true : false;
                 $user = $page->checkUser->username ?? '';
             break;
             default:
             $status = $page->raw;
+            $hasDownFile = false;
             $user = $page->rawUser->username ?? '';
         }
         switch($status){
             case 'doing':
-                $badge = '<span class="badge badge-warning">'.$user.'</span>';
+                $badge = '<label class="btn btn-warning btn-xs">Doing: '.$user.'</label>';
             break;
             case 'done': 
-                $badge = '<span class="badge badge-success">'.$user.'</span>';
+                $badge = '<label class="btn btn-success btn-xs">Done: '.$user.'</label>';
             break;
             default:
-            $badge = '<span class="badge badge-danger">Pending</span>';
+            $badge = $hasDownFile ? '<label class="btn btn-danger btn-xs"><input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom '.$type.'-task-id"> Pending</label>' : '<label class="btn btn-danger btn-xs">Pending</label>' ;
         }
         return $badge;
     }

@@ -3,7 +3,7 @@
 
 <head>
     @include('partials.common.admin-head')
-    <title>{{__('Job Report')}} | @yield('title')</title>
+    <title>{{__('MANAGERMENT')}} || @yield('title')</title>
 </head>
 
 <body class="sidebar-mini text-xs">
@@ -38,7 +38,7 @@
     <!-- ./wrapper -->
 
     @include('partials.common.admin-script')
-
+    
 </body>
 
 </html>

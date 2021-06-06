@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Volume\VolumeRequest;
 use App\Models\Book;
 use App\Models\Volume;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ class VolumeController extends Controller
         $eloquent = Volume::leftJoin('books','volumes.book_id','books.id')->select('volumes.id','volumes.filename','volumes.status','books.filename as bookname');
         return DataTables::eloquent($eloquent)
             ->editColumn('status', function ($volume) {
-                return '<span class="badge badge-primary">'.$volume->status.'</span>';
+                return '<span class="badge badge-primary py-1 px-2">'.$volume->status.'</span>';
             })
             ->addColumn('Action', function ($volume) {
                 $btn = '<a href="' . route('volumes.detail', $volume->id) . '" class="btn btn-sm btn-primary mr-2"><i class="far fa-eye"></i></a>';
@@ -43,7 +44,7 @@ class VolumeController extends Controller
         return view('admins.volume.create',compact('books'));
     }
 
-    public function store(Request $request)
+    public function store(VolumeRequest $request)
     {
         try{
             $data = [
@@ -64,6 +65,7 @@ class VolumeController extends Controller
     }
 
     public function detail($id){
-        return view('admins.volume.detail');
+        $volume = $id;
+        return view('admins.volume.detail',compact('volume'));
     }
 }

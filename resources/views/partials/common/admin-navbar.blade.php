@@ -13,6 +13,13 @@
     <ul class="navbar-nav ml-auto">
         <!-- Messages Dropdown Menu -->
         <li class="nav-item">
+            <select name="role" class="dropdown-item border rounded" id="auth-role">
+                @foreach (config('lfm.volume') as $item)
+                    <option value="{{$item}}" {{$item === auth()->user()->role ? 'selected' : '' }}>{{$item}}</option>
+                @endforeach 
+            </select>
+        </li>
+        <li class="nav-item">
             <a class="dropdown-item" href="{{ route('users.changePassword') }}">
                 {{ __('Password') }}
             </a>

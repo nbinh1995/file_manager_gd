@@ -1,25 +1,25 @@
 @php
 $dir = explode('/', $volume->path);
 array_splice($dir,0,1);
-$dir = '/'.implode('/',$dir).'/'.config('lfm.vol.raw');
+$dir = '/'.implode('/',$dir).'/'.config('lfm.vol.check');
 @endphp
 @extends('layouts.app')
-@section('title','RAW FOLDER')
-@section('header_page','Raw Folder')
+@section('title','CHECK FOLDER')
+@section('header_page','Check Folder')
 
 @push('head')
 
 @endpush
 
 @push('script')
-
+    
 @endpush
 
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12">
-                {{-- <form action="{{route('pages.storeRaw',['volume' => $volume->id])}}" method="POST"> --}}
+                {{-- <form action="{{route('pages.storeCheck',['volume' => $volume->id])}}" method="POST"> --}}
                     <div class="card">
                         <div class="card-header d-flex align-items-center">
                             <h6 class="card-title text-capitalize text-muted text-monospace text-sm"><i class="fas fa-folder-open text-primary"></i>  {{$dir}}</h6>

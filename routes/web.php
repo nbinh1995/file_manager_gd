@@ -50,30 +50,18 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::delete('/{id}/destroy', 'VolumeController@destroy')->name('destroy');
     });
     Route::group(['prefix' => 'pages','middleware' => 'admin', 'as' => 'pages.'], function () {
+        Route::get('/create-old', 'PageController@createOld')->name('createOld');
         Route::get('/create-raw', 'PageController@createRaw')->name('createRaw');
-        Route::post('/store-raw', 'PageController@storeRaw')->name('storeRaw');
         Route::get('/create-clean', 'PageController@createClean')->name('createClean');
-        Route::post('/store-clean', 'PageController@storeClean')->name('storeClean');
         Route::get('/create-type', 'PageController@createType')->name('createType');
-        Route::post('/store-type', 'PageController@storeType')->name('storeType');
         Route::get('/create-sfx', 'PageController@createSFX')->name('createSFX');
-        Route::post('/store-sfx', 'PageController@storeSFX')->name('storeSFX');
         Route::get('/create-check', 'PageController@createCheck')->name('createCheck');
-        Route::post('/store-check', 'PageController@storeCheck')->name('storeCheck');
+        Route::post('{idVolume}/add-task','PageController@addTask')->name('addTask');
+        Route::get('/download-file','PageController@downloadFile')->name('downloadFile');
     });
     Route::group(['prefix' => 'file-manager','middleware' => 'admin','as'=>'file-manager.'], function () {
         Route::get('/', 'FileManagerController@index')->name('index');
         Route::get('/refresh-dir', 'FileManagerController@refreshDir')->name('refreshDir');
-        Route::get('/test',function(){
-            \Image::configure(array('driver' => 'imagick'));
-            $file = \Image::make('storage/files/shares/Truyen Doremon/Vol1/Raw/001.psd')->encode('png');
-            $file->save();
-            $type = $file->mime();
-            dd($type);
-            $response = \Response::make($file, 200);
-            $response->header("Content-Type", $type);
-            return $response; 
-        });
     });
     Route::group(['prefix' => 'ajax'], function () {
         Route::post('ajaxGetUsers', 'UserController@ajaxGetUsers')->name('ajaxGetUsers');
@@ -81,6 +69,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::post('ajaxSaveFile', 'FileManagerController@ajaxSaveFile')->name('ajaxSaveFile');
         Route::post('ajaxGetBooks', 'BookController@ajaxGetBooks')->name('ajaxGetBooks');
         Route::post('ajaxGetVolumes', 'VolumeController@ajaxGetVolumes')->name('ajaxGetVolumes');
+        Route::post('ajaxGetPages', 'PageController@ajaxGetPages')->name('ajaxGetPages');
     });
 });
 

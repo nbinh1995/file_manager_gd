@@ -78,7 +78,7 @@
     <div id="tree"></div>
 
     <div id="main">
-      <div id="alerts"></div>
+      {{-- <div id="alerts"></div> --}}
 
       <nav aria-label="breadcrumb" class="d-none d-lg-block" id="breadcrumbs">
         <ol class="breadcrumb">
@@ -195,7 +195,16 @@
   <script src="{{ asset('vendor/laravel-filemanager/js/dropzone.min.js') }}"></script>
   <script>
     var lang = {!! json_encode(trans('laravel-filemanager::lfm')) !!};
-    var actions = [
+    var actions = (new URL(location.href)).searchParams.get('dir') !== null ? 
+    [
+      {
+        name: 'trash',
+        icon: 'trash',
+        label: lang['menu-delete'],
+        multiple: true
+      },
+    ]
+    :[
       // {
       //   name: 'use',
       //   icon: 'check',
@@ -245,7 +254,7 @@
         multiple: true
       },
     ];
-
+    
     var sortings = [
       {
         by: 'alphabetic',

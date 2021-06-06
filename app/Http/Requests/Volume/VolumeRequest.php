@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Book;
+namespace App\Http\Requests\Volume;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BookRequest extends FormRequest
+class VolumeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,8 @@ class BookRequest extends FormRequest
     public function rules()
     {
         return [
-            'filename' => 'required|string|alpha_num|max:255|unique:books,filename',
+            'filename' => 'required|string|alpha_num|max:255|unique:volumes,filename',
+            'book_id' => 'required|exists:books,id'
         ];
     }
 }

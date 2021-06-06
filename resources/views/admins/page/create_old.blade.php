@@ -1,18 +1,18 @@
 @php
 $dir = explode('/', $volume->path);
 array_splice($dir,0,1);
-$dir = '/'.implode('/',$dir).'/'.config('lfm.vol.raw');
+$dir = '/'.implode('/',$dir).'/'.config('lfm.vol.old');
 @endphp
 @extends('layouts.app')
-@section('title','RAW FOLDER')
-@section('header_page','Raw Folder')
+@section('title','OLD FOLDER')
+@section('header_page','Old Folder')
 
 @push('head')
 
 @endpush
 
 @push('script')
-
+    
 @endpush
 
 @section('content')

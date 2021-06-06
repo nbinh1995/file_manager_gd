@@ -29,7 +29,7 @@ return [
     'public_dir' => 'files/shares/',
     'vol' => [
         'raw'=>'Raw',
-        'clear'=>'Clean',
+        'clean'=>'Clean',
         'type'=>'Type',
         'sfx'=>'SFX',
         'check'=>'Check',
@@ -37,7 +37,7 @@ return [
     ],
     'volume' => [
         'raw'=>'Raw',
-        'clear'=>'Clean',
+        'clean'=>'Clean',
         'type'=>'Type',
         'sfx'=>'SFX',
         'check'=>'Check'

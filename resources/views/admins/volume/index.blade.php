@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', __('Users'))
-@section('header_page', __('Users'))
+@section('title', __('VOLUMES'))
+@section('header_page', __('Volumes'))
 @section('content')
     <div class="content">
         <div class="container-fluid">
@@ -65,6 +65,5 @@
 
 @push('head')
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
-    <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
 @endpush

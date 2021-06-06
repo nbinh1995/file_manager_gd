@@ -49,7 +49,6 @@ $(document).ready(function () {
     $('#to-previous').remove();
     $('#tree').remove();
     $('#breadcrumbs').remove();
-    $('#alerts').hide();
     $('#main').css('width','100%');
     btn = btn.splice(0,1);
     $('[data-action=use]').hide();

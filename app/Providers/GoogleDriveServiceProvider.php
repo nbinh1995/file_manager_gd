@@ -17,22 +17,22 @@ class GoogleDriveServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        \Storage::extend('google_drive', function($app, $config) {
-            $client = new Google_Client();
-            $client->setClientId($config['clientId']);
-            $client->setClientSecret($config['clientSecret']);
-            $client->refreshToken($config['refreshToken']);
-            $service = new Google_Service_Drive($client);
+        // \Storage::extend('google_drive', function($app, $config) {
+        //     $client = new Google_Client();
+        //     $client->setClientId($config['clientId']);
+        //     $client->setClientSecret($config['clientSecret']);
+        //     $client->refreshToken($config['refreshToken']);
+        //     $service = new Google_Service_Drive($client);
             
-            $options = [];
-            if (isset($config['teamDriveId'])) {
-                $options['teamDriveId'] = $config['teamDriveId'];
-            }
+        //     $options = [];
+        //     if (isset($config['teamDriveId'])) {
+        //         $options['teamDriveId'] = $config['teamDriveId'];
+        //     }
 
-            $adapter = new GoogleDriveAdapter($service, $config['folderId'], $options);
+        //     $adapter = new GoogleDriveAdapter($service, $config['folderId'], $options);
 
-            return new Filesystem($adapter);
-        });
+        //     return new Filesystem($adapter);
+        // });
     }
 
     /**

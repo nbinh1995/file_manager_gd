@@ -3,20 +3,12 @@
 @section('header_page','Create Volume')
 
 @push('head')
-    <!-- Toastr -->
-    <link rel="stylesheet" href="{{ asset('AdminLTE/plugins/toastr/toastr.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/select2/css/select2.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
 @endpush
 
 @push('script')
-    <script src="{{asset('AdminLTE/plugins/jquery-ui/jquery-ui.min.js')}}"></script>
-    <!-- Toastr -->
-    <script src="{{ asset('AdminLTE/plugins/toastr/toastr.min.js')}}"></script>
-    <!-- BootBox -->
-    {{-- <script src="{{ asset('AdminLTE/plugins/bootbox/bootbox.js')}}"></script> --}}
     <script src="{{asset('AdminLTE/plugins/select2/js/select2.min.js')}}"></script>
-    <script src="{{asset('AdminLTE/plugins/axios/dist/axios.min.js')}}"></script>
     <script src="{{asset('/js/admin/create_volume.js')}}"></script>
 @endpush
 
@@ -35,14 +27,20 @@
                                                 <select name="book_id"  class="form-control" id="select2">
                                                     <option value=""></option>
                                                     @foreach ($books as $book)
-                                                        <option value="{{$book->id}}">{{$book->filename}}</option>
+                                                        <option value="{{$book->id}}" {{old('book_id') == $book->id ? 'selected' : ''}}>{{$book->filename}}</option>
                                                     @endforeach
                                                 </select>
                                         </div>
+                                        @if($errors->has('book_id'))
+                                        <label class="text-danger">{{$errors->get('book_id')[0]}}</label>
+                                        @endif
                                         <div class="form-group">
                                             <label >{{__('Tên thư mục được')}}</label>
-                                            <input type="text" name="filename" class="form-control" placeholder="Folder Name">
+                                            <input type="text" name="filename" value="{{old('filename')}}" class="form-control" placeholder="Folder Name">
                                         </div>
+                                        @if($errors->has('filename'))
+                                        <label class="text-danger">{{$errors->get('filename')[0]}}</label>
+                                        @endif
                                     </div>
                                 </div>
                             

@@ -18,6 +18,7 @@
                 data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                         with font-awesome or any other icon font library -->
+                @if (auth()->id() === 1)
                 <li class="nav-item">
                     <a href="{{route('users.index')}}"
                         class="nav-link font-weight-light {{Request::is('users*') ? 'active': ''}}">
@@ -27,6 +28,7 @@
                         </p>
                     </a>
                 </li>
+                @endif
                 <li class="nav-item">
                     <a href="{{route('books.index')}}"
                         class="nav-link font-weight-light {{Request::is('books*') ? 'active': ''}}">
@@ -45,6 +47,7 @@
                         </p>
                     </a>
                 </li>
+                @if (auth()->id() === 1)
                 <li class="nav-item">
                     <a href="{{route('file-manager.index')}}"
                         class="nav-link font-weight-light {{Request::is('file-manager*') ? 'active': ''}}">
@@ -54,6 +57,7 @@
                         </p>
                     </a>
                 </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
