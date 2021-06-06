@@ -18,7 +18,7 @@ class CreateVolumesTable extends Migration
             $table->unsignedInteger('book_id');
             $table->string('filename')->unique();
             $table->text('path');
-            $table->enum('status',['pending','doing','done'])->default('pending');
+            $table->enum('status',['pending','completed'])->default('pending');
             $table->timestamps();
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
         });

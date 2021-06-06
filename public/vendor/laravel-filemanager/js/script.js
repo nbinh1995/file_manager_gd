@@ -342,6 +342,8 @@ function loadItems() {
               if (item.is_file) {
                 if((new URL(location.href)).searchParams.get('dir') === null){
                 use(getSelectedItems());
+                }else{
+                  clearSelected();
                 }
               } else {
                 goTo(item.url);

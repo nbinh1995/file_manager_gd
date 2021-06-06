@@ -196,7 +196,12 @@
   <script>
     var lang = {!! json_encode(trans('laravel-filemanager::lfm')) !!};
     var actions = (new URL(location.href)).searchParams.get('dir') !== null ? 
-    [
+    [{
+        name: 'download',
+        icon: 'download',
+        label: lang['menu-download'],
+        multiple: true
+      },
       {
         name: 'trash',
         icon: 'trash',

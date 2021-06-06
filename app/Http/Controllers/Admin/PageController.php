@@ -35,7 +35,7 @@ class PageController extends Controller
             ->addColumn('Action', function ($page) use($volume) {
                 $btn = '';
                 if (auth()->user()->is_admin) {
-                    $btn = '<a href="#" data-url="' . route('volumes.destroy', $page->id) . '" class="btn btn-sm delete btn-danger"><i class="fas fa-trash"></i></a>';
+                    $btn = '<a href="#" data-url="' . route('pages.destroy', $page->id) . '" class="btn btn-sm delete btn-danger"><i class="fas fa-trash"></i></a>';
                 }
                 return $btn;
             })
@@ -161,5 +161,22 @@ class PageController extends Controller
         }else{
             return response()->download($request->path_download);
         }
+    }
+
+    public function destroy($id){
+        $page = Page::with('volume')->find($id);
+
+        if ($page instanceof Page) {
+            $directory = $page->volume->path;
+            foreach(config('lfm.vol') as $file ){
+                Storage::disk(config('lfm.disk'))->delete($directory.'/'.$file.'/'.$page->filename.'.png');
+                Storage::disk(config('lfm.disk'))->delete($directory.'/'.$file.'/'.$page->filename.'.psd');
+            }
+            if($page->delete()){
+                return redirect()->back()->withFlashSuccess('The Volume Deleted Success');
+            }
+            return redirect()->back()->withFlashDanger('There were errors. Please try again.');
+        }
+        return redirect()->back()->withFlashDanger('The ID \'s Book is not found');
     }
 }

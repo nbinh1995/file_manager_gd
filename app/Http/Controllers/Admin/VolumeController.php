@@ -68,4 +68,38 @@ class VolumeController extends Controller
         $volume = $id;
         return view('admins.volume.detail',compact('volume'));
     }
+
+    public function edit($id){
+        $volume = Volume::find($id);
+
+        return view('admins.volume.edit',compact('volume'));
+    }
+
+    public function update(Request $request , $id){
+        $volume = Volume::find($id);
+        if($volume instanceof Volume){
+            if($request->status !== 'pending'){
+                Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.clean'));
+                Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.type'));
+                Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.sfx'));
+            }
+
+            $volume->update($request->only('status'));
+            return redirect()->route('volumes.index');
+        }
+    }
+
+    public function destroy($id){
+        $volume = Volume::find($id);
+
+        if ($volume instanceof Volume) {
+            $directory = $volume->path;
+            if($volume->delete()){
+                Storage::disk(config('lfm.disk'))->deleteDirectory($directory);
+                return redirect()->route('volumes.index')->withFlashSuccess('The Volume Deleted Success');
+            }
+            return redirect()->back()->withFlashDanger('There were errors. Please try again.');
+        }
+        return redirect()->back()->withFlashDanger('The ID \'s Book is not found');
+    }
 }

@@ -4,8 +4,10 @@ namespace App\Listeners;
 
 use App\Models\Page;
 use App\Models\Volume;
+use Carbon\Carbon;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Storage;
 use phpDocumentor\Reflection\Types\Void_;
 use UniSharp\LaravelFilemanager\Events\ImageIsUploading;
 
@@ -29,7 +31,7 @@ class IsUploadingImageListener
      */
     public function handle(ImageIsUploading $event)
     {   
-        if(!str_contains($event->path(), 'Old')){
+        if(strpos($event->path(), 'Old') === false){
                 $regex = null;
                 $type = 'raw';
         foreach(config('lfm.volume') as $key => $type){
@@ -39,14 +41,14 @@ class IsUploadingImageListener
                 break;
             }
         }
-       
+
         if($regex){
             $publicFilePath = str_replace(storage_path('app/public').'/', "", $event->path());
             preg_match($regex, $publicFilePath,$pathVolume);
             $volume = Volume::where('path',$pathVolume[1])->first();
             if($volume instanceof Volume){
-                $filename = str_replace($pathVolume[0].'/', "", $publicFilePath);
-                $filename = explode('.',$filename)[0];
+                $basename = str_replace($pathVolume[0].'/', "", $publicFilePath);
+                $filename = explode('.',$basename)[0];
                 $page =null;
                 if($type !== 'raw'){
                     $page = Page::where('filename',$filename)->where('volume_id',$volume->id)->first();
@@ -77,10 +79,18 @@ class IsUploadingImageListener
                     break;
                     case 'sfx':
                         if($page instanceof Page && $page->type === 'done'){
-                            $page->update([
-                                'sfx' => 'done',
-                                'sfx_id' => auth()->id()
-                            ]);
+                            if(Storage::disk(config('lfm.disk'))->exists($publicFilePath)){
+                                $lastModified = date('ymd',Storage::disk(config('lfm.disk'))->lastModified($publicFilePath));
+                                $newPublicFilePath = explode('.',$publicFilePath);
+                                $newPublicFilePath[0] = $newPublicFilePath[0].'date'.$lastModified;
+                                $newPublicFilePath = implode('.',$newPublicFilePath);
+                                Storage::disk(config('lfm.disk'))->move($publicFilePath,$newPublicFilePath);
+                            }else{
+                                $page->update([
+                                    'sfx' => 'done',
+                                    'sfx_id' => auth()->id()
+                                ]);
+                            }
                         }else{
                             throw new \Exception('The file name "'.$filename.'" does not exist in "SFX" directory!');
                         }

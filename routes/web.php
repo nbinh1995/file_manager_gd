@@ -46,7 +46,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::get('/create', 'VolumeController@create')->name('create');
         Route::post('/store', 'VolumeController@store')->name('store');
         Route::get('/{id}/edit', 'VolumeController@edit')->name('edit');
-        Route::put('/{id}/update', 'VolumeController@update')->name('update');
+        Route::patch('/{id}/update', 'VolumeController@update')->name('update');
         Route::delete('/{id}/destroy', 'VolumeController@destroy')->name('destroy');
     });
     Route::group(['prefix' => 'pages','middleware' => 'admin', 'as' => 'pages.'], function () {
@@ -58,6 +58,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::get('/create-check', 'PageController@createCheck')->name('createCheck');
         Route::post('{idVolume}/add-task','PageController@addTask')->name('addTask');
         Route::get('/download-file','PageController@downloadFile')->name('downloadFile');
+        Route::delete('/{id}/destroy', 'PageController@destroy')->name('destroy');
     });
     Route::group(['prefix' => 'file-manager','middleware' => 'admin','as'=>'file-manager.'], function () {
         Route::get('/', 'FileManagerController@index')->name('index');

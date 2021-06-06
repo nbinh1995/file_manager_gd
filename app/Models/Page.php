@@ -29,4 +29,8 @@ class Page extends Model
     public function checkUser(){
         return $this->hasOne(User::class,'id','check_id');
     }
+
+    public function volume(){
+        return $this->belongsTo(Volume::class,'volume_id','id');
+    }
 }
