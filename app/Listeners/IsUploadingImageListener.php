@@ -110,7 +110,7 @@ class IsUploadingImageListener
                             'volume_id' => $volume->id,
                             'raw_id' => auth()->id(),
                         ]);
-                    }else{
+                    }else{ 
                         throw new \Exception('The file name "'.$filename.'" is exist in "Raw" directory!');
                     }
                 }
