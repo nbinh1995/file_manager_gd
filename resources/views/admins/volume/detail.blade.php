@@ -87,6 +87,7 @@
     <script src="{{ asset('AdminLTE/plugins/sweetalert2/sweetalert2.all.min.js')}}"></script>
     <script>
         var volume_id_page = {{$volume}};
+        var url_page_table = "{{route('ajaxGetPages')}}";
         var hasDownload = false;
     </script>
     @if (session()->has('path_download'))

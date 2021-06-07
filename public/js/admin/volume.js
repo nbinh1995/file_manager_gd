@@ -8,7 +8,7 @@ $(document).ready(function(){
         order: [[0, 'desc']],
         bAutoWidth: false,
         ajax: {
-            url: 'ajax/ajaxGetVolumes',
+            url: url_volume_table,
             method: 'post',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),

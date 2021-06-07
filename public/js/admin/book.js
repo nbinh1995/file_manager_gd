@@ -8,7 +8,7 @@ $(document).ready(function(){
         order: [[0, 'desc']],
         bAutoWidth: false,
         ajax: {
-            url: 'ajax/ajaxGetBooks',
+            url: url_book_table,
             method: 'post',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),

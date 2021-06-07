@@ -50,11 +50,9 @@ class IsUploadingImageListener
                 $basename = str_replace($pathVolume[0].'/', "", $publicFilePath);
                 $filename = explode('.',$basename)[0];
                 $page =null;
-                if($type !== 'raw'){
-                    $page = Page::where('filename',$filename)->where('volume_id',$volume->id)->first();
-                    if(!$page instanceof Page){
+                $page = Page::where('filename',$filename)->where('volume_id',$volume->id)->first();
+                if(!$page instanceof Page && $type !== 'raw'){
                         throw new \Exception('The file name "'.$filename.'" does not exist in "Raw" directory!');
-                    }
                 }
                 switch($type){
                     case 'clean':
@@ -106,11 +104,15 @@ class IsUploadingImageListener
                         }
                     break;
                     default:
-                    Page::create([
-                        'filename' => $filename,
-                        'volume_id' => $volume->id,
-                        'raw_id' => auth()->id(),
-                    ]);
+                    if(!($page instanceof Page) && $type === 'raw'){
+                        Page::create([
+                            'filename' => $filename,
+                            'volume_id' => $volume->id,
+                            'raw_id' => auth()->id(),
+                        ]);
+                    }else{
+                        throw new \Exception('The file name "'.$filename.'" is exist in "Raw" directory!');
+                    }
                 }
             }
         }

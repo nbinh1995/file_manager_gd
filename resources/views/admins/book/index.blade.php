@@ -58,6 +58,9 @@
     <script src="{{asset('/AdminLTE/plugins/datatables/jquery.dataTables.min.js')}}"></script>
     <script src="{{asset('/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{ asset('AdminLTE/plugins/sweetalert2/sweetalert2.all.min.js')}}"></script>
+    <script>
+        var url_book_table = "{{route('ajaxGetBooks')}}";
+    </script>
     <script src="{{asset('/js/admin/book.js')}}"></script>
 @endpush
 

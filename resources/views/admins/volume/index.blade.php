@@ -60,6 +60,9 @@
     <script src="{{asset('/AdminLTE/plugins/datatables/jquery.dataTables.min.js')}}"></script>
     <script src="{{asset('/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{ asset('AdminLTE/plugins/sweetalert2/sweetalert2.all.min.js')}}"></script>
+    <script>
+        var url_volume_table = "{{route('ajaxGetVolumes')}}";
+    </script>
     <script src="{{asset('/js/admin/volume.js')}}"></script>
 @endpush
 

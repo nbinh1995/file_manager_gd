@@ -8,7 +8,7 @@ $(document).ready(function(event){
         order: [[1, 'desc']],
         bAutoWidth: false,
         ajax: {
-            url: '/ajax/ajaxGetPages',
+            url: url_page_table,
             method: 'post',
             data:{
                 volume:volume_id_page

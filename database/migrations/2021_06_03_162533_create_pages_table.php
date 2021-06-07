@@ -15,7 +15,7 @@ class CreatePagesTable extends Migration
     {
         Schema::create('pages', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('filename')->unique();
+            $table->string('filename');
             $table->unsignedInteger('volume_id');
             $table->unsignedInteger('raw_id');
             $table->unsignedInteger('clean_id')->nullable();

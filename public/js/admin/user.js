@@ -8,7 +8,7 @@ $(document).ready(function(){
         order: [[0, 'desc']],
         bAutoWidth: false,
         ajax: {
-            url: 'ajax/ajaxGetUsers',
+            url: url_user_table,
             method: 'post',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
