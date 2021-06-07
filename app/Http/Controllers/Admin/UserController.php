@@ -8,8 +8,11 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Mail\CreateUserMail;
+use App\Mail\UpdatePassWordUserMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\MessageBag;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -53,6 +56,13 @@ class UserController extends Controller
         $data['password'] = Hash::make($request->password);
         $user = User::create($data);
         if ($user instanceof User) {
+            //send mail
+            $dataMail = [
+                'email' => $user->email,
+                'password' => $request->password
+            ];
+            $email = new CreateUserMail($dataMail);
+            Mail::to($user->email)->send($email);
             return redirect()->route('users.index')->withFlashSuccess('Successful added user to database.');
         } else {
             return redirect()->back()->withFlashDanger('Server error. Please try again.');
@@ -84,8 +94,18 @@ class UserController extends Controller
                 $data['password'] = Hash::make($request->password);
             }
             $user->update($data);
-
-            return redirect()->route('users.index')->withFlashSuccess('Successful updated user to database.');
+            if($user instanceof User){
+                if($request->password){
+                    //send mail
+                    $dataMail = [
+                        'email' => $user->email,
+                        'password' => $request->password
+                    ];
+                    $email = new UpdatePassWordUserMail($dataMail);
+                    Mail::to($user->email)->send($email);
+                }
+                return redirect()->route('users.index')->withFlashSuccess('Successful updated user to database.');
+            }
         }
         return redirect()->route('users.index')->withFlashDanger('Not found!');
     }catch(\Exception $e){

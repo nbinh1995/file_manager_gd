@@ -96,6 +96,7 @@ $(document).ready(function(event){
     }
     $(document).on('click','#task-btn',function(e){
         e.preventDefault();
+        $(this).attr('disabled', true).html('<i class="fas fa-sync fa-spin"></i>');
         var role = sessionStorage.getItem('authRole').toLowerCase();
         var task_id = '.'+role+'-task-id:checked';
         var arrayIDTask = [];
