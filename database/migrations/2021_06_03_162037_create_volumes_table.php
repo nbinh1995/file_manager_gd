@@ -16,7 +16,7 @@ class CreateVolumesTable extends Migration
         Schema::create('volumes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('book_id');
-            $table->string('filename')->unique();
+            $table->string('filename');
             $table->text('path');
             $table->enum('status',['pending','completed'])->default('pending');
             $table->timestamps();

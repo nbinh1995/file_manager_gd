@@ -31,7 +31,7 @@ $dir = '/'.implode('/',$dir).'/'.config('lfm.vol.clean');
                                 {{csrf_field()}}
                                 <div class="row">
                                     <div class="col-12">
-                                        <iframe src="/laravel-filemanager?dir={{urldecode($dir)}}"
+                                        <iframe src="/manga/laravel-filemanager?dir={{urldecode($dir)}}"
                                         style="width: 100%; height: 70vh; overflow: hidden; border: none;"></iframe>
                                     </div>
                                 </div>

@@ -69,6 +69,13 @@ return [
             'refreshToken' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
             'folderId' => env('GOOGLE_DRIVE_FOLDER_ID'),
         ],
+
+        'private' => [
+            'driver' => 'local',
+            'root' => '/var/www/image',
+            'url' => env('APP_URL').'/storage',
+            'visibility' => '/var/www/test/manga',
+        ],
     ],
 
 ];

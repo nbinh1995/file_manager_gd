@@ -63,6 +63,9 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
     Route::group(['prefix' => 'file-manager','middleware' => 'admin','as'=>'file-manager.'], function () {
         Route::get('/', 'FileManagerController@index')->name('index');
         Route::get('/refresh-dir', 'FileManagerController@refreshDir')->name('refreshDir');
+        Route::get('/test', function(){
+            dd(storage_path());
+        });
     });
     Route::group(['prefix' => 'ajax'], function () {
         Route::post('ajaxGetUsers', 'UserController@ajaxGetUsers')->name('ajaxGetUsers');

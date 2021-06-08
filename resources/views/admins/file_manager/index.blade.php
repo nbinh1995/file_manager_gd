@@ -6,7 +6,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-12">
-            <iframe src="/laravel-filemanager"
+            <iframe src="/manga/laravel-filemanager"
                 style="width: 100%; height: 80vh; overflow: hidden; border: none;"></iframe>
         </div>
     </div>
