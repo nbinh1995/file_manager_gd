@@ -66,7 +66,8 @@ class BookController extends Controller
             ];
             $book = Book::create($data);
             if($book instanceof Book){
-                Storage::disk(config('lfm.disk'))->makeDirectory($book->path);
+
+                Storage::disk(config('lfm.disk'))->makeDirectory($book->path,0777,true,true);
                 return redirect()->route('books.index')->withFlashSuccess('The Book Added Success');
             }
         }catch(\Exception $e){

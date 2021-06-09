@@ -55,7 +55,7 @@ class VolumeController extends Controller
             $volume = Volume::create($data);
             if($volume instanceof Volume){
                 foreach(config('lfm.vol') as $filename ){
-                    Storage::disk(config('lfm.disk'))->makeDirectory($volume->path.'/'.$filename);
+                    Storage::disk(config('lfm.disk'))->makeDirectory($volume->path.'/'.$filename,0777,true,true);
                 }
                 return redirect()->route('volumes.detail',['id' => $volume->id])->withFlashSuccess('The Volume Added Success');
             }

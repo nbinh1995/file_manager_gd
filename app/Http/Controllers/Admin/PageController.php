@@ -133,23 +133,24 @@ class PageController extends Controller
 
         $pagesSearch = $pages->get()->pluck('filename');
         $pathFolderDownload = $volume->path.'/'.$subFolder.'/';
-        $filesDown =$request->type_task === 'clean' ? collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('filename',$pagesSearch) : 
-        collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->where('extension','psd')->whereIn('filename',$pagesSearch);
+        // $filesDown =$request->type_task === 'clean' ? collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('filename',$pagesSearch) : 
+        // collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->where('extension','psd')->whereIn('filename',$pagesSearch);
+        $filesDown = collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('filename',$pagesSearch);
         if(count($filesDown) > 1){
             $zip = new ZipArchive();
             $zipFileName = config('lfm.public_dir').'download.zip';
-            if ($zip->open(public_path('/storage/'.$zipFileName), ZipArchive::CREATE) === TRUE)
+            if ($zip->open(config('filesystems.disks.private.visibility').'/storage/'.$zipFileName, ZipArchive::CREATE) === TRUE)
             {   
                 foreach ($filesDown as $key => $value) {
                     $relativeNameInZipFile = $value['basename'];
-                    $zip->addFile(public_path( '/storage/'.$value['path']), $relativeNameInZipFile);
+                    $zip->addFile(config('filesystems.disks.private.visibility').'/storage/'.$value['path'], $relativeNameInZipFile);
                 }
                 $zip->close();
             }
 
-            return redirect()->back()->withPathDownload(public_path('/storage/'.$zipFileName));
+            return redirect()->back()->withPathDownload(config('filesystems.disks.private.visibility').'/storage/'.$zipFileName);
         }else{
-            return redirect()->back()->withPathDownload(public_path('/storage/'.$filesDown->first()['path']));
+            return redirect()->back()->withPathDownload(config('filesystems.disks.private.visibility').'/storage/'.$filesDown->first()['path']);
         }
     }
 

@@ -43,7 +43,7 @@ class IsUploadingImageListener
         }
 
         if($regex){
-            $publicFilePath = str_replace(storage_path('app/public').'/', "", $event->path());
+            $publicFilePath = str_replace(config('filesystems.disks.private.root').'/', "", $event->path());
             preg_match($regex, $publicFilePath,$pathVolume);
             $volume = Volume::where('path',$pathVolume[1])->first();
             if($volume instanceof Volume){
