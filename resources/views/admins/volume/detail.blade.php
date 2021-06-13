@@ -61,6 +61,20 @@
             <!-- /.row -->
         </div>
         <!-- /.container-fluid -->
+        <div class="modal fade" id="modal-show-images">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body text-center">
+                        <img src="" alt="" style="width: auto; height:85vh">
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+        <div class="image-arrow left" data-url="{{route('file-manager.showPrevImage')}}"><i class="fas fa-chevron-left"></i></div>
+        <div class="image-arrow right" data-url="{{route('file-manager.showNextImage')}}"><i class="fas fa-chevron-right"></i></div>
     </div>
     <form action=""  id="page-delete" method="POST">
         {{ csrf_field() }}

@@ -1,4 +1,14 @@
 $(document).ready(function(event){
+    var flagShift = false;
+    var fetchData = function (data, ajaxUrl, method = 'post', beforeSend = null) {
+        return $.ajax({
+            data: data,
+            dataType: 'json',
+            url: ajaxUrl,
+            method: method,
+            beforeSend: beforeSend,
+        });
+    };
     var pageTable = $('#pages-table').DataTable({
         processing: true,
         serverSide: true,
@@ -53,6 +63,18 @@ $(document).ready(function(event){
             }
         });
     });
+    $(document).on('keydown',function(e){
+        if(e.keyCode === 16){
+            flagShift =true;
+        }
+    });
+
+    $(document).on('keyup',function(e){
+        if(e.keyCode === 16){
+            flagShift =false;
+        }
+    });
+
     checkRoleTask('raw');
     checkRoleTask('clean');
     checkRoleTask('type');
@@ -62,6 +84,7 @@ $(document).ready(function(event){
     function checkRoleTask(type){
         var task_id = '.'+type+'-task-id';
         $(document).on('click',task_id,function(e){
+            var current = this;
             var role = sessionStorage.getItem('authRole').toLowerCase();
             if(role !== type){
                 e.preventDefault();
@@ -70,11 +93,34 @@ $(document).ready(function(event){
             }else{
                 if($(task_id+':checked').length > 0){
                     $('#receive-box').show();
+                    if(flagShift){
+                        var firstValue = 0;
+                        var lastValue = 0;
+                        $(task_id).each(function(index,ele){
+                            if($(ele).val() == $(task_id+':checked').first().val()){
+                                firstValue = index;
+                            }
+                            if($(ele).val() == $(current).val()){
+                                lastValue = index;
+                            }
+                        });
+                        if(firstValue < lastValue){
+                            for(var i = firstValue ; i < lastValue ; i++){
+                                $($(task_id)[i]).prop('checked',true);
+                            }
+                        }else{
+                            for(var i = lastValue ; i < firstValue ; i++){
+                                $($(task_id)[i]).prop('checked',true);
+                            }
+                        }
+                    }
                 }else{
                     $('#receive-box').hide();
+                    
                 }
             }
         })
+
     }
 
     checkRoleFolder('raw');
@@ -109,4 +155,61 @@ $(document).ready(function(event){
 
         $('#page-task').trigger('submit');
     });
+
+    showImages('raw');
+    showImages('clean');
+    showImages('type');
+    showImages('sfx');
+    showImages('check');
+
+    function showImages(type){
+        var folderImage = '.'+type+'-detail';
+        $(document).on('click',folderImage,function(e){
+            e.preventDefault();
+            var url = $(this).data('url');
+            $('#modal-show-images').find('img').attr('src',url)
+            $('#modal-show-images').modal('show');
+        })
+    }
+
+    $('#modal-show-images').on('show.bs.modal', function (e) {
+        $('.image-arrow').show();
+    })
+
+    $('#modal-show-images').on('hide.bs.modal', function (e) {
+        $('.image-arrow').hide();
+    })
+
+    $('.image-arrow.left').on('click',function(e){
+        var url = $(this).data('url');
+        var page_id = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('page_id');
+        var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
+
+        fetchData({type:type,page_id:page_id,volume_id:volume_id_page},url,'GET').done(function(data){
+            if(data.code === 200){
+                $('#modal-show-images').find('img').attr('src',data.src);
+            }else{
+                toastr.warning("Not Found!")
+            }
+        }).fail(function(){
+            toastr.error("There were errors. Please try again.")
+        });
+    });
+
+    $('.image-arrow.right').on('click',function(e){
+        var url = $(this).data('url');
+        var page_id = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('page_id');
+        var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
+
+        fetchData({type:type,page_id:page_id,volume_id:volume_id_page},url,'GET').done(function(data){
+            if(data.code === 200){
+                $('#modal-show-images').find('img').attr('src',data.src);
+            }else{
+                toastr.warning("Not Found!");
+            }
+        }).fail(function(){
+            toastr.error("There were errors. Please try again.");
+        });
+    });
+
 });

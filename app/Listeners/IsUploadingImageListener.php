@@ -78,9 +78,9 @@ class IsUploadingImageListener
                     case 'sfx':
                         if($page instanceof Page && $page->type === 'done'){
                             if(Storage::disk(config('lfm.disk'))->exists($publicFilePath)){
-                                $lastModified = date('ymd',Storage::disk(config('lfm.disk'))->lastModified($publicFilePath));
+                                $lastModified = date('Ymd_His',Storage::disk(config('lfm.disk'))->lastModified($publicFilePath));
                                 $newPublicFilePath = explode('.',$publicFilePath);
-                                $newPublicFilePath[0] = $newPublicFilePath[0].'date'.$lastModified;
+                                $newPublicFilePath[0] = $newPublicFilePath[0].'_'.$lastModified;
                                 $newPublicFilePath = implode('.',$newPublicFilePath);
                                 Storage::disk(config('lfm.disk'))->move($publicFilePath,$newPublicFilePath);
                             }else{
@@ -110,9 +110,10 @@ class IsUploadingImageListener
                             'volume_id' => $volume->id,
                             'raw_id' => auth()->id(),
                         ]);
-                    }else{ 
-                        throw new \Exception('The file name "'.$filename.'" is exist in "Raw" directory!');
                     }
+                    // else{ 
+                    //     throw new \Exception('The file name "'.$filename.'" is exist in "Raw" directory!');
+                    // }
                 }
             }
         }

@@ -14,17 +14,18 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
-Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['auth','admin']], function () {
+Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['auth']], function () {
     \UniSharp\LaravelFilemanager\Lfm::routes();
 });
 
 Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth'], function () {
     Route::get('/', 'HomeController@index')->name('home');
-    Route::group(['prefix' => 'users'], function () {
+    Route::post('/goToVolDetail', 'HomeController@goToVolDetail')->name('goToVolDetail');
+    Route::group(['prefix' => 'users', 'middleware' => 'super_admin'], function () {
         Route::get('/password', 'UserController@password')->name('users.password');
         Route::post('/password', 'UserController@changePassword')->name('users.changePassword');
     });
-    Route::group(['prefix' => 'users','middleware' => 'admin'], function () {
+    Route::group(['prefix' => 'users','middleware' => 'super_admin'], function () {
         Route::get('/', 'UserController@index')->name('users.index');
         Route::get('/create', 'UserController@create')->name('users.create');
         Route::post('/', 'UserController@store')->name('users.store');
@@ -42,14 +43,16 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
     });
     Route::group(['prefix' => 'volumes','middleware' => 'admin','as'=>'volumes.'], function () {
         Route::get('/', 'VolumeController@index')->name('index');
-        Route::get('/{id}/detail', 'VolumeController@detail')->name('detail');
         Route::get('/create', 'VolumeController@create')->name('create');
         Route::post('/store', 'VolumeController@store')->name('store');
         Route::get('/{id}/edit', 'VolumeController@edit')->name('edit');
         Route::patch('/{id}/update', 'VolumeController@update')->name('update');
         Route::delete('/{id}/destroy', 'VolumeController@destroy')->name('destroy');
     });
-    Route::group(['prefix' => 'pages','middleware' => 'admin', 'as' => 'pages.'], function () {
+    Route::group(['prefix' => 'volumes','as'=>'volumes.'], function () {
+        Route::get('/{id}/detail', 'VolumeController@detail')->name('detail');
+    });
+    Route::group(['prefix' => 'pages', 'as' => 'pages.'], function () {
         Route::get('/create-old', 'PageController@createOld')->name('createOld');
         Route::get('/create-raw', 'PageController@createRaw')->name('createRaw');
         Route::get('/create-clean', 'PageController@createClean')->name('createClean');
@@ -58,14 +61,16 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::get('/create-check', 'PageController@createCheck')->name('createCheck');
         Route::post('{idVolume}/add-task','PageController@addTask')->name('addTask');
         Route::get('/download-file','PageController@downloadFile')->name('downloadFile');
-        Route::delete('/{id}/destroy', 'PageController@destroy')->name('destroy');
+        Route::delete('/{id}/destroy', 'PageController@destroy')->name('destroy')->middleware('admin');
     });
-    Route::group(['prefix' => 'file-manager','middleware' => 'admin','as'=>'file-manager.'], function () {
-        Route::get('/', 'FileManagerController@index')->name('index');
+    Route::group(['prefix' => 'file-manager','as'=>'file-manager.'], function () {
+        Route::get('/', 'FileManagerController@index')->name('index')->middleware('admin');
         Route::get('/refresh-dir', 'FileManagerController@refreshDir')->name('refreshDir');
-        Route::get('/test', function(){
-            dd(storage_path());
-        });
+        Route::get('/get-image', 'FileManagerController@showImage')->name('showImage');
+        Route::get('/get-url-manager', 'FileManagerController@showUrlManager')->name('showUrlManager');
+        Route::get('/get-prev-image', 'FileManagerController@showPrevImage')->name('showPrevImage');
+        Route::get('/get-next-image', 'FileManagerController@showNextImage')->name('showNextImage');
+        Route::post('/download-file','FileManagerController@downloadFile')->name('downloadFile');
     });
     Route::group(['prefix' => 'ajax'], function () {
         Route::post('ajaxGetUsers', 'UserController@ajaxGetUsers')->name('ajaxGetUsers');
@@ -74,6 +79,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::post('ajaxGetBooks', 'BookController@ajaxGetBooks')->name('ajaxGetBooks');
         Route::post('ajaxGetVolumes', 'VolumeController@ajaxGetVolumes')->name('ajaxGetVolumes');
         Route::post('ajaxGetPages', 'PageController@ajaxGetPages')->name('ajaxGetPages');
+        Route::post('ajaxGetVolumesByBookID', 'VolumeController@ajaxGetVolumesByBookID')->name('ajaxGetVolumesByBookID');
     });
 });
 

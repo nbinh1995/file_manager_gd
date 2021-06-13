@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Home\HomeRequest;
+use App\Models\Book;
+use App\Models\Volume;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,7 +26,17 @@ class HomeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {   $active = 1;
-        return view('home',compact('active'));
+    {   
+        $volumes = [];
+        if(old('volume')){
+        $volumes = Volume::where('book_id',old('volume'))->get();
+        }
+
+        $books = Book::all();
+        return view('home',compact('books','volumes'));
+    }
+
+    public function goToVolDetail(HomeRequest $request){
+        return redirect()->route('volumes.detail',['id'=>$request->volume]);
     }
 }

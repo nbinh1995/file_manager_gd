@@ -349,19 +349,17 @@ function loadItems() {
                 goTo(item.url);
               }
             });
-
-          if (item.thumb_url) {
+          if (!(item.is_file && item.is_image)) {
             var image = $('<div>').css('background-image', 'url("' + item.thumb_url + '?timestamp=' + item.time + '")');
           } else {
             var icon = $('<div>').addClass('ico');
             var image = $('<div>').addClass('mime-icon ico-' + item.icon).append(icon);
-            console.log(image);
           }
 
           template.find('.square').append(image);
           template.find('.item_name').text(item.name);
           template.find('time').text((new Date(item.time * 1000)).toLocaleString());
-          console.log(template);
+          // console.log(template);
           $('#content').append(template);
         });
       }
@@ -403,6 +401,10 @@ function loadItems() {
       setOpenFolders();
       loading(false);
       toggleActions();
+      if(hasDownload){
+        $('#custom-manager-download').trigger('submit');
+        hasDownload =false;
+      }
     });
 }
 
@@ -447,20 +449,30 @@ function resize(item) {
 }
 
 function download(items) {
-  items.forEach(function (item, index) {
-    var data = defaultParameters();
+  // console.log(items)
+  loading(true);
+  var dir = '/files'+(new URL(location.href)).searchParams.get('dir');
+  var filenames = items.map(function(item){
+    return item['name'];
+  }).join(',');
+  $('#custom-download-file').find('[name=dir]').val(dir);
+  $('#custom-download-file').find('[name=filenames]').val(filenames);
+  $('#custom-download-file').trigger('submit');
+  // location.href = location.origin  + '/manga/file-manager/download?' + $.param(data);
+  // items.forEach(function (item, index) {
+  //   var data = defaultParameters();
 
-    data['file'] = item.name;
+  //   data['file'] = item.name;
 
-    var token = getUrlParam('token');
-    if (token) {
-      data['token'] = token;
-    }
+  //   var token = getUrlParam('token');
+  //   if (token) {
+  //     data['token'] = token;
+  //   }
 
-    setTimeout(function () {
-      location.href = lfm_route + '/download?' + $.param(data);
-    }, index * 100);
-  });
+  //   setTimeout(function () {
+  //     location.href = lfm_route + '/download?' + $.param(data);
+  //   }, index * 100);
+  // });
 }
 
 function open(item) {

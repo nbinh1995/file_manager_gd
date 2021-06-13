@@ -63,14 +63,15 @@ if (!function_exists('showRawStatus')) {
         }
         switch($status){
             case 'doing':
-                $badge = '<label class="btn btn-warning btn-xs">Doing: '.$user.'</label>';
+                $badge = '<label class="btn btn-warning btn-xs text-monospace">Doing: '.$user.'</label>';
             break;
             case 'done': 
-                $badge = '<label class="btn btn-success btn-xs">Done: '.$user.'</label>';
+                $badge = '<label class="btn btn-success btn-xs  text-monospace '.$type.'-detail" data-url="'.route('file-manager.showImage',['type'=>config('lfm.vol')[$type],'page_id'=>$page->id]).'"><i class="fas fa-images"></i> Done: '.$user.' </label>';
             break;
             default:
-            $badge = $hasDownFile ? '<label class="btn btn-danger btn-xs"><input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom '.$type.'-task-id"> Pending</label>' : '<label class="btn btn-danger btn-xs">Pending</label>' ;
+            $badge = $hasDownFile ? '<label class="btn btn-danger btn-xs text-monospace"><input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom '.$type.'-task-id"> Pending</label>' : '<label class="btn btn-danger btn-xs text-monospace">Pending</label>' ;
         }
+        
         return $badge;
     }
 }

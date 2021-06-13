@@ -7,7 +7,6 @@ use App\Models\Page;
 use App\Models\Volume;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use PDO;
 use Yajra\DataTables\Facades\DataTables;
 use ZipArchive;
 
@@ -87,8 +86,11 @@ class PageController extends Controller
     public function addTask(Request $request,$idVolume){
         $volume = Volume::find($idVolume);
         $arrayPages = explode(',',$request->id_tasks);
-
+        
         $pages = Page::whereIn('id',$arrayPages);
+        if($pages->get()->where($request->type_task,'!=','pending')->count() > 0){
+            return redirect()->back()->withFlashWarning('The task has been accepted by someone!');
+        }
         $arrayKeyVol = array_keys(config('lfm.volume'));
         switch($request->type_task){
             case 'clean':
@@ -139,18 +141,18 @@ class PageController extends Controller
         if(count($filesDown) > 1){
             $zip = new ZipArchive();
             $zipFileName = config('lfm.public_dir').'download.zip';
-            if ($zip->open(config('filesystems.disks.private.visibility').'/storage/'.$zipFileName, ZipArchive::CREATE) === TRUE)
+            if ($zip->open(config('filesystems.disks.private.root').'/'.$zipFileName, ZipArchive::CREATE) === TRUE)
             {   
                 foreach ($filesDown as $key => $value) {
                     $relativeNameInZipFile = $value['basename'];
-                    $zip->addFile(config('filesystems.disks.private.visibility').'/storage/'.$value['path'], $relativeNameInZipFile);
+                    $zip->addFile(config('filesystems.disks.private.root').'/'.$value['path'], $relativeNameInZipFile);
                 }
                 $zip->close();
             }
 
-            return redirect()->back()->withPathDownload(config('filesystems.disks.private.visibility').'/storage/'.$zipFileName);
+            return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$zipFileName);
         }else{
-            return redirect()->back()->withPathDownload(config('filesystems.disks.private.visibility').'/storage/'.$filesDown->first()['path']);
+            return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$filesDown->first()['path']);
         }
     }
 

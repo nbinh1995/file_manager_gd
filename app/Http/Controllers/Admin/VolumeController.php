@@ -8,6 +8,7 @@ use App\Models\Book;
 use App\Models\Volume;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -54,12 +55,14 @@ class VolumeController extends Controller
             $data['path'] = Book::find($request->book_id)->path.'/'.$request->filename;
             $volume = Volume::create($data);
             if($volume instanceof Volume){
+                // File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path,0777);
                 foreach(config('lfm.vol') as $filename ){
-                    Storage::disk(config('lfm.disk'))->makeDirectory($volume->path.'/'.$filename,0777,true,true);
+                    File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path.'/'.$filename,0777,true,true);
                 }
                 return redirect()->route('volumes.detail',['id' => $volume->id])->withFlashSuccess('The Volume Added Success');
             }
         }catch(\Exception $e){
+            dd($e);
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
     }
@@ -101,5 +104,12 @@ class VolumeController extends Controller
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
         return redirect()->back()->withFlashDanger('The ID \'s Book is not found');
+    }
+
+    public function ajaxGetVolumesByBookID(Request $request){
+        $book_id = $request->book;
+        $volumes = Volume::where('book_id',$book_id)->get();
+
+        return response()->json(['volumes'=> $volumes]);
     }
 }

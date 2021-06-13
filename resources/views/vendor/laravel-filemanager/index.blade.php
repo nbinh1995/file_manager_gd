@@ -25,6 +25,16 @@
   {{-- <link rel="stylesheet" href="{{ asset('/vendor/laravel-filemanager/css/lfm.css') }}"> --}}
 </head>
 <body>
+  @if(session()->has('path_download'))
+  <form action="{{route('pages.downloadFile')}}"  id="custom-manager-download">
+      <input type="text" name="path_download" hidden value="{{session('path_download')}}">
+  </form>
+  @endif
+  <form action="{{route('file-manager.downloadFile')}}" method="post" style="display: none" id="custom-download-file">
+    {{ csrf_field() }}
+    <input type="text" hidden name="filenames">
+    <input type="text" name="dir" hidden> 
+  </form>
   <nav class="navbar sticky-top navbar-expand-lg navbar-dark" id="nav">
     <a class="navbar-brand invisible-lg d-none d-lg-inline" id="to-previous">
       <i class="fas fa-arrow-left fa-fw"></i>
@@ -194,6 +204,7 @@
   <script src="{{ asset('vendor/laravel-filemanager/js/cropper.min.js') }}"></script>
   <script src="{{ asset('vendor/laravel-filemanager/js/dropzone.min.js') }}"></script>
   <script>
+    var  hasDownload = false;
     var lang = {!! json_encode(trans('laravel-filemanager::lfm')) !!};
     var actions = (new URL(location.href)).searchParams.get('dir') !== null ? 
     [{
@@ -273,6 +284,13 @@
       }
     ];
   </script>
+  @if (session()->has('path_download'))
+  <script>
+    $(document).ready(function () {
+      hasDownload = true;
+    })
+  </script>
+@endif
   <script src="{{asset('vendor/laravel-filemanager/js/script.js')}}"></script>
   {{-- <script>{!! \File::get(base_path('vendor/unisharp/laravel-filemanager/public/js/script.js')) !!}</script> --}}
   {{-- Use the line below instead of the above if you need to cache the script. --}}

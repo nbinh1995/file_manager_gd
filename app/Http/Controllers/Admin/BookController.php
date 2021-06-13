@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Book\BookRequest;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -59,6 +60,7 @@ class BookController extends Controller
      */
     public function store(BookRequest $request)
     {
+        // dd(Storage::disk(config('lfm.disk')));
         try{
             $data = [
                 'filename' => $request->filename,
@@ -66,11 +68,17 @@ class BookController extends Controller
             ];
             $book = Book::create($data);
             if($book instanceof Book){
-
-                Storage::disk(config('lfm.disk'))->makeDirectory($book->path,0777,true,true);
+                // if(!File::exists(config('filesystems.disks.private.root').'/files')){
+                //     File::makeDirectory(config('filesystems.disks.private.root').'/files',0777);
+                // }
+                // if(!File::exists(config('filesystems.disks.private.root').'/files/shares')){
+                //     File::makeDirectory(config('filesystems.disks.private.root').'/files/shares',0777);
+                // }
+                File::makeDirectory(config('filesystems.disks.private.root').'/'.$book->path,0777,true,true);
                 return redirect()->route('books.index')->withFlashSuccess('The Book Added Success');
             }
         }catch(\Exception $e){
+            
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
     }

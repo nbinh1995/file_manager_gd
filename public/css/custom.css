@@ -140,6 +140,25 @@ table.dataTable > tbody > tr.child ul.dtr-details > li {
     display: none;
 }
 
+.image-arrow{
+    display: none;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 9999; 
+    font-size:8vw ; 
+    color:rgba(255,255,255,0.5);
+    cursor: pointer;
+}
+
+.image-arrow.left{
+    left:1vw;
+}
+
+.image-arrow.right{
+    right:1vw;
+}
+
 /* css drag-drop */
 .upload-zone {
     margin: auto;
