@@ -67,6 +67,14 @@ $(document).ready(function(event){
         if(e.keyCode === 16){
             flagShift =true;
         }
+        if($('#modal-show-images').is(':visible')){
+            if(e.keyCode === 37){
+                $('.image-arrow.left:visible').trigger('click');
+            }
+            if(e.keyCode === 39){
+                $('.image-arrow.right:visible').trigger('click');
+            }
+        }
     });
 
     $(document).on('keyup',function(e){
