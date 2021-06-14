@@ -352,8 +352,13 @@ function loadItems() {
           if (!(item.is_file && item.is_image)) {
             var image = $('<div>').css('background-image', 'url("' + item.thumb_url + '?timestamp=' + item.time + '")');
           } else {
-            var icon = $('<div>').addClass('ico');
-            var image = $('<div>').addClass('mime-icon ico-' + item.icon).append(icon);
+            if(item.name.search('psd') !== -1){
+              image = $('<div>').css('background-image', 'url("' + location.origin+'/manga/vendor/laravel-filemanager/img/psd.png")');
+            }else{
+              image = $('<div>').css('background-image', 'url("' + location.origin+'/manga/vendor/laravel-filemanager/img/image.png")');
+            }
+            // var icon = $('<div>').addClass('ico');
+            // var image = $('<div>').addClass('mime-icon ico-' + item.icon).append(icon);
           }
 
           template.find('.square').append(image);

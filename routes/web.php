@@ -21,7 +21,7 @@ Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['auth']], func
 Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth'], function () {
     Route::get('/', 'HomeController@index')->name('home');
     Route::post('/goToVolDetail', 'HomeController@goToVolDetail')->name('goToVolDetail');
-    Route::group(['prefix' => 'users', 'middleware' => 'super_admin'], function () {
+    Route::group(['prefix' => 'users'], function () {
         Route::get('/password', 'UserController@password')->name('users.password');
         Route::post('/password', 'UserController@changePassword')->name('users.changePassword');
     });

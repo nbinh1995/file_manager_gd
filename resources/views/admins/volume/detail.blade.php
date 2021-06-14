@@ -65,7 +65,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-body text-center">
-                        <img src="" alt="" style="width: auto; height:85vh">
+                        <img src="" alt="" style="width: 100%; height:auto">
                     </div>
                 </div>
                 <!-- /.modal-content -->
