@@ -68,8 +68,11 @@ class VolumeController extends Controller
     }
 
     public function detail($id){
-        $volume = $id;
-        return view('admins.volume.detail',compact('volume'));
+        $volume = Volume::find($id);
+        if($volume instanceof Volume){
+            return view('admins.volume.detail',compact('volume'));
+        }
+        return redirect()->back()->withFlashDanger('Not Found!');
     }
 
     public function edit($id){
@@ -80,11 +83,22 @@ class VolumeController extends Controller
 
     public function update(Request $request , $id){
         $volume = Volume::find($id);
+
         if($volume instanceof Volume){
             if($request->status !== 'pending'){
                 Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.clean'));
                 Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.type'));
                 Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.sfx'));
+            }else{
+                if(!File::exists(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.clean'))){
+                    File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.clean'),0777);
+                }
+                if(!File::exists(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.type'))){
+                    File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.type'),0777);
+                }
+                if(!File::exists(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.sfx'))){
+                    File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.sfx'),0777);
+                }
             }
 
             $volume->update($request->only('status'));

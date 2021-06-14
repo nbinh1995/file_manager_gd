@@ -11,17 +11,19 @@
                         <div class="card-header">
                             <div class="row">
                                 <div class="col-12">
-                                    <a href="{{route('pages.createOld',['volume' => $volume])}}" class="btn btn-warning btn-xs mb-1" id="old-folder">
+                                    <a href="{{route('pages.createOld',['volume' => $volume->id])}}" class="btn btn-warning btn-xs mb-1" id="old-folder">
                                         <i class="fas fa-folder-open mr-2"></i>{{__('Old Folder')}}</a>
-                                    <a href="{{route('pages.createRaw',['volume' => $volume])}}" class="btn btn-secondary btn-xs mb-1" id="raw-folder"><i
+                                    <a href="{{route('pages.createRaw',['volume' => $volume->id])}}" class="btn btn-secondary btn-xs mb-1" id="raw-folder"><i
                                                 class="fas fa-folder-open mr-2"></i>{{__('Raw Folder')}}</a>
-                                    <a href="{{route('pages.createClean',['volume' => $volume])}}" class="btn btn-primary btn-xs mb-1" id="clean-folder"><i
-                                                class="fas fa-folder-open mr-2"></i>{{__('Clean Folder')}}</a>
-                                    <a href="{{route('pages.createType',['volume' => $volume])}}" class="btn btn-info btn-xs mb-1" id="type-folder"><i
+                                    @if ($volume->status === 'pending')
+                                    <a href="{{route('pages.createClean',['volume' => $volume->id])}}" class="btn btn-primary btn-xs mb-1" id="clean-folder"><i
+                                        class="fas fa-folder-open mr-2"></i>{{__('Clean Folder')}}</a>
+                                    <a href="{{route('pages.createType',['volume' => $volume->id])}}" class="btn btn-info btn-xs mb-1" id="type-folder"><i
                                                 class="fas fa-folder-open mr-2"></i>{{__('Type Folder')}}</a>
-                                    <a href="{{route('pages.createSFX',['volume' => $volume])}}" class="btn btn-danger btn-xs mb-1" id="sfx-folder"><i
-                                                class="fas fa-folder-open mr-2"></i>{{__('SFX Folder')}}</a>
-                                    <a href="{{route('pages.createCheck',['volume' => $volume])}}" class="btn btn-success btn-xs mb-1" id="check-folder"><i
+                                    <a href="{{route('pages.createSFX',['volume' => $volume->id])}}" class="btn btn-danger btn-xs mb-1" id="sfx-folder"><i
+                                        class="fas fa-folder-open mr-2"></i>{{__('SFX Folder')}}</a>
+                                    @endif
+                                    <a href="{{route('pages.createCheck',['volume' => $volume->id])}}" class="btn btn-success btn-xs mb-1" id="check-folder"><i
                                                 class="fas fa-folder-open mr-2"></i>{{__('Check Folder')}}</a>
                                     
                                 </div>
@@ -86,7 +88,7 @@
     </form>
     @endif
     <div style="position: fixed; right:0; bottom: 20%; display:none" id="receive-box">
-        <form action="{{route('pages.addTask',['idVolume' => $volume])}}"  id="page-task" method="POST"  style="height: 50px;width: 90px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
+        <form action="{{route('pages.addTask',['idVolume' => $volume->id])}}"  id="page-task" method="POST"  style="height: 50px;width: 90px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
             {{ csrf_field() }}
             <input type="text" hidden name="type_task">
             <input type="text" hidden name="id_tasks">
@@ -100,7 +102,7 @@
     <script src="{{asset('/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{ asset('AdminLTE/plugins/sweetalert2/sweetalert2.all.min.js')}}"></script>
     <script>
-        var volume_id_page = {{$volume}};
+        var volume_id_page = {{$volume->id}};
         var url_page_table = "{{route('ajaxGetPages')}}";
         var hasDownload = false;
     </script>

@@ -1,6 +1,6 @@
 <div class="login-box">
     <div class="login-logo">
-        <a href="{{ route('home')}}"><b>{{__('JOB MANAGER')}} </b>{{__('Dashboard')}}</a>
+        <a href="javascript:void(0)"><b>{{__('Voz Manga Remake')}} </b>{{__('Project')}}</a>
     </div>
     <!-- /.login-logo -->
     <div class="card">

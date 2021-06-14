@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Volume;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use ZipArchive;
@@ -84,7 +86,12 @@ class PageController extends Controller
 
     }
     public function addTask(Request $request,$idVolume){
+        DB::beginTransaction();
+        try{
         $volume = Volume::find($idVolume);
+        if($volume->status === 'completed'){
+            return redirect()->back()->withFlashWarning('The volume was completed!');
+        }
         $arrayPages = explode(',',$request->id_tasks);
         
         $pages = Page::whereIn('id',$arrayPages);
@@ -130,6 +137,7 @@ class PageController extends Controller
                     );
                 break;
             default:
+            DB::rollBack();
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
 
@@ -149,11 +157,20 @@ class PageController extends Controller
                 }
                 $zip->close();
             }
-
+            DB::commit();
             return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$zipFileName);
         }else{
+            if(count($filesDown) == 0){
+                DB::rollBack();
+                return redirect()->back()->withFlashDanger('Can\'t find the file in the folder');
+            }
+            DB::commit();
             return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$filesDown->first()['path']);
         }
+    } catch (\Exception $e){
+        DB::rollBack();
+        return redirect()->back()->withFlashDanger('There were errors. Please try again.');
+    }
     }
 
     public function downloadFile(Request $request)

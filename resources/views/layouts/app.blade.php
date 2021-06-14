@@ -3,7 +3,7 @@
 
 <head>
     @include('partials.common.admin-head')
-    <title>{{__('MANAGERMENT')}} || @yield('title')</title>
+    <title>{{__('VOZ MANGA REMAKE')}} || @yield('title')</title>
 </head>
 
 <body class="sidebar-mini text-xs">
