@@ -82,15 +82,21 @@ class FileManagerController extends Controller
         $volume_id = $request->volume_id;
         $type = $request->type;
         $column = strtolower($type); 
-        $prev_page = Page::with('volume')->where($column,'done')->where('volume_id',$volume_id)->where('id', '<', $page_id)->max('id');
+        $prev_page = Page::where($column,'done')->where('volume_id',$volume_id)->where('id', '<', $page_id)->max('id');
         $url ='';
         $code = 404;
+        $hasAction = 0;
+        if($column === 'sfx'){
+            if(Page::where('check','pending')->where('id',$prev_page)->exists()){
+                $hasAction = 1;
+            }
+        }
         if(!is_null($prev_page)){
             $code=200;
             $url = route('file-manager.showImage',['type'=>$type,'page_id'=>$prev_page]);
         }
 
-        return response()->json(['src' => $url,'code' => $code]);
+        return response()->json(['src' => $url,'hasAction'=> $hasAction,'code' => $code]);
     }
 
     public function showNextImage(Request $request){
@@ -98,15 +104,21 @@ class FileManagerController extends Controller
         $volume_id = $request->volume_id;
         $type = $request->type;
         $column = strtolower($type); 
-        $next_page = Page::with('volume')->where($column,'done')->where('volume_id',$volume_id)->where('id', '>', $page_id)->min('id');
+        $next_page = Page::where($column,'done')->where('volume_id',$volume_id)->where('id', '>', $page_id)->min('id');
         $url ='';
         $code = 404;
+        $hasAction = 0;
+        if($column === 'sfx'){
+            if(Page::where('check','pending')->where('id',$next_page)->exists()){
+                $hasAction = 1;
+            }
+        }
         if(!is_null($next_page)){
             $code=200;
             $url = route('file-manager.showImage',['type'=>$type,'page_id'=>$next_page]);
         }
 
-        return response()->json(['src' => $url,'code' => $code]);
+        return response()->json(['src' => $url,'hasAction'=> $hasAction,'code' => $code]);
     }
 
     public function downloadFile(Request $request){

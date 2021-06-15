@@ -8,6 +8,7 @@ use App\Models\Volume;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use ZipArchive;
@@ -188,9 +189,11 @@ class PageController extends Controller
 
         if ($page instanceof Page) {
             $directory = $page->volume->path;
-            foreach(config('lfm.vol') as $file ){
-                Storage::disk(config('lfm.disk'))->delete($directory.'/'.$file.'/'.$page->filename.'.png');
-                Storage::disk(config('lfm.disk'))->delete($directory.'/'.$file.'/'.$page->filename.'.psd');
+            foreach(config('lfm.volume') as $file ){
+                $filesDelete = collect(Storage::disk(config('lfm.disk'))->listContents($directory.'/'.$file,false))->whereIn('filename',$page->filename)->first();
+                if(isset($filesDelete)){
+                    Storage::disk(config('lfm.disk'))->delete($filesDelete['path']);
+                }
             }
             if($page->delete()){
                 return redirect()->back()->withFlashSuccess('The Volume Deleted Success');
@@ -198,5 +201,52 @@ class PageController extends Controller
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
         return redirect()->back()->withFlashDanger('The ID \'s Book is not found');
+    }
+
+    public function rejectCheck(Request $request){
+        try{
+            $page_id = $request->page_id;
+            $page = Page::with('volume')->find($page_id);
+            if($page instanceof Page){
+                $page->update([
+                    'check' => 'doing',
+                    'check_id' => auth()->id()
+                ]);
+                return response()->json();
+            }
+        }catch(\Exception $e){
+            return response()->json(['code'=> 500]);
+        }
+    }
+
+    public function doneCheck(Request $request){
+        DB::beginTransaction();
+        try{
+            $page_id = $request->page_id;
+            $page = Page::with('volume')->find($page_id);
+        if($page instanceof Page){
+            $page->update([
+                'check' => 'done',
+                'check_id' => auth()->id()
+            ]);
+            $folderPath = $page->volume->path.'/'.config('lfm.vol.sfx');
+            $newFilePath = $page->volume->path.'/'.config('lfm.vol.check').'/'.$page->filename;
+            $filesDone = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->whereIn('filename',$page->filename)->first();
+            $publicFilePath = config('filesystems.disks.private.root').'/'.$filesDone['path'];
+            if($filesDone['extension'] === 'psd'){
+                \Image::configure(array('driver' => 'imagick'));
+                $file = \Image::make($publicFilePath)->encode('png');
+                $file->save(config('filesystems.disks.private.root').'/'.$newFilePath.'.png');
+            }else{
+                Storage::disk(config('lfm.disk'))->move($publicFilePath,$newFilePath.'.'.$filesDone['extension']);
+            }
+            DB::commit();
+            return response()->json(['code'=>200]);
+        }
+        }catch(\Exception $e){
+            DB::rollBack();
+            dd($e);
+            return response()->json(['code'=> $e]);
+        }
     }
 }

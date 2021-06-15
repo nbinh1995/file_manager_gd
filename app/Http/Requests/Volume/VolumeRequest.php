@@ -25,7 +25,7 @@ class VolumeRequest extends FormRequest
     public function rules()
     {
         return [
-            'filename' => ['required','string','alpha_num','max:255',function ($attribute, $value, $fail) {
+            'filename' => ['required','string','regex:/^[a-zA-Z][^~`\'\",.-]+/','max:255',function ($attribute, $value, $fail) {
                 if(Volume::where('book_id',$this->validationData()['book_id'])->where('filename',$value)->exists()){
                     return $fail('The  filename  was exists!');
                 }

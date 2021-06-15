@@ -1,5 +1,7 @@
 $(document).ready(function(event){
     var flagShift = false;
+    var flagShow = true;
+    var flagReload = false;
     var fetchData = function (data, ajaxUrl, method = 'post', beforeSend = null) {
         return $.ajax({
             data: data,
@@ -174,50 +176,144 @@ $(document).ready(function(event){
         var folderImage = '.'+type+'-detail';
         $(document).on('click',folderImage,function(e){
             e.preventDefault();
+            var role = sessionStorage.getItem('authRole').toLowerCase();
             var url = $(this).data('url');
-            $('#modal-show-images').find('img').attr('src',url)
+            $('#modal-show-images').find('img').attr('src',url);
+            $('#title-show-image').text('');
+            $('#title-show-image').text(type+ ' ID:');
+            loading(true);
+            if(type === 'sfx' && role === 'check' && $(this).closest('td').next().find('label').text() == 'Pending'){
+                $('#modal-show-images').find('img').data('hasAction','1');
+            }else{
+                $('#modal-show-images').find('img').data('hasAction','0');
+            }
             $('#modal-show-images').modal('show');
         })
     }
 
     $('#modal-show-images').on('show.bs.modal', function (e) {
         $('.image-arrow').show();
+        loadingCheck(false);
     })
 
     $('#modal-show-images').on('hide.bs.modal', function (e) {
         $('.image-arrow').hide();
+        $('#action-check').hide();
+        if(flagReload){
+            pageTable.ajax.reload(null, false);
+            flagReload = false;
+        }
     })
 
     $('.image-arrow.left').on('click',function(e){
+        if(flagShow){
         var url = $(this).data('url');
         var page_id = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('page_id');
         var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
 
-        fetchData({type:type,page_id:page_id,volume_id:volume_id_page},url,'GET').done(function(data){
+        fetchData({type:type,page_id:page_id,volume_id:volume_id_page},url,'GET',loading(true)).done(function(data){
             if(data.code === 200){
+                $('#modal-show-images').find('img').data('hasAction',data.hasAction);
                 $('#modal-show-images').find('img').attr('src',data.src);
             }else{
                 toastr.warning("Not Found!")
+                loading(false);
             }
         }).fail(function(){
-            toastr.error("There were errors. Please try again.")
+            toastr.error("There were errors. Please try again.");
+            loading(false);
         });
+        }
     });
 
     $('.image-arrow.right').on('click',function(e){
+        if(flagShow){
         var url = $(this).data('url');
         var page_id = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('page_id');
         var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
 
-        fetchData({type:type,page_id:page_id,volume_id:volume_id_page},url,'GET').done(function(data){
+        fetchData({type:type,page_id:page_id,volume_id:volume_id_page},url,'GET',loading(true)).done(function(data){
             if(data.code === 200){
+                $('#modal-show-images').find('img').data('hasAction',data.hasAction);
                 $('#modal-show-images').find('img').attr('src',data.src);
             }else{
                 toastr.warning("Not Found!");
+                loading(false);
             }
         }).fail(function(){
             toastr.error("There were errors. Please try again.");
+            loading(false);
         });
+        }
     });
 
+    function loading(status){
+        if(status){
+            flagShow = false;
+            $('#skeleton').show();
+            $('#image-page-show').hide();
+        }else{
+            flagShow = true;
+            $('#skeleton').hide();
+            $('#image-page-show').show();
+        }
+    }
+
+    $('#image-page-show').on('load',function(){
+        var role = sessionStorage.getItem('authRole').toLowerCase();
+        var page_id = (new URL($(this).attr('src'))).searchParams.get('page_id');
+        var textHead = $('#title-show-image').text().split(':');
+        $('#title-show-image').text('');
+        $('#title-show-image').text(textHead[0]+': '+page_id);
+        if($(this).data('hasAction') == 1 && role === 'check'){
+            $('#action-check').show();
+        }else{
+            $('#action-check').hide();
+        }
+        loadingCheck(false);
+        loading(false);
+    })
+
+    $('.reject-check').on('click',function(e){
+        var role = sessionStorage.getItem('authRole').toLowerCase();
+        var page_id = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('page_id');
+        var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
+        if(type === 'SFX' && role === 'check'){
+            fetchData({page_id:page_id},url_reject_check,'GET',loadingCheck(true)).done(function(data){
+                $('.image-arrow.left:visible').trigger('click');
+            }).fail(function(){
+                toastr.error("There were errors. Please try again.");
+            });
+        }else{
+            toastr.error("Roles user or file is not correct!");
+        }
+    })
+
+    $('.done-check').on('click',function(e){
+        var role = sessionStorage.getItem('authRole').toLowerCase();
+        var page_id = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('page_id');
+        var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
+        if(type === 'SFX' && role === 'check'){
+            fetchData({page_id:page_id},url_done_check,'GET',loadingCheck(true)).done(function(data){
+                $('.image-arrow.left:visible').trigger('click');
+            }).fail(function(){
+                toastr.error("There were errors. Please try again.");
+            });
+        }else{
+            toastr.error("Roles user or file is not correct!");
+        }
+    })
+
+    function loadingCheck(status){
+        if(status){
+            flagReload = true;
+            $('#modal-show-images').find('.close-check').prop('disabled',true);
+            $('#modal-show-images').find('.reject-check').prop('disabled',true);
+            $('#modal-show-images').find('.done-check').prop('disabled',true);
+        }else{
+            $('#modal-show-images').find('.close-check').prop('disabled',false);
+            $('#modal-show-images').find('.reject-check').prop('disabled',false);
+            $('#modal-show-images').find('.done-check').prop('disabled',false);
+        }
+    }
 });

@@ -66,8 +66,28 @@
         <div class="modal fade" id="modal-show-images">
             <div class="modal-dialog">
                 <div class="modal-content">
+                    <div class="modal-header bg-lightblue">
+                        <h4 class="modal-title text-uppercase" id="title-show-image">ID ...</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                     <div class="modal-body text-center">
-                        <img src="" alt="" style="width: 100%; height:auto">
+                        <div id="skeleton">
+                            <div class="row">
+                                <div class="col-12  skeleton-block" >
+
+                                </div>
+                            </div>
+                        </div>
+                        <img src="" alt="" id="image-page-show" style="width: 100%; height:auto">
+                    </div>
+                    <div class="modal-footer justify-content-between" id="action-check" style="display: none">
+                        <button type="button" class="btn btn-secondary close-check" data-dismiss="modal">Close</button>
+                        <div>
+                            <button type="button" class="btn btn-warning reject-check">Reject</button>
+                            <button type="button" class="btn btn-success done-check">Done</button>
+                        </div>
                     </div>
                 </div>
                 <!-- /.modal-content -->
@@ -105,6 +125,8 @@
         var volume_id_page = {{$volume->id}};
         var url_page_table = "{{route('ajaxGetPages')}}";
         var hasDownload = false;
+        var url_reject_check = "{{route('pages.rejectCheck')}}";
+        var url_done_check = "{{route('pages.doneCheck')}}";
     </script>
     @if (session()->has('path_download'))
         <script>
@@ -119,4 +141,31 @@
 @push('head')
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
+    <style>
+        #skeleton{
+            display: none;
+            overflow: hidden; 
+            background-color: #e6e6e6;
+            border: 1px solid #e6e6e6;
+            border-radius: 5px; 
+        }
+        .skeleton-block{
+            height: 90vh;
+            -webkit-animation: phAnimation 0.8s linear infinite;
+            animation: phAnimation 0.8s linear infinite;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 46%, rgba(255, 255, 255, 0.35) 50%, rgba(255, 255, 255, 0) 54%) 50% 50%;
+            
+        }
+        @-webkit-keyframes phAnimation {
+        0% {
+            transform: translate3d(-30%, 0, 0); }
+        100% {
+            transform: translate3d(30%, 0, 0); } }
+
+        @keyframes phAnimation {
+        0% {
+            transform: translate3d(-30%, 0, 0); }
+        100% {
+            transform: translate3d(30%, 0, 0); } }
+    </style>
 @endpush

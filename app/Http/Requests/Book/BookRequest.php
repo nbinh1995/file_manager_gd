@@ -24,7 +24,7 @@ class BookRequest extends FormRequest
     public function rules()
     {
         return [
-            'filename' => 'required|string|alpha_num|max:255|unique:books,filename',
+            'filename' => 'required|string|regex:/^[a-zA-Z][^~`\'\",.-]+/|max:255|unique:books,filename',
         ];
     }
 }

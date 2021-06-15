@@ -4,7 +4,7 @@
 <!-- CSRF Token -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <!--Icon-->
-<link rel="icon" type="image/png" href="{{asset('/bpotech.png')}}">
+<link rel="icon" type="image/png" href="{{asset('/doremonfavicon.png')}}">
 <!-- Google Font: Source Sans Pro -->
 <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">

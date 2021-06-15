@@ -1,11 +1,9 @@
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar elevation-4 sidebar-light-lightblue">
     <!-- Brand Logo -->
-    <a href="{{route('home')}}" class="brand-link">
-        <img src="{{ asset('AdminLTE/dist/img/logo-head.png')}}" alt="BPO Tech" class="brand-image"
-             style="opacity: .8">
-        <span class="brand-text font-weight-bold text-lightblue"
-              style="font-family: 'Nerko One', cursive; opacity: 0">BPO Tech</span>
+    <a href="{{route('home')}}" class="brand-link bg-lightblue">
+        <img src="{{ asset('/VozDoremonlogo.png')}}" alt="Doremon" class="brand-image">
+        <span class="brand-text text-lightblue">.</span>
     </a>
 
     <!-- Sidebar -->

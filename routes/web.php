@@ -59,12 +59,14 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::get('/create-type', 'PageController@createType')->name('createType');
         Route::get('/create-sfx', 'PageController@createSFX')->name('createSFX');
         Route::get('/create-check', 'PageController@createCheck')->name('createCheck');
+        Route::get('/reject-check', 'PageController@rejectCheck')->name('rejectCheck');
+        Route::get('/done-check', 'PageController@doneCheck')->name('doneCheck');
         Route::post('{idVolume}/add-task','PageController@addTask')->name('addTask');
         Route::get('/download-file','PageController@downloadFile')->name('downloadFile');
         Route::delete('/{id}/destroy', 'PageController@destroy')->name('destroy')->middleware('admin');
     });
     Route::group(['prefix' => 'file-manager','as'=>'file-manager.'], function () {
-        Route::get('/', 'FileManagerController@index')->name('index')->middleware('admin');
+        Route::get('/', 'FileManagerController@index')->name('index')->middleware('super_admin');
         Route::get('/refresh-dir', 'FileManagerController@refreshDir')->name('refreshDir');
         Route::get('/get-image', 'FileManagerController@showImage')->name('showImage');
         Route::get('/get-url-manager', 'FileManagerController@showUrlManager')->name('showUrlManager');

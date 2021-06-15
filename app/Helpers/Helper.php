@@ -53,7 +53,7 @@ if (!function_exists('showRawStatus')) {
             break;
             case 'check': 
                 $status = $page->check;
-                $hasDownFile = $page->sfx === 'done' ? true : false;
+                $hasDownFile = false;
                 $user = $page->checkUser->username ?? '';
             break;
             default:
@@ -63,7 +63,7 @@ if (!function_exists('showRawStatus')) {
         }
         switch($status){
             case 'doing':
-                $badge = '<label class="btn btn-warning btn-xs text-monospace">Doing: '.$user.'</label>';
+                $badge = $type === 'check' ? '<label class="btn btn-warning btn-xs text-monospace">Reject: '.$user.'</label>' :'<label class="btn btn-warning btn-xs text-monospace">Doing: '.$user.'</label>';
             break;
             case 'done': 
                 $badge = '<label class="btn btn-success btn-xs  text-monospace '.$type.'-detail" data-url="'.route('file-manager.showImage',['type'=>config('lfm.vol')[$type],'page_id'=>$page->id]).'"><i class="fas fa-images"></i> Done: '.$user.' </label>';
