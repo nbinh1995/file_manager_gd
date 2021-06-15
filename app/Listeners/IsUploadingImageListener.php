@@ -82,6 +82,10 @@ class IsUploadingImageListener
                                 $newPublicFilePath = explode('.',$publicFilePath);
                                 $newPublicFilePath[0] = $newPublicFilePath[0].'_'.$lastModified;
                                 $newPublicFilePath = implode('.',$newPublicFilePath);
+                                $page->update([
+                                    'check' => 'pending',
+                                    'check_id' => null
+                                ]);
                                 Storage::disk(config('lfm.disk'))->move($publicFilePath,$newPublicFilePath);
                             }else{
                                 $page->update([
