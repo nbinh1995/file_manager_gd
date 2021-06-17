@@ -40,13 +40,14 @@ class FileManagerController extends Controller
     }
 
     public function showImage(Request $request){
-        $page_id = $request->page_id;
+        $volume_id = $request->volume_id;
+        $fileName = $request->fileName;
         $typeFolder = $request->type;
-        $page = Page::with('volume')->find($page_id);
+        $page = Page::with('volume')->where('volume_id',$volume_id)->where('filename',$fileName)->first();
         $folderPath = $page->volume->path.'/'.$typeFolder;
-        $filesShow = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->whereIn('filename',$page->filename)->first();
+        $filesShow = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->sortByDesc('timestamp')->whereIn('filename',$page->filename)->first();
         $publicFilePath = config('filesystems.disks.private.root').'/'.$filesShow['path'];
-       
+        
         if($filesShow['extension'] === 'psd'){
         \Image::configure(array('driver' => 'imagick'));
         $file = \Image::make($publicFilePath)->encode('png');
@@ -78,57 +79,58 @@ class FileManagerController extends Controller
     }
 
     public function showPrevImage(Request $request){
-        $page_id = $request->page_id;
+        $fileName = (int)$request->fileName;
         $volume_id = $request->volume_id;
         $type = $request->type;
         $column = strtolower($type); 
-        $prev_page = Page::where($column,'done')->where('volume_id',$volume_id)->where('id', '<', $page_id)->max('id');
+        $prev_page = Page::where($column,'done')->where('volume_id',$volume_id)->whereRaw('CAST( filename AS unsigned) < ?',$fileName)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get()->max();
         $url ='';
         $code = 404;
         $hasAction = 0;
-        if($column === 'sfx'){
-            if(Page::where('check','pending')->where('id',$prev_page)->exists()){
-                $hasAction = 1;
-            }
-        }
         if(!is_null($prev_page)){
+            if($column === 'sfx'){
+                if(Page::where('check','pending')->where('volume_id',$volume_id)->where('filename',$prev_page->filename)->exists()){
+                    $hasAction = 1;
+                }
+            }
             $code=200;
-            $url = route('file-manager.showImage',['type'=>$type,'page_id'=>$prev_page]);
+            $url = route('file-manager.showImage',['volume_id'=>$volume_id,'type'=>$type,'fileName'=>$prev_page->filename]);
         }
 
         return response()->json(['src' => $url,'hasAction'=> $hasAction,'code' => $code]);
     }
 
     public function showNextImage(Request $request){
-        $page_id = $request->page_id;
+        $fileName = (int)$request->fileName;
         $volume_id = $request->volume_id;
         $type = $request->type;
         $column = strtolower($type); 
-        $next_page = Page::where($column,'done')->where('volume_id',$volume_id)->where('id', '>', $page_id)->min('id');
+        $next_page = Page::where($column,'done')->where('volume_id',$volume_id)->whereRaw('CAST( filename AS unsigned) > ?',$fileName)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get()->min();
         $url ='';
         $code = 404;
         $hasAction = 0;
-        if($column === 'sfx'){
-            if(Page::where('check','pending')->where('id',$next_page)->exists()){
-                $hasAction = 1;
-            }
-        }
         if(!is_null($next_page)){
+            if($column === 'sfx'){
+                if(Page::where('check','pending')->where('volume_id',$volume_id)->where('filename',$next_page->filename)->exists()){
+                    $hasAction = 1;
+                }
+            }
             $code=200;
-            $url = route('file-manager.showImage',['type'=>$type,'page_id'=>$next_page]);
+            $url = route('file-manager.showImage',['volume_id'=>$volume_id,'type'=>$type,'fileName'=>$next_page->filename]);
         }
 
         return response()->json(['src' => $url,'hasAction'=> $hasAction,'code' => $code]);
     }
 
     public function downloadFile(Request $request){
+        ini_set('max_execution_time', 300); 
         $pathFolderDownload = $request->dir.'/';
         $arrayFileName = explode(',',$request->filenames);
         $filesDown = collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('basename',$arrayFileName);
     
         if(count($filesDown) > 1){
             $zip = new ZipArchive();
-            $zipFileName = config('lfm.public_dir').'download.zip'; 
+            $zipFileName = 'download.zip'; 
             if ($zip->open(config('filesystems.disks.private.root').'/'.$zipFileName, ZipArchive::CREATE) === TRUE)
             {   
                 foreach ($filesDown as $key => $value) {

@@ -89,6 +89,7 @@ class PageController extends Controller
     public function addTask(Request $request,$idVolume){
         DB::beginTransaction();
         try{
+        ini_set('max_execution_time', 300); 
         $volume = Volume::find($idVolume);
         if($volume->status === 'completed'){
             return redirect()->back()->withFlashWarning('The volume was completed!');
@@ -148,16 +149,20 @@ class PageController extends Controller
         // collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->where('extension','psd')->whereIn('filename',$pagesSearch);
         $filesDown = collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('filename',$pagesSearch);
         if(count($filesDown) > 1){
+            // $totalFile = count($filesDown);
+            // session()->put('process_zip', 0);
             $zip = new ZipArchive();
-            $zipFileName = config('lfm.public_dir').'download.zip';
+            $zipFileName = 'download.zip';
             if ($zip->open(config('filesystems.disks.private.root').'/'.$zipFileName, ZipArchive::CREATE) === TRUE)
             {   
                 foreach ($filesDown as $key => $value) {
                     $relativeNameInZipFile = $value['basename'];
                     $zip->addFile(config('filesystems.disks.private.root').'/'.$value['path'], $relativeNameInZipFile);
+                    // session()->put('process_zip', round((($key+1)/$totalFile),2));
                 }
                 $zip->close();
             }
+            // session()->forget('process_zip');
             DB::commit();
             return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$zipFileName);
         }else{
@@ -205,14 +210,20 @@ class PageController extends Controller
 
     public function rejectCheck(Request $request){
         try{
-            $page_id = $request->page_id;
-            $page = Page::with('volume')->find($page_id);
+            $fileName = $request->fileName;
+            $volume_id = $request->volume_id;
+            $note = $request->note;
+            $page = Page::with('volume')->where('volume_id',$volume_id)->where('filename',$fileName)->first();
             if($page instanceof Page){
-                $page->update([
+                $data = [
                     'check' => 'doing',
-                    'check_id' => auth()->id()
-                ]);
-                return response()->json();
+                    'check_id' => auth()->id(),
+                ];
+                if($note){
+                    $data['note'] = $note;
+                }
+                $page->update($data);
+                return response()->json(['code'=> 200]);
             }
         }catch(\Exception $e){
             return response()->json(['code'=> 500]);
@@ -222,8 +233,10 @@ class PageController extends Controller
     public function doneCheck(Request $request){
         DB::beginTransaction();
         try{
-            $page_id = $request->page_id;
-            $page = Page::with('volume')->find($page_id);
+            $fileName = $request->fileName;
+            $volume_id = $request->volume_id;
+
+            $page = Page::with('volume')->where('volume_id',$volume_id)->where('filename',$fileName)->first();
         if($page instanceof Page){
             $page->update([
                 'check' => 'done',
@@ -245,8 +258,16 @@ class PageController extends Controller
         }
         }catch(\Exception $e){
             DB::rollBack();
-            dd($e);
-            return response()->json(['code'=> $e]);
+            return response()->json(['code'=> 500]);
+        }
+    }
+
+    public function checkProcessZip(){
+        if(session()->has('process_zip')){
+
+            return response()->json(['process'=>session('process_zip')]);
+        }else{
+            return response()->json(['process'=> 1]);
         }
     }
 }

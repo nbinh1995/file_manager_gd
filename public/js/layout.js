@@ -1,4 +1,7 @@
 $(document).ready(function(){
+    toastr.options = {
+        "preventDuplicates": true,
+    }
     if (undefined !== window.flashSuccess) {
         toastr.success(window.flashSuccess);
     }

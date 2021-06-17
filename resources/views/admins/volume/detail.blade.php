@@ -12,7 +12,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <a href="{{route('pages.createOld',['volume' => $volume->id])}}" class="btn btn-warning btn-xs mb-1" id="old-folder">
-                                        <i class="fas fa-folder-open mr-2"></i>{{__('Old Folder')}}</a>
+                                        <i class="fas fa-folder-open mr-2"></i>{{__('Reference Folder')}}</a>
                                     <a href="{{route('pages.createRaw',['volume' => $volume->id])}}" class="btn btn-secondary btn-xs mb-1" id="raw-folder"><i
                                                 class="fas fa-folder-open mr-2"></i>{{__('Raw Folder')}}</a>
                                     @if ($volume->status === 'pending')
@@ -37,8 +37,8 @@
                                         <table id="pages-table" class="table table-bordered table-striped">
                                             <thead>
                                             <tr>
-                                                <th>ID</th>
-                                                <th>File Name</th>
+                                                {{-- <th style="width: 10px;">ID</th> --}}
+                                                <th style="width: 30px">File Name</th>
                                                 <th>Raw</th>
                                                 <th>Clean</th>
                                                 <th>Type</th>
@@ -67,7 +67,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header bg-lightblue">
-                        <h4 class="modal-title text-uppercase" id="title-show-image">ID ...</h4>
+                        <h6 class="modal-title text-uppercase " id="title-show-image">ID ...</h6>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -97,6 +97,31 @@
         <!-- /.modal -->
         <div class="image-arrow left" data-url="{{route('file-manager.showPrevImage')}}"><i class="fas fa-chevron-left"></i></div>
         <div class="image-arrow right" data-url="{{route('file-manager.showNextImage')}}"><i class="fas fa-chevron-right"></i></div>
+
+        <div class="modal fade" id="modal-note-page">
+            <div class="modal-dialog">
+                <form action="{{route('pages.rejectCheck')}}" id="reject-check-form" >
+                    <div class="modal-content">
+                            <input type="text" name="fileName" hidden>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <h4 class="text-monospace" >{{__('Note')}}</h4>
+                                    <textarea name="note" cols="30" rows="6" class="form-control"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn btn-secondary close-check" data-dismiss="modal">Close</button>
+                                <div>
+                                    <button type="submit" class="btn btn-success reject-check-submit">Submit</button>
+                                </div>
+                            </div>
+                    </div>
+                </form>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
     </div>
     <form action=""  id="page-delete" method="POST">
         {{ csrf_field() }}
@@ -108,11 +133,11 @@
     </form>
     @endif
     <div style="position: fixed; right:0; bottom: 20%; display:none" id="receive-box">
-        <form action="{{route('pages.addTask',['idVolume' => $volume->id])}}"  id="page-task" method="POST"  style="height: 50px;width: 90px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
+        <form action="{{route('pages.addTask',['idVolume' => $volume->id])}}"  id="page-task" method="POST"  style="height: 50px;width: 130px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
             {{ csrf_field() }}
-            <input type="text" hidden name="type_task">
+            <input type="text" hidden name="type_task" >
             <input type="text" hidden name="id_tasks">
-            <button type="submit" class="btn btn-sm btn-primary mr-2" id="task-btn"><i class="fas fa-upload"></i></button>
+            <button type="submit" class="btn btn-sm btn-warning mr-2" id="task-btn"><i class="fas fa-download"></i></button><span class="text-monospace text-get-task">Get Task</span>
         </form>
     </div>
 @endsection
@@ -125,7 +150,7 @@
         var volume_id_page = {{$volume->id}};
         var url_page_table = "{{route('ajaxGetPages')}}";
         var hasDownload = false;
-        var url_reject_check = "{{route('pages.rejectCheck')}}";
+        var url_check_process = "{{route('pages.checkProcessZip')}}";
         var url_done_check = "{{route('pages.doneCheck')}}";
     </script>
     @if (session()->has('path_download'))
@@ -134,7 +159,6 @@
         </script>
     @endif
     <script src="{{asset('/js/admin/pages.js')}}"></script>
-   
 
 @endpush
 
@@ -142,6 +166,30 @@
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
     <style>
+        .info-reject-check > .far{
+            display: none;
+        }
+        .info-reject-check:hover > .fas{
+            display: block;
+        }
+
+        .info-reject-check:hover > .far{
+            display: none;
+        }
+
+        .toast-center{
+            top: 50% !important;
+            transform: translateY(-50%);
+        }
+        #pages-table td {
+            padding: 0 0 0 0.5rem;
+            vertical-align: middle;
+        }
+
+        #pages-table td label{
+            margin-bottom: 0;
+        }
+
         #skeleton{
             display: none;
             overflow: hidden; 
@@ -167,5 +215,19 @@
             transform: translate3d(-30%, 0, 0); }
         100% {
             transform: translate3d(30%, 0, 0); } }
+        #task-btn + span  {
+        animation: blinker 1s linear infinite;
+        }
+        .text-get-task{
+            background: -webkit-linear-gradient(#605ca8 , #ff851b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bolder;
+        }
+        @keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+        }
     </style>
 @endpush

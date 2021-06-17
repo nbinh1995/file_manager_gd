@@ -21,6 +21,14 @@
   <link rel="stylesheet" href="{{ asset('vendor/laravel-filemanager/css/dropzone.min.css') }}">
   <link rel="stylesheet" href="{{ asset('vendor/laravel-filemanager/css/mime-icons.min.css') }}">
   <style>{!! \File::get(base_path('vendor/unisharp/laravel-filemanager/public/css/lfm.css')) !!}</style>
+  <style>
+    #uploadModal #uploadForm input[name="_token"] + div{
+        min-height: 100% !important;
+    }
+    #uploadModal #uploadForm input[name="_token"] + div{
+        min-height: 80vh !important;
+    }
+  </style>
   {{-- Use the line below instead of the above if you need to cache the css. --}}
   {{-- <link rel="stylesheet" href="{{ asset('/vendor/laravel-filemanager/css/lfm.css') }}"> --}}
 </head>
@@ -117,7 +125,7 @@
   </div>
 
   <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg" style="max-width: 95vw">
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title" id="myModalLabel">{{ trans('laravel-filemanager::lfm.title-upload') }}</h4>

@@ -17,8 +17,10 @@ $(document).ready(function(event){
         // responsive: true,
         searching: true,
         destroy: true,
-        order: [[1, 'desc']],
+        order: [[0, 'asc']],
         bAutoWidth: false,
+        lengthMenu: [ 50, 100, 200 ],
+        pageLength:200,
         ajax: {
             url: url_page_table,
             method: 'post',
@@ -28,16 +30,8 @@ $(document).ready(function(event){
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
             },
-            dataSrc:function ( json ) {
-                if(hasDownload){
-                    hasDownload = false;
-                    $('#page-download').trigger('submit');
-                } 
-                return json.data;
-            }
         },
         columns: [
-            {data: 'id'},
             {data: 'filename'},
             {data: 'raw'},
             {data: 'clean'},
@@ -47,8 +41,15 @@ $(document).ready(function(event){
             {data: 'Action'},
         ],
         columnDefs: [
-            {targets: 7, searchable: false, orderable: false},
+            {targets: 6, searchable: false, orderable: false},
         ],
+        drawCallback: function( settings ) {
+            if(hasDownload){
+                hasDownload = false;
+                $('#page-download').trigger('submit');
+            } 
+            $('[data-toggle="popover"]').popover(); 
+        }
     });
     $('html body').on('click', '.delete', function(event){
         event.preventDefault();
@@ -152,6 +153,7 @@ $(document).ready(function(event){
     }
     $(document).on('click','#task-btn',function(e){
         e.preventDefault();
+        // setInterval(checkProcess, 5000);
         $(this).attr('disabled', true).html('<i class="fas fa-sync fa-spin"></i>');
         var role = sessionStorage.getItem('authRole').toLowerCase();
         var task_id = '.'+role+'-task-id:checked';
@@ -180,7 +182,7 @@ $(document).ready(function(event){
             var url = $(this).data('url');
             $('#modal-show-images').find('img').attr('src',url);
             $('#title-show-image').text('');
-            $('#title-show-image').text(type+ ' ID:');
+            $('#title-show-image').text(type+ ': ');
             loading(true);
             if(type === 'sfx' && role === 'check' && $(this).closest('td').next().find('label').text() == 'Pending'){
                 $('#modal-show-images').find('img').data('hasAction','1');
@@ -208,15 +210,23 @@ $(document).ready(function(event){
     $('.image-arrow.left').on('click',function(e){
         if(flagShow){
         var url = $(this).data('url');
-        var page_id = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('page_id');
+        var fileName = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('fileName');
         var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
 
-        fetchData({type:type,page_id:page_id,volume_id:volume_id_page},url,'GET',loading(true)).done(function(data){
+        fetchData({type:type,fileName:fileName,volume_id:volume_id_page},url,'GET',loading(true)).done(function(data){
             if(data.code === 200){
                 $('#modal-show-images').find('img').data('hasAction',data.hasAction);
                 $('#modal-show-images').find('img').attr('src',data.src);
             }else{
+                toastr.options = {
+                    "positionClass": "toast-top-center toast-center",
+                    "preventDuplicates": true,
+                }
                 toastr.warning("Not Found!")
+                toastr.options = {
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": true,
+                }
                 loading(false);
             }
         }).fail(function(){
@@ -229,15 +239,23 @@ $(document).ready(function(event){
     $('.image-arrow.right').on('click',function(e){
         if(flagShow){
         var url = $(this).data('url');
-        var page_id = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('page_id');
+        var fileName = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('fileName');
         var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
 
-        fetchData({type:type,page_id:page_id,volume_id:volume_id_page},url,'GET',loading(true)).done(function(data){
+        fetchData({type:type,fileName:fileName,volume_id:volume_id_page},url,'GET',loading(true)).done(function(data){
             if(data.code === 200){
                 $('#modal-show-images').find('img').data('hasAction',data.hasAction);
                 $('#modal-show-images').find('img').attr('src',data.src);
             }else{
+                toastr.options = {
+                    "positionClass": "toast-top-center toast-center",
+                    "preventDuplicates": true,
+                }
                 toastr.warning("Not Found!");
+                toastr.options = {
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": true,
+                }
                 loading(false);
             }
         }).fail(function(){
@@ -261,10 +279,10 @@ $(document).ready(function(event){
 
     $('#image-page-show').on('load',function(){
         var role = sessionStorage.getItem('authRole').toLowerCase();
-        var page_id = (new URL($(this).attr('src'))).searchParams.get('page_id');
+        var fileName = (new URL($(this).attr('src'))).searchParams.get('fileName');
         var textHead = $('#title-show-image').text().split(':');
         $('#title-show-image').text('');
-        $('#title-show-image').text(textHead[0]+': '+page_id);
+        $('#title-show-image').text(textHead[0]+': '+fileName);
         if($(this).data('hasAction') == 1 && role === 'check'){
             $('#action-check').show();
         }else{
@@ -276,11 +294,26 @@ $(document).ready(function(event){
 
     $('.reject-check').on('click',function(e){
         var role = sessionStorage.getItem('authRole').toLowerCase();
-        var page_id = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('page_id');
+        var fileName = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('fileName');
         var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
         if(type === 'SFX' && role === 'check'){
-            fetchData({page_id:page_id},url_reject_check,'GET',loadingCheck(true)).done(function(data){
-                $('.image-arrow.left:visible').trigger('click');
+            $('#reject-check-form').find('[name=note]').val('');
+            $('#reject-check-form').find('[name=fileName]').val(fileName);
+            $('#modal-note-page').modal('show');
+        }else{
+            toastr.error("Roles user or file is not correct!");
+        }
+    })
+
+    $('.done-check').on('click',function(e){
+        var role = sessionStorage.getItem('authRole').toLowerCase();
+        var fileName = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('fileName');
+        var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
+        if(type === 'SFX' && role === 'check'){
+            fetchData({fileName:fileName,volume_id:volume_id_page},url_done_check,'GET',loadingCheck(true)).done(function(data){
+                if(data.code == 200){
+                    $('.image-arrow.right:visible').trigger('click');
+                }
             }).fail(function(){
                 toastr.error("There were errors. Please try again.");
             });
@@ -289,19 +322,19 @@ $(document).ready(function(event){
         }
     })
 
-    $('.done-check').on('click',function(e){
-        var role = sessionStorage.getItem('authRole').toLowerCase();
-        var page_id = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('page_id');
-        var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
-        if(type === 'SFX' && role === 'check'){
-            fetchData({page_id:page_id},url_done_check,'GET',loadingCheck(true)).done(function(data){
-                $('.image-arrow.left:visible').trigger('click');
+    $('#reject-check-form').on('submit',function(e){
+        e.preventDefault();
+        var fileName = $(this).find('[name=fileName]').val();
+        var note = $(this).find('[name=note]').val();
+        var url_reject_check = $(this).attr('action');
+        $('#modal-note-page').modal('hide');
+        fetchData({fileName:fileName,volume_id:volume_id_page,note:note},url_reject_check,'GET',loadingCheck(true)).done(function(data){
+            if(data.code == 200){
+                $('.image-arrow.right:visible').trigger('click');
+            }
             }).fail(function(){
                 toastr.error("There were errors. Please try again.");
             });
-        }else{
-            toastr.error("Roles user or file is not correct!");
-        }
     })
 
     function loadingCheck(status){
@@ -316,4 +349,10 @@ $(document).ready(function(event){
             $('#modal-show-images').find('.done-check').prop('disabled',false);
         }
     }
+
+    // function checkProcess(){
+    //     fetchData({},url_check_process,'GET').done(function(data){
+    //         console.log(data)
+    //     })
+    // }
 });

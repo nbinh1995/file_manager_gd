@@ -60,21 +60,21 @@ class BookController extends Controller
      */
     public function store(BookRequest $request)
     {
-        // dd(Storage::disk(config('lfm.disk')));
         try{
             $data = [
                 'filename' => $request->filename,
-                'path' => config('lfm.public_dir').$request->filename
+                'path' => config('lfm.public_dir'). convert_name($request->filename)
             ];
             $book = Book::create($data);
             if($book instanceof Book){
-                // if(!File::exists(config('filesystems.disks.private.root').'/files')){
-                //     File::makeDirectory(config('filesystems.disks.private.root').'/files',0777);
-                // }
-                // if(!File::exists(config('filesystems.disks.private.root').'/files/shares')){
-                //     File::makeDirectory(config('filesystems.disks.private.root').'/files/shares',0777);
-                // }
-                File::makeDirectory(config('filesystems.disks.private.root').'/'.$book->path,0777,true,true);
+                if(!File::exists(config('filesystems.disks.private.root').'/files')){
+                    File::makeDirectory(config('filesystems.disks.private.root').'/files',0777);
+                }
+                if(!File::exists(config('filesystems.disks.private.root').'/files/shares')){
+                    File::makeDirectory(config('filesystems.disks.private.root').'/files/shares',0777);
+                }
+                
+                File::makeDirectory(config('filesystems.disks.private.root').'/'.$book->path,0777,true);
                 return redirect()->route('books.index')->withFlashSuccess('The Book Added Success');
             }
         }catch(\Exception $e){

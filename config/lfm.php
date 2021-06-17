@@ -37,7 +37,7 @@ return [
         'type'=>'Type',
         'sfx'=>'SFX',
         'check'=>'Check',
-        'old' => 'Old',
+        'old' => 'Reference',
     ],
     'volume' => [
         'raw'=>'Raw',

@@ -22,6 +22,9 @@ class VolumeController extends Controller
     public function ajaxGetVolumes(){
         $eloquent = Volume::leftJoin('books','volumes.book_id','books.id')->select('volumes.id','volumes.filename','volumes.status','books.filename as bookname');
         return DataTables::eloquent($eloquent)
+            ->editColumn('filename', function ($volume) {
+                return '<a href="'.route('volumes.detail',['id'=>$volume->id]).'">'.$volume->filename.'</a>';
+            })
             ->editColumn('status', function ($volume) {
                 return '<span class="badge badge-primary py-1 px-2">'.$volume->status.'</span>';
             })
@@ -33,7 +36,7 @@ class VolumeController extends Controller
                 }
                 return $btn;
             })
-            ->rawColumns(['Action', 'status'])
+            ->rawColumns(['Action', 'status','filename'])
             ->toJson();
     }
 
@@ -52,7 +55,7 @@ class VolumeController extends Controller
                 'filename' => $request->filename,
                 'book_id' => $request->book_id
             ];
-            $data['path'] = Book::find($request->book_id)->path.'/'.$request->filename;
+            $data['path'] = Book::find($request->book_id)->path.'/'.convert_name($request->filename);
             $volume = Volume::create($data);
             if($volume instanceof Volume){
                 // File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path,0777);
