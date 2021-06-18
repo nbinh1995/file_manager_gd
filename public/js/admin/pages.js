@@ -319,7 +319,7 @@ $(document).ready(function(event){
             $('#title-show-image').text('');
             $('#title-show-image').text(type+ ': ');
             loading(true);
-            if(type === 'sfx' && role === 'check' && $(this).closest('td').next().find('label').text() == 'Pending'){
+            if(type === 'sfx' && role === 'check'){
                 $('#modal-show-images').find('img').data('hasAction','1');
             }else{
                 $('#modal-show-images').find('img').data('hasAction','0');

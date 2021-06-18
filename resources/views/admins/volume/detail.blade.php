@@ -192,6 +192,10 @@
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
     <style>
+        #image-page-show {
+            width: 100%; 
+            height:auto
+        }
         .image-page-show {
             display:none; 
             width: 100%; 
