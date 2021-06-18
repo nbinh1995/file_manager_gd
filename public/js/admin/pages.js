@@ -36,13 +36,14 @@ $(document).ready(function(event){
             },
             columns: [
                 {data: 'id'},
-                {data: 'filename'},
+                {data: 'filename',orderData:[8]},
                 {data: 'raw'},
                 {data: 'clean'},
                 {data: 'type'},
                 {data: 'sfx'},
                 {data: 'check'},
                 {data: 'Action'},
+                {data: 'id_filename', visible: false},
             ],
             columnDefs: [
                 {targets: 0, searchable: false, orderable: false},
@@ -79,21 +80,21 @@ $(document).ready(function(event){
         });
     });
     $(document).on('keydown',function(e){
-        if(e.keyCode === 16){
+        if(e.key === 'Shift'){
             flagShift =true;
         }
         if($('#modal-show-images').is(':visible')){
-            if(e.keyCode === 37){
+            if(e.key === 'ArrowLeft'){
                 $('.image-arrow.left:visible').trigger('click');
             }
-            if(e.keyCode === 39){
+            if(e.key === 'ArrowRight'){
                 $('.image-arrow.right:visible').trigger('click');
             }
         }
     });
 
     $(document).on('keyup',function(e){
-        if(e.keyCode === 16){
+        if(e.key === 'Shift'){
             flagShift =false;
         }
     });
@@ -417,7 +418,7 @@ $(document).ready(function(event){
         var textHead = $('#title-show-image').text().split(':');
         $('#title-show-image').text('');
         $('#title-show-image').text(textHead[0]+': '+fileName);
-        if($(this).data('hasAction') == 1 && role === 'check'){
+        if(($(this).data('hasAction') == 1 || $(this).data('hasAction') == 0)&& role === 'check'){
             $('#action-check').show();
         }else{
             $('#action-check').hide();

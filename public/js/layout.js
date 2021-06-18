@@ -1,6 +1,7 @@
 $(document).ready(function(){
     toastr.options = {
         "preventDuplicates": true,
+        "positionClass": "toast-top-center",
     }
     if (undefined !== window.flashSuccess) {
         toastr.success(window.flashSuccess);
@@ -26,6 +27,9 @@ $(document).ready(function(){
     $('#auth-role').on('change',function(e){
         setRoleUser(); 
         $('.task-checkbox').prop('checked',false);
+        $('#undo-box').hide();
+        $('#download-box').hide();
+        $('#receive-box').hide();
     })
     function setRoleUser(){
         // Save data to sessionStorage

@@ -109,6 +109,9 @@ class IsUploadingImageListener
                         }
                     break;
                     default:
+                    if(preg_match('/^[\d]{1,3}$/', $filename) == 0){
+                        throw new \Exception('The file name is numeric');
+                    }
                     if(!($page instanceof Page) && $type === 'raw'){
                         Page::create([
                             'filename' => $filename,

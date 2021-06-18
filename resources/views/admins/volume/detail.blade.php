@@ -87,6 +87,7 @@
                             </div>
                         </div>
                         <img src="" alt="" id="image-page-show" style="width: 100%; height:auto">
+                        <img src="" alt="" id="image-buffer-show" style="display:none; width: 100%; height:auto">
                     </div>
                     <div class="modal-footer justify-content-between" id="action-check" style="display: none">
                         <button type="button" class="btn btn-secondary close-check" data-dismiss="modal">Close</button>
@@ -138,7 +139,7 @@
         {{ csrf_field() }}
         {{ method_field('delete') }}
     </form>
-    <div style="position: fixed; right:0; bottom: 28%; display:none" id="download-box">
+    <div style="position: fixed; right:0; bottom: 28%; display:none;z-index: 9999;" id="download-box">
         <form action="{{route('pages.downTask',['idVolume' => $volume->id])}}"  id="download-page-task" method="POST"  style="height: 50px;width: 130px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
             {{ csrf_field() }}
             <input type="text" hidden name="id_tasks"> 
@@ -146,7 +147,7 @@
             <button type="submit" class="btn btn-sm btn-primary mr-2" id="download-task-btn" title="Get Task"><i class="fas fa-download"></i></button><span class="text-monospace text-get-task">Download File</span>
         </form>
     </div>
-    <div style="position: fixed; right:0; bottom: 20%; display:none" id="receive-box">
+    <div style="position: fixed; right:0; bottom: 20%; display:none;z-index: 9999;" id="receive-box">
         <form action="{{route('pages.addTask',['idVolume' => $volume->id])}}"  id="page-task" method="POST"  style="height: 50px;width: 130px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
             {{ csrf_field() }}
             <input type="text" hidden name="type_task" >
@@ -154,7 +155,7 @@
             <button type="submit" class="btn btn-sm btn-warning mr-2" id="task-btn" title="Get Task"><i class="fas fa-shopping-basket"></i></button><span class="text-monospace text-get-task">Get Task</span>
         </form>
     </div>
-    <div style="position: fixed; right:0; bottom: 12%; display:none" id="undo-box">
+    <div style="position: fixed; right:0; bottom: 12%; display:none;z-index: 9999;" id="undo-box">
         <form action="{{route('pages.undoTask',['idVolume' => $volume->id])}}"  id="undo-page-task" method="POST"  style="height: 50px;width: 130px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
             {{ csrf_field() }}
             <input type="text" hidden name="type_task" >

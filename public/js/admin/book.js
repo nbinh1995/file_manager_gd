@@ -35,7 +35,7 @@ $(document).ready(function(){
         }).then((result) => {
             if (result.value) {
                 $("#book-delete").attr('action',$(this).attr('data-url'));
-                $("#book-delete").trigger('submit');
+                $('#password-again-book').modal('show');
             }
         });
     });

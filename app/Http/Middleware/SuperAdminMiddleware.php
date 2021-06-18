@@ -16,7 +16,7 @@ class SuperAdminMiddleware
     public function handle($request, Closure $next)
     {
         if (!(auth()->check() && auth()->id() === 1)) {
-            return redirect()->route('home');
+            return redirect()->route('home')->withFlashDanger('Permission not granted');
         }
         return $next($request);
     }

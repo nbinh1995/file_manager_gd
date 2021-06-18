@@ -23,7 +23,7 @@
   <style>{!! \File::get(base_path('vendor/unisharp/laravel-filemanager/public/css/lfm.css')) !!}</style>
   <style>
     #uploadModal #uploadForm input[name="_token"] + div{
-        min-height: 100% !important;
+        min-height: 80vh !important;
     }
     #uploadModal #uploadForm {
         min-height: 80vh !important;

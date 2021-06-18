@@ -36,7 +36,7 @@ $(document).ready(function(){
         }).then((result) => {
             if (result.value) {
                 $("#volume-delete").attr('action',$(this).attr('data-url'));
-                $("#volume-delete").trigger('submit');
+                $('#password-again-volume').modal('show');
             }
         });
     });

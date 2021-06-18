@@ -68,7 +68,7 @@ return [
     'folder_categories'        => [
         'file'  => [
             'folder_name'  => 'files',
-            'startup_view' => 'grid',
+            'startup_view' => 'list',
             'max_size'     => 1000000, // size in KB
             'valid_mime'   => [
                 // 'image/jpeg',

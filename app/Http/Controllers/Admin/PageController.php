@@ -17,7 +17,7 @@ class PageController extends Controller
 {
     public function ajaxGetPages(Request $request){
         $volume = $request->volume;
-        $eloquent = Page::with(['rawUser','cleanUser','typeUser','sfxUser','checkUser'])->where('volume_id',$request->volume);
+        $eloquent = Page::with(['rawUser','cleanUser','typeUser','sfxUser','checkUser'])->where('volume_id',$request->volume)->selectRaw('*,CAST( filename AS unsigned) AS id_filename ');
         return DataTables::eloquent($eloquent)
             ->editColumn('id', function ($page) use ($request) {
                 $column = $request->type_down ?? 'raw';

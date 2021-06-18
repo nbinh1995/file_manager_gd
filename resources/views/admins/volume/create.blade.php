@@ -23,7 +23,7 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="form-group">
-                                            <label >{{__('Chọn đường dẫn thư mục cần tạo')}}</label>
+                                            <label >{{__('Please Choose Book:')}}</label>
                                                 <select name="book_id"  class="form-control" id="select2">
                                                     <option value=""></option>
                                                     @foreach ($books as $book)
@@ -35,7 +35,7 @@
                                         <label class="text-danger">{{$errors->get('book_id')[0]}}</label>
                                         @endif
                                         <div class="form-group">
-                                            <label >{{__('Tên thư mục được')}}</label>
+                                            <label >{{__('Volume Name')}}</label>
                                             <input type="text" name="filename" value="{{old('filename')}}" class="form-control" placeholder="Folder Name">
                                         </div>
                                         @if($errors->has('filename'))

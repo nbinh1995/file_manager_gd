@@ -20,7 +20,7 @@
                             <div class="row">
                                 <div class="col-6">
                                     <div class="form-group">
-                                        <label >{{__('Tên thư mục')}}</label>
+                                        <label >{{__('Book Name')}}</label>
                                         <input type="text" name="filename" value="{{old('filename')}}" class="form-control" placeholder="Folder Name">
                                     </div>
                                     @if($errors->has('filename'))
