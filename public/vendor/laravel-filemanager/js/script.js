@@ -353,7 +353,7 @@ function loadItems() {
             var image = $('<div>').css('background-image', 'url("' + item.thumb_url + '?timestamp=' + item.time + '")');
           } else {
             if(item.name.search('psd') !== -1){
-              image = $('<div>').css('background-image', 'url("' + location.origin+'/manga/vendor/laravel-filemanager/img/psd.png")');
+              var image = $('<div>').css('background-image', 'url("' + location.origin+'/manga/vendor/laravel-filemanager/img/psd.png")');
             }else{
               image = $('<div>').css('background-image', 'url("' + location.origin+'/manga/vendor/laravel-filemanager/img/image.png")');
             }
@@ -456,9 +456,9 @@ function resize(item) {
 function download(items) {
   // console.log(items)
   loading(true);
-  var dir = '/files'+(new URL(location.href)).searchParams.get('dir');
+  var dir = getDir(items[0]);
   var filenames = items.map(function(item){
-    return item['name'];
+    return item.name;
   }).join(',');
   $('#custom-download-file').find('[name=dir]').val(dir);
   $('#custom-download-file').find('[name=filenames]').val(filenames);
@@ -495,16 +495,25 @@ function preview(items) {
   items.forEach(function (item, index) {
     var carouselItem = imageTemplate.clone()
       .addClass(index === 0 ? 'active' : '');
-
-    if (item.thumb_url) {
-      carouselItem.find('.carousel-image').css('background-image', 'url(\'' + item.url + '?timestamp=' + item.time + '\')');
-    } else {
-      carouselItem.find('.carousel-image').css('width', '50vh').append($('<div>').addClass('mime-icon ico-' + item.icon));
-    }
-
-    carouselItem.find('.carousel-label').attr('target', '_blank').attr('href', item.url)
-      .append(item.name)
-      .append($('<i class="fas fa-external-link-alt ml-2"></i>'));
+      if (!(item.is_file && item.is_image)) {
+        carouselItem.find('.carousel-image').css('background-image', 'url(\'' + item.url + '?timestamp=' + item.time + '\')');
+      } else {
+        var leftItem = ' <div class="image-arrow left"><i class="fas fa-chevron-left"></i></div>';
+        var rightItem = '<div class="image-arrow right"><i class="fas fa-chevron-right"></i></div>';
+        var streamUrlImage = url_show_manager+'?filename='+encodeURI(item.url.replace((location.origin+'/manga/storage'),''));
+        carouselItem.append(leftItem).append(rightItem);
+        carouselItem.find('.carousel-image').css('background-image', 'url("' + streamUrlImage +'")').css('height','90vh');
+        carouselItem.find('.carousel-label').attr('target', '_blank').attr('href', streamUrlImage)
+        .append('<span class="carousel-item-name">'+item.name+'</span>')
+        .append($('<i class="fas fa-external-link-alt ml-2"></i>'));
+        // var icon = $('<div>').addClass('ico');
+        // var image = $('<div>').addClass('mime-icon ico-' + item.icon).append(icon);
+      }
+    // if (item.thumb_url) {
+    //   carouselItem.find('.carousel-image').css('background-image', 'url(\'' + item.url + '?timestamp=' + item.time + '\')');
+    // } else {
+    //   carouselItem.find('.carousel-image').css('width', '50vh').append($('<div>').addClass('mime-icon ico-' + item.icon));
+    // }
 
     carousel.children('.carousel-inner').append(carouselItem);
 
@@ -699,3 +708,68 @@ function dialog(title, value, callback) {
   });
   $('#dialog').modal('show').find('.modal-title').text(title);
 }
+$(document).on('click','.image-arrow.left',function(e){
+  e.preventDefault();
+  var currentName = $(this).closest('.carousel-item').find('a.carousel-label .carousel-item-name').text();
+  var prevIndex = -1;
+  var dir = getDir(items[0]);
+ 
+  items.forEach(function(value,index){
+      if(value.name == currentName){
+          prevIndex = index -1;
+          return false;
+      }
+  });
+  
+  if(prevIndex !== -1){
+    var streamUrlImage = url_show_manager+'?filename='+encodeURI(items[prevIndex].url.replace((location.origin+'/manga/storage'),''));
+    $(this).closest('.carousel-item').find('a.carousel-label').attr('href',streamUrlImage);
+    $(this).closest('.carousel-item').find('a.carousel-label .carousel-item-name').text(items[prevIndex].name);
+    $(this).closest('.carousel-item').find('.carousel-image').css('background-image', 'url("' + streamUrlImage +'")').css('height','90vh');
+  }else{
+
+  }
+})
+$(document).on('click','.image-arrow.right',function(e){
+  e.preventDefault();
+  var currentName = $(this).closest('.carousel-item').find('a.carousel-label .carousel-item-name').text();
+  var nextIndex = items.length;
+  var dir = getDir(items[0]);
+ 
+  items.forEach(function(value,index){
+      if(value.name == currentName){
+        nextIndex = index + 1;
+        return false
+      }
+  });
+  if(nextIndex !== items.length){
+    var streamUrlImage = url_show_manager+'?filename='+encodeURI(items[nextIndex].url.replace((location.origin+'/manga/storage'),''));
+    $(this).closest('.carousel-item').find('a.carousel-label').attr('href',streamUrlImage);
+    $(this).closest('.carousel-item').find('a.carousel-label .carousel-item-name').text(items[nextIndex].name);
+    $(this).closest('.carousel-item').find('.carousel-image').css('background-image', 'url("' + streamUrlImage +'")').css('height','90vh');
+  }else{
+
+  }
+})
+
+function getDir(item){
+  var item_url = item.url;
+  var item_name = item.name;
+  var dir = item_url.replace((location.origin+'/manga/storage'),'').replace(item_name,'');
+  return dir;
+}
+
+$(document).on('keydown',function(e){
+  if($('#notify').is(':visible')){
+      if(e.keyCode === 37){
+          $('.image-arrow.left:visible').trigger('click');
+      }
+      if(e.keyCode === 39){
+          $('.image-arrow.right:visible').trigger('click');
+      }
+  }
+});
+
+$(document).on('keyup',function(e){
+  
+});

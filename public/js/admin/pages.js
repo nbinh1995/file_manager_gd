@@ -11,46 +11,58 @@ $(document).ready(function(event){
             beforeSend: beforeSend,
         });
     };
-    var pageTable = $('#pages-table').DataTable({
-        processing: true,
-        serverSide: true,
-        // responsive: true,
-        searching: true,
-        destroy: true,
-        order: [[0, 'asc']],
-        bAutoWidth: false,
-        lengthMenu: [ 50, 100, 200 ],
-        pageLength:200,
-        ajax: {
-            url: url_page_table,
-            method: 'post',
-            data:{
-                volume:volume_id_page
+
+    function configDataTable(){
+    return $('#pages-table').DataTable({
+            processing: true,
+            serverSide: true,
+            // responsive: true,
+            searching: true,
+            destroy: true,
+            order: [[1, 'asc']],
+            bAutoWidth: false,
+            lengthMenu: [ 50, 100, 200 ],
+            pageLength:200,
+            ajax: {
+                url: url_page_table,
+                method: 'post',
+                data:{
+                    volume:volume_id_page,
+                    type_down: $('#type_down').val()
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                },
             },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-            },
-        },
-        columns: [
-            {data: 'filename'},
-            {data: 'raw'},
-            {data: 'clean'},
-            {data: 'type'},
-            {data: 'sfx'},
-            {data: 'check'},
-            {data: 'Action'},
-        ],
-        columnDefs: [
-            {targets: 6, searchable: false, orderable: false},
-        ],
-        drawCallback: function( settings ) {
-            if(hasDownload){
-                hasDownload = false;
-                $('#page-download').trigger('submit');
-            } 
-            $('[data-toggle="popover"]').popover(); 
-        }
-    });
+            columns: [
+                {data: 'id'},
+                {data: 'filename'},
+                {data: 'raw'},
+                {data: 'clean'},
+                {data: 'type'},
+                {data: 'sfx'},
+                {data: 'check'},
+                {data: 'Action'},
+            ],
+            columnDefs: [
+                {targets: 0, searchable: false, orderable: false},
+                {targets: 7, searchable: false, orderable: false},
+            ],
+            drawCallback: function( settings ) {
+                if(hasDownload){
+                    hasDownload = false;
+                    $('#page-download').trigger('submit');
+                } 
+                $('[data-toggle="popover"]').popover(); 
+            }
+        });
+    }
+
+    var pageTable = configDataTable();
+    $('#type_down').on('change',function(e){
+        e.preventDefault();
+        pageTable = configDataTable();
+    })
     $('html body').on('click', '.delete', function(event){
         event.preventDefault();
         Swal.fire({
@@ -90,10 +102,64 @@ $(document).ready(function(event){
     checkRoleTask('clean');
     checkRoleTask('type');
     checkRoleTask('sfx');
-    checkRoleTask('check');
+    // checkRoleTask('check');
     
+    $(document).on('click','.download-page-id',function(e){
+        var current = this;
+            if($('.pending-task:checked').length > 0){
+                $('.pending-task').prop('checked',false);
+                $('#receive-box').hide();
+            }
+            if($('.doing-task:checked').length > 0){
+                $('.doing-task').prop('checked',false);
+                $('#undo-box').hide();
+            }
+            if($('.download-page-id:checked').length > 0){
+                $('#download-box').show();
+                if(flagShift){
+                    var firstValue = 0;
+                    var lastValue = 0;
+                    $('.download-page-id').each(function(index,ele){
+                        if($(ele).val() == $('.download-page-id:checked').first().val()){
+                            firstValue = index;
+                        }
+                        if($(ele).val() == $(current).val()){
+                            lastValue = index;
+                        }
+                    });
+                    if(firstValue < lastValue){
+                        for(var i = firstValue ; i < lastValue ; i++){
+                            $($('.download-page-id')[i]).prop('checked',true);
+                        }
+                    }else{
+                        for(var i = lastValue ; i < firstValue ; i++){
+                            $($('.download-page-id')[i]).prop('checked',true);
+                        }
+                    }
+                }
+            }else{
+                $('#download-box').hide();
+            }
+    })
+
+    $(document).on('click','#download-task-btn',function(e){
+        e.preventDefault();
+        $(this).attr('disabled', true).html('<i class="fas fa-sync fa-spin"></i>');
+        var role = $('#type_down').val();
+        var arrayIDTask = [];
+        $('.download-page-id:checked').each(function(key, ele){
+            arrayIDTask.push($(ele).val());
+        })
+        
+        $('#download-page-task [name=id_tasks]').val(arrayIDTask.join(','));
+        $('#download-page-task [name=type_task]').val(role);
+
+        $('#download-page-task').trigger('submit');
+    });
+
     function checkRoleTask(type){
         var task_id = '.'+type+'-task-id';
+        var undo_task_id = '.'+type+'-undo-task';
         $(document).on('click',task_id,function(e){
             var current = this;
             var role = sessionStorage.getItem('authRole').toLowerCase();
@@ -102,6 +168,14 @@ $(document).ready(function(event){
                 e.stopPropagation();
                 toastr.warning("The User's Role is not '"+type+"'")
             }else{
+                if($('.download-page-id:checked').length > 0){
+                    $('.download-page-id').prop('checked',false);
+                    $('#download-box').hide();
+                }
+                if($('.doing-task:checked').length > 0){
+                    $('.doing-task').prop('checked',false);
+                    $('#undo-box').hide();
+                }
                 if($(task_id+':checked').length > 0){
                     $('#receive-box').show();
                     if(flagShift){
@@ -131,7 +205,50 @@ $(document).ready(function(event){
                 }
             }
         })
-
+        $(document).on('click',undo_task_id,function(e){
+            var current = this;
+            var role = sessionStorage.getItem('authRole').toLowerCase();
+            if(role !== type){
+                e.preventDefault();
+                e.stopPropagation();
+                toastr.warning("The User's Role is not '"+type+"'")
+            }else{
+                if($('.download-page-id:checked').length > 0){
+                    $('.download-page-id').prop('checked',false);
+                    $('#download-box').hide();
+                }
+                if($('.pending-task:checked').length > 0){
+                    $('.pending-task').prop('checked',false);
+                    $('#receive-box').hide();
+                }
+                if($(undo_task_id+':checked').length > 0){
+                    $('#undo-box').show();
+                    if(flagShift){
+                        var firstValue = 0;
+                        var lastValue = 0;
+                        $(undo_task_id).each(function(index,ele){
+                            if($(ele).val() == $(undo_task_id+':checked').first().val()){
+                                firstValue = index;
+                            }
+                            if($(ele).val() == $(current).val()){
+                                lastValue = index;
+                            }
+                        });
+                        if(firstValue < lastValue){
+                            for(var i = firstValue ; i < lastValue ; i++){
+                                $($(undo_task_id)[i]).prop('checked',true);
+                            }
+                        }else{
+                            for(var i = lastValue ; i < firstValue ; i++){
+                                $($(undo_task_id)[i]).prop('checked',true);
+                            }
+                        }
+                    }
+                }else{
+                    $('#undo-box').hide();
+                }
+            }
+        })
     }
 
     checkRoleFolder('raw');
@@ -166,6 +283,23 @@ $(document).ready(function(event){
         $('#page-task [name=type_task]').val(role);
 
         $('#page-task').trigger('submit');
+    });
+
+    $(document).on('click','#undo-task-btn',function(e){
+        e.preventDefault();
+        // setInterval(checkProcess, 5000);
+        $(this).attr('disabled', true).html('<i class="fas fa-sync fa-spin"></i>');
+        var role = sessionStorage.getItem('authRole').toLowerCase();
+        var undo_task_id = '.'+role+'-undo-task:checked';
+        var arrayIDTask = [];
+        $(undo_task_id).each(function(key, ele){
+            arrayIDTask.push($(ele).val());
+        })
+        
+        $('#undo-page-task [name=id_tasks]').val(arrayIDTask.join(','));
+        $('#undo-page-task [name=type_task]').val(role);
+
+        $('#undo-page-task').trigger('submit');
     });
 
     showImages('raw');
@@ -343,6 +477,8 @@ $(document).ready(function(event){
             $('#modal-show-images').find('.close-check').prop('disabled',true);
             $('#modal-show-images').find('.reject-check').prop('disabled',true);
             $('#modal-show-images').find('.done-check').prop('disabled',true);
+            $('#skeleton').show();
+            $('#image-page-show').hide();
         }else{
             $('#modal-show-images').find('.close-check').prop('disabled',false);
             $('#modal-show-images').find('.reject-check').prop('disabled',false);

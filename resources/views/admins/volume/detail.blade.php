@@ -37,7 +37,13 @@
                                         <table id="pages-table" class="table table-bordered table-striped">
                                             <thead>
                                             <tr>
-                                                {{-- <th style="width: 10px;">ID</th> --}}
+                                                <th style="width: 10px;"> 
+                                                    <select name="type_down" id="type_down" class="border" style="outline: none">
+                                                    @foreach (config('lfm.volume') as $key => $item)
+                                                        <option value="{{$item}}">{{$item}}</option>
+                                                    @endforeach 
+                                                    </select>
+                                                </th>
                                                 <th style="width: 30px">File Name</th>
                                                 <th>Raw</th>
                                                 <th>Clean</th>
@@ -123,21 +129,37 @@
         </div>
         <!-- /.modal -->
     </div>
-    <form action=""  id="page-delete" method="POST">
-        {{ csrf_field() }}
-        {{ method_field('delete') }}
-    </form>
     @if(session()->has('path_download'))
     <form action="{{route('pages.downloadFile')}}"  id="page-download">
         <input type="text" name="path_download" hidden value="{{session('path_download')}}">
     </form>
     @endif
+    <form action=""  id="page-delete" method="POST">
+        {{ csrf_field() }}
+        {{ method_field('delete') }}
+    </form>
+    <div style="position: fixed; right:0; bottom: 28%; display:none" id="download-box">
+        <form action="{{route('pages.downTask',['idVolume' => $volume->id])}}"  id="download-page-task" method="POST"  style="height: 50px;width: 130px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
+            {{ csrf_field() }}
+            <input type="text" hidden name="id_tasks"> 
+            <input type="text" hidden name="type_task" >
+            <button type="submit" class="btn btn-sm btn-primary mr-2" id="download-task-btn" title="Get Task"><i class="fas fa-download"></i></button><span class="text-monospace text-get-task">Download File</span>
+        </form>
+    </div>
     <div style="position: fixed; right:0; bottom: 20%; display:none" id="receive-box">
         <form action="{{route('pages.addTask',['idVolume' => $volume->id])}}"  id="page-task" method="POST"  style="height: 50px;width: 130px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
             {{ csrf_field() }}
             <input type="text" hidden name="type_task" >
             <input type="text" hidden name="id_tasks">
-            <button type="submit" class="btn btn-sm btn-warning mr-2" id="task-btn"><i class="fas fa-download"></i></button><span class="text-monospace text-get-task">Get Task</span>
+            <button type="submit" class="btn btn-sm btn-warning mr-2" id="task-btn" title="Get Task"><i class="fas fa-shopping-basket"></i></button><span class="text-monospace text-get-task">Get Task</span>
+        </form>
+    </div>
+    <div style="position: fixed; right:0; bottom: 12%; display:none" id="undo-box">
+        <form action="{{route('pages.undoTask',['idVolume' => $volume->id])}}"  id="undo-page-task" method="POST"  style="height: 50px;width: 130px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
+            {{ csrf_field() }}
+            <input type="text" hidden name="type_task" >
+            <input type="text" hidden name="id_tasks">
+            <button type="submit" class="btn btn-sm btn-info mr-2" id="undo-task-btn" title="Get Again"><i class="fas fa-undo-alt"></i></button><span class="text-monospace text-get-task">Get Again</span>
         </form>
     </div>
 @endsection
@@ -150,13 +172,13 @@
         var volume_id_page = {{$volume->id}};
         var url_page_table = "{{route('ajaxGetPages')}}";
         var hasDownload = false;
-        var url_check_process = "{{route('pages.checkProcessZip')}}";
+        // var url_check_process = "{{route('pages.checkProcessZip')}}";
         var url_done_check = "{{route('pages.doneCheck')}}";
     </script>
     @if (session()->has('path_download'))
-        <script>
-            hasDownload = true;
-        </script>
+    <script>
+        hasDownload = true;
+    </script>
     @endif
     <script src="{{asset('/js/admin/pages.js')}}"></script>
 
@@ -166,23 +188,12 @@
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
     <style>
-        .info-reject-check > .far{
-            display: none;
-        }
-        .info-reject-check:hover > .fas{
-            display: block;
-        }
-
-        .info-reject-check:hover > .far{
-            display: none;
-        }
-
         .toast-center{
             top: 50% !important;
             transform: translateY(-50%);
         }
         #pages-table td {
-            padding: 0 0 0 0.5rem;
+            padding: 0.25rem 0 0.25rem 0.5rem;
             vertical-align: middle;
         }
 
@@ -218,8 +229,15 @@
         #task-btn + span  {
         animation: blinker 1s linear infinite;
         }
+        #download-task-btn + span  {
+        animation: blinker 1s linear infinite;
+        }
+        #undo-task-btn + span  {
+        animation: blinker 1s linear infinite;
+        }
         .text-get-task{
-            background: -webkit-linear-gradient(#605ca8 , #ff851b);
+            background: -webkit-linear-gradient(#dc3545 , #ffc107);
+            -webkit-text-stroke: 1px #343a40;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: bolder;

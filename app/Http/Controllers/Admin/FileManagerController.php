@@ -63,7 +63,7 @@ class FileManagerController extends Controller
     }
 
     public function showUrlManager(Request $request){
-        $publicFilePath = config('filesystems.disks.private.root').'/'.$request->path;
+        $publicFilePath = config('filesystems.disks.private.root').$request->filename;
         if(strpos($publicFilePath,'psd') !== false){
         \Image::configure(array('driver' => 'imagick'));
         $file = \Image::make($publicFilePath)->encode('png');
@@ -124,7 +124,7 @@ class FileManagerController extends Controller
 
     public function downloadFile(Request $request){
         ini_set('max_execution_time', 300); 
-        $pathFolderDownload = $request->dir.'/';
+        $pathFolderDownload = $request->dir;
         $arrayFileName = explode(',',$request->filenames);
         $filesDown = collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('basename',$arrayFileName);
     
@@ -141,6 +141,9 @@ class FileManagerController extends Controller
             }
             return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$zipFileName);
         }else{
+            if(count($filesDown) == 0){
+                return redirect()->back()->withFlashDanger('Can\'t find the file in the folder');
+            }
             return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$filesDown->first()['path']);
         }
     }

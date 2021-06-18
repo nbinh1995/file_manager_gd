@@ -22,7 +22,7 @@ class BookController extends Controller
         return view('admins.book.index');
     }
 
-       /**
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -91,7 +91,8 @@ class BookController extends Controller
      */
     public function destroy($id)
     {
-        $book = Book::find($id);
+        try{
+            $book = Book::find($id);
 
         if ($book instanceof Book) {
             $directory = $book->path;
@@ -101,6 +102,9 @@ class BookController extends Controller
             }
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
-        return redirect()->back()->withFlashDanger('The ID \'s Book is not found');
+        return redirect()->back()->withFlashDanger('The Book Not Found');
+        }catch(\Exception $e){
+            return redirect()->back()->withFlashDanger('There were errors. Please try again.');
+        }
     }
 }

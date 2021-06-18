@@ -25,9 +25,26 @@
     #uploadModal #uploadForm input[name="_token"] + div{
         min-height: 100% !important;
     }
-    #uploadModal #uploadForm input[name="_token"] + div{
+    #uploadModal #uploadForm {
         min-height: 80vh !important;
     }
+    .image-arrow{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 9999; 
+    font-size:8vw ; 
+    color:rgba(0,0,0,0.5);
+    cursor: pointer;
+  }
+
+  .image-arrow.left{
+      left:1vw;
+  }
+
+  .image-arrow.right{
+      right:1vw;
+  }
   </style>
   {{-- Use the line below instead of the above if you need to cache the css. --}}
   {{-- <link rel="stylesheet" href="{{ asset('/vendor/laravel-filemanager/css/lfm.css') }}"> --}}
@@ -204,15 +221,17 @@
       <span class="sr-only">Next</span>
     </a>
   </div>
-
+  
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
   <script src="{{ asset('vendor/laravel-filemanager/js/cropper.min.js') }}"></script>
   <script src="{{ asset('vendor/laravel-filemanager/js/dropzone.min.js') }}"></script>
+
   <script>
     var  hasDownload = false;
+    var url_show_manager = "{{route('file-manager.showUrlManager')}}";
     var lang = {!! json_encode(trans('laravel-filemanager::lfm')) !!};
     var actions = (new URL(location.href)).searchParams.get('dir') !== null ? 
     [{
@@ -298,7 +317,7 @@
       hasDownload = true;
     })
   </script>
-@endif
+  @endif
   <script src="{{asset('vendor/laravel-filemanager/js/script.js')}}"></script>
   {{-- <script>{!! \File::get(base_path('vendor/unisharp/laravel-filemanager/public/js/script.js')) !!}</script> --}}
   {{-- Use the line below instead of the above if you need to cache the script. --}}

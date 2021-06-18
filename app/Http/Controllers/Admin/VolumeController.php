@@ -85,42 +85,53 @@ class VolumeController extends Controller
     }
 
     public function update(Request $request , $id){
-        $volume = Volume::find($id);
+        try{
+            $volume = Volume::find($id);
 
-        if($volume instanceof Volume){
-            if($request->status !== 'pending'){
-                Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.clean'));
-                Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.type'));
-                Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.sfx'));
-            }else{
-                if(!File::exists(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.clean'))){
-                    File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.clean'),0777);
+            if($volume instanceof Volume){
+                if($request->status !== 'pending'){
+                    Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.clean'));
+                    Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.type'));
+                    Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.sfx'));
+                }else{
+                    if(!File::exists(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.clean'))){
+                        File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.clean'),0777);
+                    }
+                    if(!File::exists(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.type'))){
+                        File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.type'),0777);
+                    }
+                    if(!File::exists(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.sfx'))){
+                        File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.sfx'),0777);
+                    }
                 }
-                if(!File::exists(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.type'))){
-                    File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.type'),0777);
-                }
-                if(!File::exists(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.sfx'))){
-                    File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.sfx'),0777);
+    
+                $volume->update($request->only('status'));
+                if($volume instanceof Volume){
+                    return redirect()->route('volumes.index')->withFlashSuccess('The Volume Updated Success');
                 }
             }
-
-            $volume->update($request->only('status'));
-            return redirect()->route('volumes.index');
+            return redirect()->back()->withFlashDanger('The Volume Not Found');
+        }catch(\Exception $e){
+            return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
     }
 
     public function destroy($id){
-        $volume = Volume::find($id);
+        try{
+            $volume = Volume::find($id);
 
-        if ($volume instanceof Volume) {
-            $directory = $volume->path;
-            if($volume->delete()){
-                Storage::disk(config('lfm.disk'))->deleteDirectory($directory);
-                return redirect()->route('volumes.index')->withFlashSuccess('The Volume Deleted Success');
+            if ($volume instanceof Volume) {
+                $directory = $volume->path;
+                if($volume->delete()){
+                    Storage::disk(config('lfm.disk'))->deleteDirectory($directory);
+                    return redirect()->route('volumes.index')->withFlashSuccess('The Volume Deleted Success');
+                }
+                return redirect()->back()->withFlashDanger('There were errors. Please try again.');
             }
+            return redirect()->back()->withFlashDanger('The Volume Not Found');
+        }catch(\Exception $e){
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
-        return redirect()->back()->withFlashDanger('The ID \'s Book is not found');
     }
 
     public function ajaxGetVolumesByBookID(Request $request){

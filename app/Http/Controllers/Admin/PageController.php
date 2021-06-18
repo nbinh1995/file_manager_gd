@@ -19,6 +19,27 @@ class PageController extends Controller
         $volume = $request->volume;
         $eloquent = Page::with(['rawUser','cleanUser','typeUser','sfxUser','checkUser'])->where('volume_id',$request->volume);
         return DataTables::eloquent($eloquent)
+            ->editColumn('id', function ($page) use ($request) {
+                $column = $request->type_down ?? 'raw';
+                switch($column){
+                    case 'Clean':
+                        $status = $page->clean;
+                    break;
+                    case 'Type':
+                        $status = $page->type;
+                    break;
+                    case 'SFX':
+                        $status = $page->sfx;
+                    break;
+                    case 'Check':
+                        $status = $page->check;
+                    break;
+                    default:
+                        $status = $page->raw;
+                }
+
+                return  $status == 'done' ? '<input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom download-page-id">' : 'N/E';
+            })
             ->editColumn('raw', function ($page) {
                 return showPageStatus($page,'raw');
             })
@@ -37,11 +58,12 @@ class PageController extends Controller
             ->addColumn('Action', function ($page) use($volume) {
                 $btn = '';
                 if (auth()->user()->is_admin) {
-                    $btn = '<a href="#" data-url="' . route('pages.destroy', $page->id) . '" class="btn btn-sm delete btn-danger"><i class="fas fa-trash"></i></a>';
+                    // $btn = '<a href="#" data-url="' . route('pages.undoTask', $page->id) . '" class="btn btn-sm undo-task btn-secondary btn-xs mr-2" title="Nhã Việc"><i class="fas fa-undo"></i></a>';
+                    $btn = '<a href="#" data-url="' . route('pages.destroy', $page->id) . '" class="btn btn-sm delete btn-danger btn-xs"><i class="fas fa-trash"></i></a>';
                 }
                 return $btn;
             })
-            ->rawColumns(['Action', 'raw' , 'clean' , 'type' , 'sfx' , 'check'])
+            ->rawColumns(['Action', 'raw' , 'clean' , 'type' , 'sfx' , 'check' ,'id'])
             ->toJson();
     }
 
@@ -87,9 +109,9 @@ class PageController extends Controller
 
     }
     public function addTask(Request $request,$idVolume){
-        DB::beginTransaction();
         try{
-        ini_set('max_execution_time', 300); 
+        DB::beginTransaction();
+        // ini_set('max_execution_time', 300); 
         $volume = Volume::find($idVolume);
         if($volume->status === 'completed'){
             return redirect()->back()->withFlashWarning('The volume was completed!');
@@ -103,7 +125,7 @@ class PageController extends Controller
         $arrayKeyVol = array_keys(config('lfm.volume'));
         switch($request->type_task){
             case 'clean':
-                $subFolder = config('lfm.vol.raw');
+                // $subFolder = config('lfm.vol.raw');
                 $pages->update(
                     [
                         $arrayKeyVol[1] => 'doing',
@@ -112,7 +134,7 @@ class PageController extends Controller
                     );
                 break;
             case 'type':
-                $subFolder = config('lfm.vol.clean');
+                // $subFolder = config('lfm.vol.clean');
                 $pages->update(
                     [
                         $arrayKeyVol[2] => 'doing',
@@ -121,7 +143,7 @@ class PageController extends Controller
                     );
                 break;
             case 'sfx':
-                $subFolder = config('lfm.vol.type');
+                // $subFolder = config('lfm.vol.type');
                 $pages->update(
                     [
                         $arrayKeyVol[3] => 'doing',
@@ -129,54 +151,90 @@ class PageController extends Controller
                     ]
                     );
                 break;
-            case 'check':
-                $subFolder = config('lfm.vol.sfx');
-                $pages->update(
-                    [
-                        $arrayKeyVol[4] => 'doing',
-                        $arrayKeyVol[4].'_id' => auth()->id()
-                    ]
-                    );
-                break;
+            // case 'check':
+            //     // $subFolder = config('lfm.vol.sfx');
+            //     $pages->update(
+            //         [
+            //             $arrayKeyVol[4] => 'doing',
+            //             $arrayKeyVol[4].'_id' => auth()->id()
+            //         ]
+            //         );
+            //     break;
             default:
             DB::rollBack();
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
-
-        $pagesSearch = $pages->get()->pluck('filename');
-        $pathFolderDownload = $volume->path.'/'.$subFolder.'/';
-        // $filesDown =$request->type_task === 'clean' ? collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('filename',$pagesSearch) : 
-        // collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->where('extension','psd')->whereIn('filename',$pagesSearch);
-        $filesDown = collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('filename',$pagesSearch);
-        if(count($filesDown) > 1){
-            // $totalFile = count($filesDown);
-            // session()->put('process_zip', 0);
-            $zip = new ZipArchive();
-            $zipFileName = 'download.zip';
-            if ($zip->open(config('filesystems.disks.private.root').'/'.$zipFileName, ZipArchive::CREATE) === TRUE)
-            {   
-                foreach ($filesDown as $key => $value) {
-                    $relativeNameInZipFile = $value['basename'];
-                    $zip->addFile(config('filesystems.disks.private.root').'/'.$value['path'], $relativeNameInZipFile);
-                    // session()->put('process_zip', round((($key+1)/$totalFile),2));
-                }
-                $zip->close();
-            }
-            // session()->forget('process_zip');
-            DB::commit();
-            return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$zipFileName);
-        }else{
-            if(count($filesDown) == 0){
-                DB::rollBack();
-                return redirect()->back()->withFlashDanger('Can\'t find the file in the folder');
-            }
-            DB::commit();
-            return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$filesDown->first()['path']);
-        }
+        DB::commit();
+        return redirect()->back()->withFlashSuccess('Get the tasks successfully!');
+        // $pagesSearch = $pages->get()->pluck('filename');
+        // $pathFolderDownload = $volume->path.'/'.$subFolder.'/';
+        // // $filesDown =$request->type_task === 'clean' ? collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('filename',$pagesSearch) : 
+        // // collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->where('extension','psd')->whereIn('filename',$pagesSearch);
+        // $filesDown = collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('filename',$pagesSearch);
+        // if(count($filesDown) > 1){
+        //     // $totalFile = count($filesDown);
+        //     // session()->put('process_zip', 0);
+        //     $zip = new ZipArchive();
+        //     $zipFileName = 'download.zip';
+        //     if ($zip->open(config('filesystems.disks.private.root').'/'.$zipFileName, ZipArchive::CREATE) === TRUE)
+        //     {   
+        //         foreach ($filesDown as $key => $value) {
+        //             $relativeNameInZipFile = $value['basename'];
+        //             $zip->addFile(config('filesystems.disks.private.root').'/'.$value['path'], $relativeNameInZipFile);
+        //             // session()->put('process_zip', round((($key+1)/$totalFile),2));
+        //         }
+        //         $zip->close();
+        //     }
+        //     // session()->forget('process_zip');
+        //     DB::commit();
+        //     return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$zipFileName);
+        // }else{
+        //     if(count($filesDown) == 0){
+        //         DB::rollBack();
+        //         return redirect()->back()->withFlashDanger('Can\'t find the file in the folder');
+        //     }
+        //     DB::commit();
+        //     return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$filesDown->first()['path']);
+        // }
     } catch (\Exception $e){
         DB::rollBack();
         return redirect()->back()->withFlashDanger('There were errors. Please try again.');
     }
+    }
+
+    public function downTask(Request $request,$idVolume){
+        try{
+            ini_set('max_execution_time', 300); 
+            $volume = Volume::find($idVolume);
+            $arrayPages = explode(',',$request->id_tasks);
+            
+            $pages = Page::whereIn('id',$arrayPages);
+            $pagesSearch = $pages->get()->pluck('filename');
+            $subFolder = config('lfm.vol')[strtolower($request->type_task)];
+            $pathFolderDownload = $volume->path.'/'.$subFolder.'/';
+
+            $filesDown = collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('filename',$pagesSearch);
+            if(count($filesDown) > 1){
+                $zip = new ZipArchive();
+                $zipFileName = 'download.zip';
+                if ($zip->open(config('filesystems.disks.private.root').'/'.$zipFileName, ZipArchive::CREATE) === TRUE)
+                {   
+                    foreach ($filesDown as $key => $value) {
+                        $relativeNameInZipFile = $value['basename'];
+                        $zip->addFile(config('filesystems.disks.private.root').'/'.$value['path'], $relativeNameInZipFile);
+                    }
+                    $zip->close();
+                }
+                return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$zipFileName);
+            }else{
+                if(count($filesDown) == 0){
+                    return redirect()->back()->withFlashDanger('Can\'t find the file in the folder');
+                }
+                return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$filesDown->first()['path']);
+            }
+            }catch(\Exception $e){
+                return redirect()->back()->withFlashDanger('There were errors. Please try again.');
+            }
     }
 
     public function downloadFile(Request $request)
@@ -190,22 +248,26 @@ class PageController extends Controller
     }
 
     public function destroy($id){
-        $page = Page::with('volume')->find($id);
+        try{
+            $page = Page::with('volume')->find($id);
 
-        if ($page instanceof Page) {
-            $directory = $page->volume->path;
-            foreach(config('lfm.volume') as $file ){
-                $filesDelete = collect(Storage::disk(config('lfm.disk'))->listContents($directory.'/'.$file,false))->whereIn('filename',$page->filename)->first();
-                if(isset($filesDelete)){
-                    Storage::disk(config('lfm.disk'))->delete($filesDelete['path']);
+            if ($page instanceof Page) {
+                $directory = $page->volume->path;
+                foreach(config('lfm.volume') as $file ){
+                    $filesDelete = collect(Storage::disk(config('lfm.disk'))->listContents($directory.'/'.$file,false))->whereIn('filename',$page->filename)->first();
+                    if(isset($filesDelete)){
+                        Storage::disk(config('lfm.disk'))->delete($filesDelete['path']);
+                    }
                 }
+                if($page->delete()){
+                    return redirect()->back()->withFlashSuccess('The Page Deleted Success');
+                }
+                return redirect()->back()->withFlashDanger('There were errors. Please try again.');
             }
-            if($page->delete()){
-                return redirect()->back()->withFlashSuccess('The Volume Deleted Success');
-            }
+            return redirect()->back()->withFlashDanger('The Page Not Found');
+        }catch(\Exception $e){
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
-        return redirect()->back()->withFlashDanger('The ID \'s Book is not found');
     }
 
     public function rejectCheck(Request $request){
@@ -268,6 +330,66 @@ class PageController extends Controller
             return response()->json(['process'=>session('process_zip')]);
         }else{
             return response()->json(['process'=> 1]);
+        }
+    }
+
+    public function undoTask(Request $request,$idVolume){
+        try{
+            DB::beginTransaction();
+            // ini_set('max_execution_time', 300); 
+            $volume = Volume::find($idVolume);
+            if($volume->status === 'completed'){
+                return redirect()->back()->withFlashWarning('The volume was completed!');
+            }
+            $arrayPages = explode(',',$request->id_tasks);
+            
+            $pages = Page::whereIn('id',$arrayPages);
+            if($pages->get()->where($request->type_task,'!=','doing')->count() > 0){
+                return redirect()->back()->withFlashDanger('There were errors. Please try again.');
+            }
+            $arrayKeyVol = array_keys(config('lfm.volume'));
+            switch($request->type_task){
+                case 'clean':
+                    $pages->update(
+                        [
+                            $arrayKeyVol[1] => 'doing',
+                            $arrayKeyVol[1].'_id' => auth()->id()
+                        ]
+                        );
+                    break;
+                case 'type':
+                    $pages->update(
+                        [
+                            $arrayKeyVol[2] => 'doing',
+                            $arrayKeyVol[2].'_id' => auth()->id()
+                        ]
+                        );
+                    break;
+                case 'sfx':
+                    $pages->update(
+                        [
+                            $arrayKeyVol[3] => 'doing',
+                            $arrayKeyVol[3].'_id' => auth()->id()
+                        ]
+                        );
+                    break;
+                // case 'check':
+                //     $pages->update(
+                //         [
+                //             $arrayKeyVol[4] => 'doing',
+                //             $arrayKeyVol[4].'_id' => auth()->id()
+                //         ]
+                //         );
+                //     break;
+                default:
+                DB::rollBack();
+                return redirect()->back()->withFlashDanger('There were errors. Please try again.');
+            }
+            DB::commit();
+            return redirect()->back()->withFlashSuccess('Get the tasks successfully!');
+        } catch (\Exception $e){
+            DB::rollBack();
+            return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
     }
 }

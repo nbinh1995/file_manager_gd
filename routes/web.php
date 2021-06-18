@@ -62,9 +62,11 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::get('/reject-check', 'PageController@rejectCheck')->name('rejectCheck');
         Route::get('/done-check', 'PageController@doneCheck')->name('doneCheck');
         Route::post('{idVolume}/add-task','PageController@addTask')->name('addTask');
+        Route::post('{idVolume}/down-task','PageController@downTask')->name('downTask');
         Route::get('/download-file','PageController@downloadFile')->name('downloadFile');
         Route::get('/check-process-zip','PageController@checkProcessZip')->name('checkProcessZip');
         Route::delete('/{id}/destroy', 'PageController@destroy')->name('destroy')->middleware('admin');
+        Route::post('/{idVolume}/undo-task', 'PageController@undoTask')->name('undoTask');
     });
     Route::group(['prefix' => 'file-manager','as'=>'file-manager.'], function () {
         Route::get('/', 'FileManagerController@index')->name('index')->middleware('super_admin');
