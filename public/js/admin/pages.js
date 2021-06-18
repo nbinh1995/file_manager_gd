@@ -319,7 +319,7 @@ $(document).ready(function(event){
             $('#title-show-image').text('');
             $('#title-show-image').text(type+ ': ');
             loading(true);
-            if(type === 'sfx' && role === 'check' && $(this).closest('td').next().find('label').text() == 'Pending'){
+            if(type === 'sfx' && role === 'check'){
                 $('#modal-show-images').find('img').data('hasAction','1');
             }else{
                 $('#modal-show-images').find('img').data('hasAction','0');
@@ -418,7 +418,7 @@ $(document).ready(function(event){
         var textHead = $('#title-show-image').text().split(':');
         $('#title-show-image').text('');
         $('#title-show-image').text(textHead[0]+': '+fileName);
-        if(($(this).data('hasAction') == 1 || $(this).data('hasAction') == 0)&& role === 'check'){
+        if($(this).data('hasAction') == 1&& role === 'check'){
             $('#action-check').show();
         }else{
             $('#action-check').hide();

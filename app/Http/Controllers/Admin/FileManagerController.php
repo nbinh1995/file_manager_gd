@@ -111,9 +111,9 @@ class FileManagerController extends Controller
         $hasAction = 0;
         if(!is_null($next_page)){
             if($column === 'sfx'){
-                if(Page::where('check','pending')->where('volume_id',$volume_id)->where('filename',$next_page->filename)->exists()){
+                // if(Page::where('check','pending')->where('volume_id',$volume_id)->where('filename',$next_page->filename)->exists()){
                     $hasAction = 1;
-                }
+                // }
             }
             $code=200;
             $url = route('file-manager.showImage',['volume_id'=>$volume_id,'type'=>$type,'fileName'=>$next_page->filename]);

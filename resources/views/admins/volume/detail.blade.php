@@ -33,7 +33,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="table-responsive">
+                                    <div class="table-responsive" id="container-pages-table">
                                         <table id="pages-table" class="table table-bordered table-striped">
                                             <thead>
                                             <tr>
@@ -189,6 +189,20 @@
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
     <style>
+        @media screen and (min-width: 767px){
+            #container-pages-table #pages-table_wrapper .row:last-child{
+            flex-direction: column;
+            }
+
+            #container-pages-table #pages-table_wrapper .row:last-child div:last-child{
+                padding: 0;
+            }
+
+            #container-pages-table #pages-table_wrapper .row:last-child div:last-child .pagination{
+                justify-content: flex-start;
+            }
+        }
+
         .toast-center{
             top: 50% !important;
             transform: translateY(-50%);
