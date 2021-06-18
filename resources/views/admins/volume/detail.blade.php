@@ -86,8 +86,10 @@
                                 </div>
                             </div>
                         </div>
-                        <img src="" alt="" id="image-page-show" style="width: 100%; height:auto">
-                        <img src="" alt="" id="image-buffer-show" style="display:none; width: 100%; height:auto">
+                        <img src="" alt="" id="image-page-show" >
+                        {{-- <img src="" alt="" class="image-page-show current" >
+                        <img src="" alt="" class="image-page-show prev" >
+                        <img src="" alt="" class="image-page-show next" > --}}
                     </div>
                     <div class="modal-footer justify-content-between" id="action-check" style="display: none">
                         <button type="button" class="btn btn-secondary close-check" data-dismiss="modal">Close</button>
@@ -173,6 +175,7 @@
         var volume_id_page = {{$volume->id}};
         var url_page_table = "{{route('ajaxGetPages')}}";
         var hasDownload = false;
+        var url_buffer_image = "{{route('file-manager.bufferImage')}}";
         // var url_check_process = "{{route('pages.checkProcessZip')}}";
         var url_done_check = "{{route('pages.doneCheck')}}";
     </script>
@@ -189,6 +192,14 @@
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
     <style>
+        .image-page-show {
+            display:none; 
+            width: 100%; 
+            height:auto
+        }
+        .current{
+            display: block;
+        }
         @media screen and (min-width: 767px){
             #container-pages-table #pages-table_wrapper .row:last-child{
             flex-direction: column;

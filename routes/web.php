@@ -72,6 +72,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::get('/', 'FileManagerController@index')->name('index')->middleware('super_admin');
         Route::get('/refresh-dir', 'FileManagerController@refreshDir')->name('refreshDir');
         Route::get('/get-image', 'FileManagerController@showImage')->name('showImage');
+        Route::get('/get-buffer-image', 'FileManagerController@bufferImage')->name('bufferImage');
         Route::get('/get-url-manager', 'FileManagerController@showUrlManager')->name('showUrlManager');
         Route::get('/get-prev-image', 'FileManagerController@showPrevImage')->name('showPrevImage');
         Route::get('/get-next-image', 'FileManagerController@showNextImage')->name('showNextImage');

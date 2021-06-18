@@ -62,6 +62,47 @@ class FileManagerController extends Controller
         return $response;
     }
 
+    public function bufferImage(Request $request){
+        $fileName = (int)$request->fileName;
+        $volume_id = $request->volume_id;
+        $type = $request->type;
+        $column = strtolower($type); 
+        // $prev_page = Page::where($column,'done')->where('volume_id',$volume_id)->whereRaw('CAST( filename AS unsigned) < ?',$fileName)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get()->max();
+        $page_volumes = Page::where($column,'done')->where('volume_id',$volume_id)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get();
+
+        $page = $page_volumes->sortBy('id_filename')->reduce(function($result,$item) use ($fileName){
+            if(isset($result['current']) && !isset($result['next'])){
+                $result['next']=$item->filename;
+            }
+            if($item->filename == $fileName){
+                $result ['current']= $item->filename;
+            }
+            if(!isset($result['current'])){
+                $result ['prev']= $item->filename;
+            }
+            return $result;
+        },[]);
+
+        $url =[];
+        if(isset($page['prev'])){
+            $url ['prev']= route('file-manager.showImage',['volume_id'=>$volume_id,'type'=>$type,'fileName'=>$page['prev']]);
+        }else{
+            $url ['prev']='';
+        }
+        if(isset($page['current'])){
+            $url ['current']= route('file-manager.showImage',['volume_id'=>$volume_id,'type'=>$type,'fileName'=>$page['current']]);
+        }else{
+            $url ['current']='';
+        }
+        if(isset($page['next'])){
+            $url ['next']= route('file-manager.showImage',['volume_id'=>$volume_id,'type'=>$type,'fileName'=>$page['next']]);
+        }else{
+            $url ['next']='';
+        }
+
+        return response()->json(['src' => $url]);
+    }
+
     public function showUrlManager(Request $request){
         $publicFilePath = config('filesystems.disks.private.root').$request->filename;
         if(strpos($publicFilePath,'psd') !== false){
@@ -83,18 +124,32 @@ class FileManagerController extends Controller
         $volume_id = $request->volume_id;
         $type = $request->type;
         $column = strtolower($type); 
-        $prev_page = Page::where($column,'done')->where('volume_id',$volume_id)->whereRaw('CAST( filename AS unsigned) < ?',$fileName)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get()->max();
+        // $prev_page = Page::where($column,'done')->where('volume_id',$volume_id)->whereRaw('CAST( filename AS unsigned) < ?',$fileName)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get()->max();
+        $page_volumes = Page::where($column,'done')->where('volume_id',$volume_id)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get();
+
+        $page = $page_volumes->sortBy('id_filename')->reduce(function($result,$item) use ($fileName){
+            if(isset($result['current']) && !isset($result['next'])){
+                $result['next']=$item->filename;
+            }
+            if($item->filename == $fileName){
+                $result ['current']= $item->filename;
+            }
+            if(!isset($result['current'])){
+                $result ['prev']= $item->filename;
+            }
+            return $result;
+        },[]);
         $url ='';
         $code = 404;
         $hasAction = 0;
-        if(!is_null($prev_page)){
+        if(isset($page['prev'])){
             if($column === 'sfx'){
-                if(Page::where('check','pending')->where('volume_id',$volume_id)->where('filename',$prev_page->filename)->exists()){
+                // if(Page::where('check','pending')->where('volume_id',$volume_id)->where('filename',$prev_page->filename)->exists()){
                     $hasAction = 1;
-                }
+                // }
             }
             $code=200;
-            $url = route('file-manager.showImage',['volume_id'=>$volume_id,'type'=>$type,'fileName'=>$prev_page->filename]);
+            $url = route('file-manager.showImage',['volume_id'=>$volume_id,'type'=>$type,'fileName'=>$page['prev']]);
         }
 
         return response()->json(['src' => $url,'hasAction'=> $hasAction,'code' => $code]);
@@ -105,18 +160,32 @@ class FileManagerController extends Controller
         $volume_id = $request->volume_id;
         $type = $request->type;
         $column = strtolower($type); 
-        $next_page = Page::where($column,'done')->where('volume_id',$volume_id)->whereRaw('CAST( filename AS unsigned) > ?',$fileName)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get()->min();
+        // $next_page = Page::where($column,'done')->where('volume_id',$volume_id)->whereRaw('CAST( filename AS unsigned) > ?',$fileName)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get()->min();
+        $page_volumes = Page::where($column,'done')->where('volume_id',$volume_id)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get();
+
+        $page = $page_volumes->sortBy('id_filename')->reduce(function($result,$item) use ($fileName){
+            if(isset($result['current']) && !isset($result['next'])){
+                $result['next']=$item->filename;
+            }
+            if($item->filename == $fileName){
+                $result ['current']= $item->filename;
+            }
+            if(!isset($result['current'])){
+                $result ['prev']= $item->filename;
+            }
+            return $result;
+        },[]);
         $url ='';
         $code = 404;
         $hasAction = 0;
-        if(!is_null($next_page)){
+        if(isset($page['next'])){
             if($column === 'sfx'){
                 // if(Page::where('check','pending')->where('volume_id',$volume_id)->where('filename',$next_page->filename)->exists()){
                     $hasAction = 1;
                 // }
             }
             $code=200;
-            $url = route('file-manager.showImage',['volume_id'=>$volume_id,'type'=>$type,'fileName'=>$next_page->filename]);
+            $url = route('file-manager.showImage',['volume_id'=>$volume_id,'type'=>$type,'fileName'=>$page['next']]);
         }
 
         return response()->json(['src' => $url,'hasAction'=> $hasAction,'code' => $code]);
