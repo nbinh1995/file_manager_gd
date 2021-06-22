@@ -29,7 +29,7 @@ $dir = '/'.implode('/',$dir).'/'.config('lfm.vol.type');
                                 {{csrf_field()}}
                                 <div class="row">
                                     <div class="col-12">
-                                        <iframe src="/manga/laravel-filemanager?dir={{urldecode($dir)}}"
+                                        <iframe src="{{($_SERVER['HTTP_HOST'] == 'vozdoremon.ddns.net') ? '' : '/manga' }}/laravel-filemanager?dir={{urldecode($dir)}}"
                                         style="width: 100%; height: 70vh; overflow: hidden; border: none;"></iframe>
                                     </div>
                                 </div>
