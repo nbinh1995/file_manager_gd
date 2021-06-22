@@ -71,14 +71,14 @@
         <!-- /.container-fluid -->
         <div class="modal fade" id="modal-show-images">
             <div class="modal-dialog">
-                <div class="modal-content">
+                <div class="modal-content"  style="max-height:100vh;">
                     <div class="modal-header bg-lightblue">
                         <h6 class="modal-title text-uppercase " id="title-show-image">ID ...</h6>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body text-center">
+                    <div class="modal-body text-center" style="overflow: auto">
                         <div id="skeleton">
                             <div class="row">
                                 <div class="col-12  skeleton-block" >
@@ -86,10 +86,11 @@
                                 </div>
                             </div>
                         </div>
-                        <img src="" alt="" id="image-page-show" >
-                        {{-- <img src="" alt="" class="image-page-show current" >
-                        <img src="" alt="" class="image-page-show prev" >
-                        <img src="" alt="" class="image-page-show next" > --}}
+                        {{-- <img src="" alt="" id="image-page-show" > --}}
+                        <img src="" alt="" class="image-page current">
+                        <img src="" alt="" class="image-page prev"  >
+                        <img src="" alt="" class="image-page next" >
+                        {{-- <img src="" alt="" class="image-page tmp"> --}}
                     </div>
                     <div class="modal-footer justify-content-between" id="action-check" style="display: none">
                         <button type="button" class="btn btn-secondary close-check" data-dismiss="modal">Close</button>
@@ -104,8 +105,8 @@
             <!-- /.modal-dialog -->
         </div>
         <!-- /.modal -->
-        <div class="image-arrow left" data-url="{{route('file-manager.showPrevImage')}}"><i class="fas fa-chevron-left"></i></div>
-        <div class="image-arrow right" data-url="{{route('file-manager.showNextImage')}}"><i class="fas fa-chevron-right"></i></div>
+        <div class="image-arrow left" data-url="{{route('file-manager.bufferImage')}}"><i class="fas fa-chevron-left"></i></div>
+        <div class="image-arrow right" data-url="{{route('file-manager.bufferImage')}}"><i class="fas fa-chevron-right"></i></div>
 
         <div class="modal fade" id="modal-note-page">
             <div class="modal-dialog">
@@ -196,7 +197,7 @@
             width: 100%; 
             height:auto
         }
-        .image-page-show {
+        .image-page {
             display:none; 
             width: 100%; 
             height:auto

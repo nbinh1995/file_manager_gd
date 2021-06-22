@@ -315,16 +315,25 @@ $(document).ready(function(event){
             e.preventDefault();
             var role = sessionStorage.getItem('authRole').toLowerCase();
             var url = $(this).data('url');
-            $('#modal-show-images').find('img').attr('src',url);
+            var fileName = (new URL(url)).searchParams.get('fileName');
+            // $('#modal-show-images').find('img').attr('src',url);
             $('#title-show-image').text('');
-            $('#title-show-image').text(type+ ': ');
-            loading(true);
+            $('#title-show-image').text(type+ ': '+fileName);
             if(type === 'sfx' && role === 'check'){
-                $('#modal-show-images').find('img').data('hasAction','1');
+                // $('#modal-show-images').find('img').data('hasAction','1');
+                $('#action-check').show();
             }else{
-                $('#modal-show-images').find('img').data('hasAction','0');
+                // $('#modal-show-images').find('img').data('hasAction','0');
+                $('#action-check').hide();
             }
             $('#modal-show-images').modal('show');
+            fetchData({},url,'GET',loading(true)).done(function(data){
+                console.log(data);
+                $('.image-page.prev').attr('src',data.src.prev);
+                $('.image-page.current').attr('src',data.src.current);
+                $('.image-page.next').attr('src',data.src.next);
+                 // loading(true);
+            });
         })
     }
 
@@ -344,59 +353,77 @@ $(document).ready(function(event){
 
     $('.image-arrow.left').on('click',function(e){
         if(flagShow){
+        flagShow=false;
         var url = $(this).data('url');
-        var fileName = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('fileName');
-        var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
-
+        var prev = $('.image-page.prev');
+        var current =  $('.image-page.current');
+        var next =  $('.image-page.next');
+        if(prev.attr('src') !== ''){
+        var fileName = (new URL(prev.attr('src'))).searchParams.get('fileName');
+        var type = (new URL(prev.attr('src'))).searchParams.get('type');
+        $('#title-show-image').text('');
+        $('#title-show-image').text(type+ ': '+fileName);
         fetchData({type:type,fileName:fileName,volume_id:volume_id_page},url,'GET',loading(true)).done(function(data){
-            if(data.code === 200){
-                $('#modal-show-images').find('img').data('hasAction',data.hasAction);
-                $('#modal-show-images').find('img').attr('src',data.src);
-            }else{
-                toastr.options = {
-                    "positionClass": "toast-top-center toast-center",
-                    "preventDuplicates": true,
-                }
-                toastr.warning("Not Found!")
-                toastr.options = {
-                    "positionClass": "toast-top-right",
-                    "preventDuplicates": true,
-                }
-                loading(false);
-            }
-        }).fail(function(){
-            toastr.error("There were errors. Please try again.");
+            next.addClass('prev').removeClass('next');
+            current.addClass('next').removeClass('current');
+            prev.addClass('current').removeClass('prev');
+            $('.image-page.prev').attr('src',data.src.prev);
+            // flagShow=true;
+            loadingCheck(false);
             loading(false);
         });
+        }else{
+            toastr.options = {
+                "positionClass": "toast-top-center toast-center",
+                "preventDuplicates": true,
+            }
+            toastr.warning("Not Found!");
+            toastr.options = {
+                "positionClass": "toast-top-right",
+                "preventDuplicates": true,
+            }
+            // flagShow=true;
+            loadingCheck(false);
+            loading(false);
+        }
         }
     });
 
     $('.image-arrow.right').on('click',function(e){
         if(flagShow){
+        flagShow = false
         var url = $(this).data('url');
-        var fileName = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('fileName');
-        var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
-
-        fetchData({type:type,fileName:fileName,volume_id:volume_id_page},url,'GET',loading(true)).done(function(data){
-            if(data.code === 200){
-                $('#modal-show-images').find('img').data('hasAction',data.hasAction);
-                $('#modal-show-images').find('img').attr('src',data.src);
-            }else{
-                toastr.options = {
-                    "positionClass": "toast-top-center toast-center",
-                    "preventDuplicates": true,
-                }
-                toastr.warning("Not Found!");
-                toastr.options = {
-                    "positionClass": "toast-top-right",
-                    "preventDuplicates": true,
-                }
+        var prev = $('.image-page.prev');
+        var current =  $('.image-page.current');
+        var next =  $('.image-page.next');
+        if(next.attr('src') !== ''){
+            var fileName = (new URL(next.attr('src'))).searchParams.get('fileName');
+            var type = (new URL(next.attr('src'))).searchParams.get('type');
+            $('#title-show-image').text('');
+            $('#title-show-image').text(type+ ': '+fileName);
+            fetchData({type:type,fileName:fileName,volume_id:volume_id_page},url,'GET',loading(true)).done(function(data){
+                prev.addClass('next').removeClass('prev');
+                current.addClass('prev').removeClass('current');
+                next.addClass('current').removeClass('next');
+                $('.image-page.next').attr('src',data.src.next);
+                // flagShow=true;
+                loadingCheck(false);
                 loading(false);
+            });
+        }else{
+            toastr.options = {
+                "positionClass": "toast-top-center toast-center",
+                "preventDuplicates": true,
             }
-        }).fail(function(){
-            toastr.error("There were errors. Please try again.");
+            toastr.warning("Not Found!");
+            toastr.options = {
+                "positionClass": "toast-top-right",
+                "preventDuplicates": true,
+            }
+            // flagShow=true;
+            loadingCheck(false);
             loading(false);
-        });
+        }
         }
     });
 
@@ -404,33 +431,33 @@ $(document).ready(function(event){
         if(status){
             flagShow = false;
             $('#skeleton').show();
-            $('#image-page-show').hide();
+            $('.image-page.current').hide();
         }else{
             flagShow = true;
             $('#skeleton').hide();
-            $('#image-page-show').show();
+            $('.image-page.current').show();
         }
     }
 
-    $('#image-page-show').on('load',function(){
-        var role = sessionStorage.getItem('authRole').toLowerCase();
-        var fileName = (new URL($(this).attr('src'))).searchParams.get('fileName');
-        var textHead = $('#title-show-image').text().split(':');
-        $('#title-show-image').text('');
-        $('#title-show-image').text(textHead[0]+': '+fileName);
-        if(($(this).data('hasAction') == 1)&& role === 'check'){
-            $('#action-check').show();
-        }else{
-            $('#action-check').hide();
-        }
+    $('.image-page.current').on('load',function(){
+        // var role = sessionStorage.getItem('authRole').toLowerCase();
+        // var fileName = (new URL($(this).attr('src'))).searchParams.get('fileName');
+        // var textHead = $('#title-show-image').text().split(':');
+        // $('#title-show-image').text('');
+        // $('#title-show-image').text(textHead[0]+': '+fileName);
+        // if(($(this).data('hasAction') == 1)&& role === 'check'){
+        //     $('#action-check').show();
+        // }else{
+        //     $('#action-check').hide();
+        // }
         loadingCheck(false);
         loading(false);
     })
 
     $('.reject-check').on('click',function(e){
         var role = sessionStorage.getItem('authRole').toLowerCase();
-        var fileName = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('fileName');
-        var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
+        var fileName = (new URL($('#modal-show-images').find('.image-page.current:visible').attr('src'))).searchParams.get('fileName');
+        var type = (new URL($('#modal-show-images').find('.image-page.current:visible').attr('src'))).searchParams.get('type');
         if(type === 'SFX' && role === 'check'){
             $('#reject-check-form').find('[name=note]').val('');
             $('#reject-check-form').find('[name=fileName]').val(fileName);
@@ -442,8 +469,8 @@ $(document).ready(function(event){
 
     $('.done-check').on('click',function(e){
         var role = sessionStorage.getItem('authRole').toLowerCase();
-        var fileName = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('fileName');
-        var type = (new URL($('#modal-show-images').find('img').attr('src'))).searchParams.get('type');
+        var fileName = (new URL($('#modal-show-images').find('.image-page.current:visible').attr('src'))).searchParams.get('fileName');
+        var type = (new URL($('#modal-show-images').find('.image-page.current:visible').attr('src'))).searchParams.get('type');
         if(type === 'SFX' && role === 'check'){
             fetchData({fileName:fileName,volume_id:volume_id_page},url_done_check,'GET',loadingCheck(true)).done(function(data){
                 if(data.code == 200){
@@ -479,7 +506,7 @@ $(document).ready(function(event){
             $('#modal-show-images').find('.reject-check').prop('disabled',true);
             $('#modal-show-images').find('.done-check').prop('disabled',true);
             $('#skeleton').show();
-            $('#image-page-show').hide();
+            $('.image-page.current').hide();
         }else{
             $('#modal-show-images').find('.close-check').prop('disabled',false);
             $('#modal-show-images').find('.reject-check').prop('disabled',false);
