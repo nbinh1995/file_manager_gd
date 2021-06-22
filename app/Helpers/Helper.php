@@ -67,7 +67,7 @@ if (!function_exists('showRawStatus')) {
                 $badge = $type === 'check' ? '<label class="btn btn-warning btn-xs text-monospace">Reject: '.$user.'</label> <label class="btn btn-xs btn-outline-danger border-0" data-toggle="popover" title="Reject Note" data-content="'.($page->note ?? '...').'"><i class="fas fa-question-circle"></i></label>' :'<label class="btn btn-warning btn-xs text-monospace"><input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom doing-task '.$type.'-undo-task"> Doing: '.$user.'</label>';
             break;
             case 'done': 
-                $badge = '<label class="btn btn-success btn-xs  text-monospace '.$type.'-detail" data-url="'.route('file-manager.showImage',['volume_id'=>$page->volume_id,'type'=>config('lfm.vol')[$type],'fileName'=>$page->filename]).'"><i class="fas fa-images"></i> Done: '.$user.' </label>';
+                $badge = '<label class="btn btn-success btn-xs  text-monospace '.$type.'-detail" data-url="'.route('file-manager.bufferImage',['volume_id'=>$page->volume_id,'type'=>config('lfm.vol')[$type],'fileName'=>$page->filename]).'"><i class="fas fa-images"></i> Done: '.$user.' </label>';
             break;
             default:
             $badge = $hasDownFile ? '<label class="btn btn-danger btn-xs text-monospace"><input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom pending-task '.$type.'-task-id"> Pending</label>' : '<label class="btn btn-danger btn-xs text-monospace">Pending</label>' ;
