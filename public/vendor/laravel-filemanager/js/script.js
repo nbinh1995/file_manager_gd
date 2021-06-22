@@ -6,8 +6,8 @@ var selected = [];
 var items = [];
 var flagShift = false;
 var controlA = {ctr: false , keyA: false};
-var url_add_1 = '/manga';
-var url_add_2 = '/manga/storage';
+var url_add_1 = location.host =='vozdoremon.ddns.net' ? '' :'/manga';
+var url_add_2 = location.host =='vozdoremon.ddns.net' ? '/storage' : '/manga/storage';
 
 $.fn.fab = function (options) {
   var menu = this;
