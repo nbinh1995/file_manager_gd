@@ -7,8 +7,9 @@ var items = [];
 var flagShift = false;
 var controlA = {ctr: false , keyA: false};
 var url_add_1 = location.host =='vozdoremon.ddns.net' ? '' :'/manga';
-var url_add_2 = location.host =='vozdoremon.ddns.net' ? '/storage' : '/manga/storage';
-
+// var url_add_2 = location.host =='vozdoremon.ddns.net' ? '/storage' : '/manga/storage';
+// var url_add_1 ='';
+var url_add_2 ='/storage';
 $.fn.fab = function (options) {
   var menu = this;
   menu.addClass('fab-wrapper');
@@ -376,7 +377,7 @@ function loadItems() {
               }
             });
           if (!(item.is_file && item.is_image)) {
-            var image = $('<div>').css('background-image', 'url("' + item.thumb_url + '?timestamp=' + item.time + '")');
+            var image = $('<div>').css('background-image', 'url("' + item.thumb_url +'")');
           } else {
             if(item.name.search('psd') !== -1){
               var image = $('<div>').css('background-image', 'url("' + location.origin+url_add_1+'/vendor/laravel-filemanager/img/psd.png")');
@@ -389,7 +390,7 @@ function loadItems() {
 
           template.find('.square').append(image);
           template.find('.item_name').text(item.name);
-          template.find('time').text((new Date(item.time * 1000)).toLocaleString());
+          // template.find('time').text((new Date(item.time * 1000)).toLocaleString());
           // console.log(template);
           $('#content').append(template);
         });
@@ -522,14 +523,14 @@ function preview(items) {
     var carouselItem = imageTemplate.clone()
       .addClass(index === 0 ? 'active' : '');
       if (!(item.is_file && item.is_image)) {
-        carouselItem.find('.carousel-image').css('background-image', 'url(\'' + item.url + '?timestamp=' + item.time + '\')');
+        carouselItem.find('.carousel-image').css('background-image', 'url(\'' + item.url + '\')');
       } else {
         if(items.length === 1){
           var leftItem = ' <div class="image-arrow left"><i class="fas fa-chevron-left"></i></div>';
           var rightItem = '<div class="image-arrow right"><i class="fas fa-chevron-right"></i></div>';
           carouselItem.append(leftItem).append(rightItem);
         }
-        var streamUrlImage = url_show_manager+'?filename='+encodeURI(item.url.replace((location.origin+url_add_2),''));
+        var streamUrlImage = url_show_manager+'?filename='+encodeURI(item.url.replace((location.host+url_add_2),''));
         carouselItem.find('.carousel-image').css('background-image', 'url("' + streamUrlImage +'")').css('height','90vh');
         carouselItem.find('.carousel-label').attr('target', '_blank').attr('href', streamUrlImage)
         .append('<span class="carousel-item-name">'+item.name+'</span>')
@@ -750,7 +751,7 @@ $(document).on('click','.image-arrow.left',function(e){
   });
   
   if(prevIndex !== -1){
-    var streamUrlImage = url_show_manager+'?filename='+encodeURI(items[prevIndex].url.replace((location.origin+url_add_2),''));
+    var streamUrlImage = url_show_manager+'?filename='+encodeURI(items[prevIndex].url.replace((location.host+url_add_2),''));
     $(this).closest('.carousel-item').find('a.carousel-label').attr('href',streamUrlImage);
     $(this).closest('.carousel-item').find('a.carousel-label .carousel-item-name').text(items[prevIndex].name);
     $(this).closest('.carousel-item').find('.carousel-image').css('background-image', 'url("' + streamUrlImage +'")').css('height','90vh');
@@ -771,7 +772,7 @@ $(document).on('click','.image-arrow.right',function(e){
       }
   });
   if(nextIndex !== items.length){
-    var streamUrlImage = url_show_manager+'?filename='+encodeURI(items[nextIndex].url.replace((location.origin+url_add_2),''));
+    var streamUrlImage = url_show_manager+'?filename='+encodeURI(items[nextIndex].url.replace((location.host+url_add_2),''));
     $(this).closest('.carousel-item').find('a.carousel-label').attr('href',streamUrlImage);
     $(this).closest('.carousel-item').find('a.carousel-label .carousel-item-name').text(items[nextIndex].name);
     $(this).closest('.carousel-item').find('.carousel-image').css('background-image', 'url("' + streamUrlImage +'")').css('height','90vh');
@@ -783,7 +784,7 @@ $(document).on('click','.image-arrow.right',function(e){
 function getDir(item){
   var item_url = item.url;
   var item_name = item.name;
-  var dir = item_url.replace((location.origin+url_add_2),'').replace(item_name,'');
+  var dir = item_url.replace((location.host+url_add_2),'').replace(item_name,'');
   return dir;
 }
 

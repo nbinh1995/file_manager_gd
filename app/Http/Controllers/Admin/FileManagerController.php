@@ -64,17 +64,18 @@ class FileManagerController extends Controller
 
     public function bufferImage(Request $request){
         $fileName = (int)$request->fileName;
+        $fileNameText = $request->fileName;
         $volume_id = $request->volume_id;
         $type = $request->type;
         $column = strtolower($type); 
         // $prev_page = Page::where($column,'done')->where('volume_id',$volume_id)->whereRaw('CAST( filename AS unsigned) < ?',$fileName)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get()->max();
         $page_volumes = Page::where($column,'done')->where('volume_id',$volume_id)->selectRaw('filename , CAST( filename AS unsigned) AS id_filename')->get();
 
-        $page = $page_volumes->sortBy('id_filename')->reduce(function($result,$item) use ($fileName){
+        $page = $page_volumes->sortBy('id_filename')->reduce(function($result,$item) use ($fileNameText){
             if(isset($result['current']) && !isset($result['next'])){
                 $result['next']=$item->filename;
             }
-            if($item->filename == $fileName){
+            if($item->filename === $fileNameText){
                 $result ['current']= $item->filename;
             }
             if(!isset($result['current'])){

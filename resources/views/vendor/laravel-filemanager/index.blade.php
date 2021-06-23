@@ -22,6 +22,10 @@
   <link rel="stylesheet" href="{{ asset('vendor/laravel-filemanager/css/mime-icons.min.css') }}">
   <style>{!! \File::get(base_path('vendor/unisharp/laravel-filemanager/public/css/lfm.css')) !!}</style>
   <style>
+    #content .info{
+      display: flex;
+      align-items: center;
+    }
     #uploadModal #uploadForm input[name="_token"] + div{
         min-height: 80vh !important;
     }

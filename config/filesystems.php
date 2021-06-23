@@ -73,7 +73,7 @@ return [
         'private' => [
             'driver' => 'local',
             'root' => '/var/www/image',
-            'url' => env('APP_URL').'/storage',
+            'url' => $_SERVER['HTTP_HOST'].'/storage',
             'visibility' => '/var/www/test/manga',
         ],
     ],
