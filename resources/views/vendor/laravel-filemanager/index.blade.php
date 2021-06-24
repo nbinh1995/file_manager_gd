@@ -249,6 +249,8 @@
   <script src="{{ asset('vendor/laravel-filemanager/js/dropzone.min.js') }}"></script>
 
   <script>
+    var flagUpload = true;
+    var totalFile = 0;
     var  hasDownload = false;
     var url_show_manager = "{{route('file-manager.showUrlManager')}}";
     var lang = {!! json_encode(trans('laravel-filemanager::lfm')) !!};
@@ -359,7 +361,7 @@
       init: function() {
         var _this = this; // For the closure
         var total = 0;
-        var flagUpload = true;
+        var countF = 0;
         this.on('success', function(file, response) {
           if (response == 'OK') {
             loadFolders();
@@ -370,26 +372,28 @@
         this.on('uploadprogress', function(file, progress, bytesSent) {
           if(flagUpload){
             flagUpload = false;
-            total = _this.getQueuedFiles().length;
-            console.log(_this.getQueuedFiles().length);
+            total = _this.getAcceptedFiles().length - totalFile;
             Swal.fire({
               icon: 'info',
+              title:'<span class="text-center text-monospace" id="count-files">0/'+total+'</span>',
               html: '  <div class="progress" id="bar"><div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><div></div>',
               showConfirmButton: false,
-              footer: 'Please wait for the upload process'
+              allowOutsideClick: false,
+              footer: 'Please wait for the upload process',
             });
           }
           if(progress == 100){
-            if(total != 0){
-              var percentCompleted = Math.round(((total-_this.getQueuedFiles().length)*100/total))
-            }else{
-              var percentCompleted=100;
-            }
-            $('#bar div').text(percentCompleted+'%').css('width',percentCompleted+'%');
+              countF++;
+              $('#count-files').text('');
+              $('#count-files').text(countF+'/'+total);
+              var percentCompleted = Math.round((countF*100/total))
+              $('#bar div').text(percentCompleted+'%').css('width',percentCompleted+'%');
           }
         });
         this.on('queuecomplete', function(file) {
           total = 0;
+          countF = 0;
+          totalFile = _this.getAcceptedFiles().length;
           flagUpload = true;
           Swal.close();
           Swal.fire({
@@ -401,7 +405,7 @@
             cancelButtonText:'Continue!',
             confirmButtonText: 'Complete!',
             reverseButtons: true
-            }).then((result) => {
+            }).then(function(result){
               if(result.isConfirmed){
                 $('#uploadModal').modal('hide');
               }
@@ -414,6 +418,12 @@
       acceptedFiles: "{{ implode(',', $helper->availableMimeTypes()) }}",
       maxFilesize: ({{ $helper->maxUploadSize() }} / 1000)
     }
+    window.addEventListener('beforeunload', function (e) {
+        if(!flagUpload){
+            e.preventDefault();
+            e.returnValue = '';
+        }
+        });
   </script>
 </body>
 </html>
