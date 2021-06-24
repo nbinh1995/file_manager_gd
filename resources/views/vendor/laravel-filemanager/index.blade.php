@@ -20,11 +20,25 @@
   <link rel="stylesheet" href="{{ asset('vendor/laravel-filemanager/css/cropper.min.css') }}">
   <link rel="stylesheet" href="{{ asset('vendor/laravel-filemanager/css/dropzone.min.css') }}">
   <link rel="stylesheet" href="{{ asset('vendor/laravel-filemanager/css/mime-icons.min.css') }}">
+  <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
   <style>{!! \File::get(base_path('vendor/unisharp/laravel-filemanager/public/css/lfm.css')) !!}</style>
   <style>
+    #bar{
+      width: 100%;
+      height: 30px;
+    }
+    .dz-image img[data-dz-thumbnail] {
+      width: 100%;
+      height: auto;
+    }
     #content .info{
       display: flex;
       align-items: center;
+      justify-content: center;
+
+    }
+    #content.grid .info .item_name{
+      border: none
     }
     #uploadModal #uploadForm input[name="_token"] + div{
         min-height: 80vh !important;
@@ -230,6 +244,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <script src="{{ asset('AdminLTE/plugins/sweetalert2/sweetalert2.all.min.js')}}"></script>
   <script src="{{ asset('vendor/laravel-filemanager/js/cropper.min.js') }}"></script>
   <script src="{{ asset('vendor/laravel-filemanager/js/dropzone.min.js') }}"></script>
 
@@ -332,10 +347,19 @@
       uploadMultiple: false,
       parallelUploads: 5,
       timeout:0,
+      thumbnail: function(file, dataUrl) {
+        if(file.name.search('psd') !== -1){
+          $(file.previewElement.querySelector("[data-dz-thumbnail]")).attr('src',location.origin+url_add_1+'/vendor/laravel-filemanager/img/psd.png')
+        }else{
+          $(file.previewElement.querySelector("[data-dz-thumbnail]")).attr('src',location.origin+url_add_1+'/vendor/laravel-filemanager/img/image.png')
+        }
+      },
       clickable: '#upload-button',
       dictDefaultMessage: lang['message-drop'],
       init: function() {
         var _this = this; // For the closure
+        var total = 0;
+        var flagUpload = true;
         this.on('success', function(file, response) {
           if (response == 'OK') {
             loadFolders();
@@ -343,6 +367,46 @@
             this.defaultOptions.error(file, response.join('\n'));
           }
         });
+        this.on('uploadprogress', function(file, progress, bytesSent) {
+          if(flagUpload){
+            flagUpload = false;
+            total = _this.getQueuedFiles().length;
+            console.log(_this.getQueuedFiles().length);
+            Swal.fire({
+              icon: 'info',
+              html: '  <div class="progress" id="bar"><div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><div></div>',
+              showConfirmButton: false,
+              footer: 'Please wait for the upload process'
+            });
+          }
+          if(progress == 100){
+            if(total != 0){
+              var percentCompleted = Math.round(((total-_this.getQueuedFiles().length)*100/total))
+            }else{
+              var percentCompleted=100;
+            }
+            $('#bar div').text(percentCompleted+'%').css('width',percentCompleted+'%');
+          }
+        });
+        this.on('queuecomplete', function(file) {
+          total = 0;
+          flagUpload = true;
+          Swal.close();
+          Swal.fire({
+            title:'The upload process was complete!',
+            icon: 'success',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            cancelButtonText:'Continue!',
+            confirmButtonText: 'Complete!',
+            reverseButtons: true
+            }).then((result) => {
+              if(result.isConfirmed){
+                $('#uploadModal').modal('hide');
+              }
+            });
+        })
       },
       headers: {
         'Authorization': 'Bearer ' + getUrlParam('token')

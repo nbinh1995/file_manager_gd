@@ -432,6 +432,7 @@ $(document).ready(function(event){
             flagShow = false;
             $('#skeleton').show();
             $('.image-page.current').hide();
+            // setTimeout(load,000);
         }else{
             flagShow = true;
             $('#skeleton').hide();
