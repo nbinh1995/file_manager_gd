@@ -5,7 +5,7 @@ $(document).ready(function(){
         // responsive: true,
         searching: true,
         destroy: true,
-        order: [[0, 'desc']],
+        order: [[1, 'asc']],
         bAutoWidth: false,
         ajax: {
             url: url_volume_table,
