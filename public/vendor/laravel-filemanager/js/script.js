@@ -4,6 +4,7 @@ var sort_type = 'alphabetic';
 var multi_selection_enabled = false;
 var selected = [];
 var items = [];
+var isUpload = false;
 var flagShift = false;
 var controlA = {ctr: false , keyA: false};
 var url_add_1 = location.host =='vozdoremon.ddns.net' ? '' :'/manga';
@@ -57,6 +58,13 @@ $(document).ready(function () {
     $('#main').css('width','100%');
     btn = btn.splice(0,1);
     $('[data-action=use]').hide();
+    if((new URL(location.href)).searchParams.get('dir').indexOf(sessionStorage.getItem('authRole')) !== -1){
+      isUpload =true;
+    }else{
+      $('#fab').remove();
+    }
+  }else{
+    isUpload = true;
   }
   $('#fab').fab({
     buttons: btn 
@@ -99,7 +107,9 @@ $(document).ready(function () {
     });
 
   $(window).on('dragenter', function(){
-    $('#uploadModal').modal('show');
+    if(isUpload){
+      $('#uploadModal').modal('show');
+    }
   });
 
   if (usingWysiwygEditor()) {
@@ -151,7 +161,9 @@ $(document).on('click', '#add-folder', function () {
 });
 
 $(document).on('click', '#upload', function () {
-  $('#uploadModal').modal('show');
+  if(isUpload){
+    $('#uploadModal').modal('show');
+  }
 });
 
 $(document).on('click', '[data-display]', function() {
@@ -481,15 +493,17 @@ function resize(item) {
 }
 
 function download(items) {
+  if(isDownLoad){
+    loading(true);
+    var dir = getDir(items[0]);
+    var filenames = items.map(function(item){
+      return item.name;
+    }).join(',');
+    $('#custom-download-file').find('[name=dir]').val(dir);
+    $('#custom-download-file').find('[name=filenames]').val(filenames);
+    $('#custom-download-file').trigger('submit');
+  }
   // console.log(items)
-  loading(true);
-  var dir = getDir(items[0]);
-  var filenames = items.map(function(item){
-    return item.name;
-  }).join(',');
-  $('#custom-download-file').find('[name=dir]').val(dir);
-  $('#custom-download-file').find('[name=filenames]').val(filenames);
-  $('#custom-download-file').trigger('submit');
   // location.href = location.origin  + '/manga/file-manager/download?' + $.param(data);
   // items.forEach(function (item, index) {
   //   var data = defaultParameters();

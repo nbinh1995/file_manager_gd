@@ -85,6 +85,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::post('ajaxGetBooks', 'BookController@ajaxGetBooks')->name('ajaxGetBooks');
         Route::post('ajaxGetVolumes', 'VolumeController@ajaxGetVolumes')->name('ajaxGetVolumes');
         Route::post('ajaxGetPages', 'PageController@ajaxGetPages')->name('ajaxGetPages');
+        Route::post('ajaxChangeHideVolume', 'VolumeController@ajaxChangeHideVolume')->name('ajaxChangeHideVolume');
         Route::post('ajaxGetVolumesByBookID', 'VolumeController@ajaxGetVolumesByBookID')->name('ajaxGetVolumesByBookID');
     });
 });

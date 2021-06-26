@@ -12,7 +12,15 @@ $dir = '/'.implode('/',$dir).'/'.config('lfm.vol.check');
 @endpush
 
 @push('script')
-    
+    <script>
+    $('#auth-role').on('change',function(e){
+        if($(this).val() == 'Check'){
+            document.querySelector('iframe').contentDocument.location.reload(true);
+        }else{
+            document.getElementById('back').click();
+        }
+    })
+    </script>
 @endpush
 
 @section('content')
@@ -24,7 +32,7 @@ $dir = '/'.implode('/',$dir).'/'.config('lfm.vol.check');
                         <div class="card-header d-flex align-items-center">
                             <h6 class="card-title text-capitalize text-muted text-monospace text-sm"><i class="fas fa-folder-open text-primary"></i>  {{$dir}}</h6>
                             <div class="ml-auto">
-                                <a href="{{route('volumes.detail',['id' =>  $volume->id])}}" type="submit" class="btn btn-link text-muted text-monospace"><i class="fas fa-arrow-circle-left text-danger"></i> Back</a>
+                                <a href="{{route('volumes.detail',['id' =>  $volume->id])}}" id="back"  class="btn btn-link text-muted text-monospace"><i class="fas fa-arrow-circle-left text-danger"></i> Back</a>
                             </div>
                         </div>
                         <div class="card-body">

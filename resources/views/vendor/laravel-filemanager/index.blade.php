@@ -249,12 +249,43 @@
   <script src="{{ asset('vendor/laravel-filemanager/js/dropzone.min.js') }}"></script>
 
   <script>
+    var isDownLoad = false
+    if((new URL(location.href)).searchParams.get('dir') !== null){
+      switch(sessionStorage.getItem('authRole')){
+                case 'Clean':
+                  if((new URL(location.href)).searchParams.get('dir').indexOf('Raw') !== -1){
+                      isDownLoad = true;
+                  }
+                break;
+                case 'Type':
+                  if((new URL(location.href)).searchParams.get('dir').indexOf('Clean') !== -1){
+                      isDownLoad = true;
+                  }
+                break;
+                case 'SFX':
+                  if((new URL(location.href)).searchParams.get('dir').indexOf('Type') !== -1){
+                      isDownLoad = true;
+                  }
+                break;
+                case 'Check':
+                  if((new URL(location.href)).searchParams.get('dir').indexOf('SFX') !== -1){
+                      isDownLoad = true;
+                  }
+                break;
+                default:
+                    isDownLoad =false;
+      }
+
+    }else{
+      isDownLoad =true;
+    }
     var flagUpload = true;
     var totalFile = 0;
     var  hasDownload = false;
     var url_show_manager = "{{route('file-manager.showUrlManager')}}";
     var lang = {!! json_encode(trans('laravel-filemanager::lfm')) !!};
     var actions = (new URL(location.href)).searchParams.get('dir') !== null ? 
+    ( isDownLoad ?
     [{
         name: 'download',
         icon: 'download',
@@ -267,7 +298,10 @@
       //   label: lang['menu-delete'],
       //   multiple: true
       // },
+    ]:[
+
     ]
+    )
     :[
       // {
       //   name: 'use',

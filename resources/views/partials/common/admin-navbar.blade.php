@@ -14,7 +14,7 @@
         <!-- Messages Dropdown Menu -->
         <li class="nav-item">
             <select name="role" class="dropdown-item border rounded" id="auth-role">
-                @foreach (config('lfm.volume') as $item)
+                @foreach ((auth()->user()->role_multi ? explode(',',auth()->user()->role_multi): config('lfm.volume')) as $item)
                     <option value="{{$item}}" {{$item === auth()->user()->role ? 'selected' : '' }}>{{$item}}</option>
                 @endforeach 
             </select>

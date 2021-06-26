@@ -29,6 +29,7 @@
                                                 <th>Book Name</th>
                                                 <th>Status</th>
                                                 <th>Action</th>
+                                                <th>Hide</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -50,6 +51,7 @@
         </div>
         <!-- /.container-fluid -->
     </div>
+
     <div class="modal fade" id="password-again-volume">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -88,6 +90,7 @@
     <script src="{{asset('/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{ asset('AdminLTE/plugins/sweetalert2/sweetalert2.all.min.js')}}"></script>
     <script>
+        var url_ajax_hide = "{{route('ajaxChangeHideVolume')}}";
         var url_volume_table = "{{route('ajaxGetVolumes')}}";
         var show_pw = document.getElementById('show_pw');
         var hide_pw = document.getElementById('hide_pw');

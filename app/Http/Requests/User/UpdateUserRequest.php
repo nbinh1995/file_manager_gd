@@ -26,7 +26,8 @@ class UpdateUserRequest extends FormRequest
         return [
             'username' => 'required|string|min:1',
             'password' => 'nullable|string|min:1|confirmed',
-            'role' => 'required',
+            'role' => 'required|in:'.implode(',',config('lfm.volume')),
+            'role_multi.*' => 'required|in:'.implode(',',config('lfm.volume')),
         ];
     }
 }

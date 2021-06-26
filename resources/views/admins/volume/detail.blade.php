@@ -37,11 +37,18 @@
                                         <table id="pages-table" class="table table-bordered table-striped">
                                             <thead>
                                             <tr>
-                                                <th style="width: 10px;"> 
+                                                <th style="width: 10px;">
                                                     <select name="type_down" id="type_down" class="border" style="outline: none">
-                                                    @foreach (config('lfm.volume') as $key => $item)
-                                                        <option value="{{$item}}">{{$item}}</option>
-                                                    @endforeach 
+                                                        @if (auth()->user()->is_admin)
+                                                            @foreach (config('lfm.volume') as $item)
+                                                                @if ($volume->status === 'pending')
+                                                                <option value="{{$item}}" >{{$item}}</option>
+                                                                @endif
+                                                                @if ($volume->status !== 'pending' && ($item === 'Raw' || $item === 'Check'))
+                                                                <option value="{{$item}}" >{{$item}}</option>
+                                                                @endif
+                                                            @endforeach 
+                                                        @endif
                                                     </select>
                                                 </th>
                                                 <th style="width: 30px">File Name</th>
@@ -173,6 +180,8 @@
     <script src="{{asset('/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{ asset('AdminLTE/plugins/sweetalert2/sweetalert2.all.min.js')}}"></script>
     <script>
+        var pending = "{{$volume->status === 'pending' ? '1' : '0'}}";
+        var check = "{{auth()->user()->is_admin ? '1' : '0'}}";
         var volume_id_page = {{$volume->id}};
         var url_page_table = "{{route('ajaxGetPages')}}";
         var hasDownload = false;

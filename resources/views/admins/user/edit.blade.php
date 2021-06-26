@@ -56,11 +56,24 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="role">{{__('Role')}}</label>
-                                                <select class="form-control" name="role" id="role" >
+                                                <label for="role_multi">{{__('Roles')}}</label>
+                                                <div id="role_multi" class="d-flex justify-content-between">
                                                     @foreach (config('lfm.volume') as $item)
-                                                        <option value="{{$item}}" {{old('role',$user->role) === $item ? 'selected' : ''}}>{{$item}}</option>
+                                                    <label class="text-muted text-monospace"><input type="checkbox" name="role_multi[]" {{in_array($item,old('role_multi',($user->role_multi ? explode(',',$user->role_multi) : []))) ? 'checked' : ''}} value="{{$item}}"> {{$item}}</label>
                                                     @endforeach
+                                                </div>
+                                                @if($errors->has('role_multi[]'))
+                                                    <label class="text-danger">{{$errors->get('role')[0]}}</label>
+                                                @endif
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="role">{{__('Default Role')}}</label>
+                                                <select class="form-control" name="role" id="role" >
+                                                    @isset($user->role_multi )
+                                                        @foreach (explode(',',$user->role_multi) as $item)
+                                                            <option value="{{$item}}" {{old('role',$user->role) === $item ? 'selected' : ''}}>{{$item}}</option>
+                                                        @endforeach
+                                                    @endisset
                                                 </select>
                                                 @if($errors->has('role'))
                                                     <label class="text-danger">{{$errors->get('role')[0]}}</label>

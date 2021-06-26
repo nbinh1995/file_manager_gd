@@ -3,6 +3,7 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 
 class UserRequest extends FormRequest
 {
@@ -21,13 +22,15 @@ class UserRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(Request $request)
     {
+        // dd($request->all());
         return [
             'username' => 'required|string|min:1',
             'password' => 'required|string|min:1|confirmed',
             'email' => 'required|string|unique:users,email',
-            'role' => 'required',
+            'role' => 'required|in:'.implode(',',config('lfm.volume')),
+            'role_multi.*' => 'required|in:'.implode(',',config('lfm.volume')),
         ];
     }
 }

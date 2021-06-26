@@ -11,6 +11,30 @@ $(document).ready(function(event){
             beforeSend: beforeSend,
         });
     };
+    function setDownLoadByRole(){
+        if(check == 0){
+            var typeDown = '';
+            switch($('#auth-role').val()){
+                case 'Clean':
+                    typeDown = 'Raw';
+                break;
+                case 'Type':
+                    typeDown = pending == 1 ? 'Clean' : '';
+                break;
+                case 'SFX':
+                    typeDown = pending == 1 ?  'Type' : '';
+                break;
+                case 'Check':
+                    typeDown = pending == 1 ? 'SFX' : '';
+                break;
+                default:
+                    typeDown = '';
+            }
+            $('#type_down').html('');
+            $('#type_down').html('<option value="'+typeDown+'" selected >'+(typeDown ? typeDown : '#')+'</option>');
+            $('#type_down').trigger('change');
+        }
+    }
 
     function configDataTable(){
     return $('#pages-table').DataTable({
@@ -63,6 +87,10 @@ $(document).ready(function(event){
     $('#type_down').on('change',function(e){
         e.preventDefault();
         pageTable = configDataTable();
+    })
+    setDownLoadByRole();
+    $('#auth-role').on('change',function(e){
+        setDownLoadByRole();
     })
     $('html body').on('click', '.delete', function(event){
         event.preventDefault();
@@ -262,11 +290,45 @@ $(document).ready(function(event){
         var task_id = '#'+type+'-folder';
         $(document).on('click',task_id,function(e){
             var role = sessionStorage.getItem('authRole').toLowerCase();
-            if(role !== type){
-                e.preventDefault();
-                e.stopPropagation();
-                toastr.warning("The User's Role is not '"+type+"'")
+            switch(role){
+                case 'raw':
+                    if(type != 'raw'){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toastr.warning("The User's Role is not '"+type+"'")
+                    }
+                    break;
+                case 'clean':
+                    if(type != 'raw' && type != 'clean'){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toastr.warning("The User's Role is not correct!")
+                    }
+                    break;
+                case 'type':
+                    if(type != 'type' && type != 'clean'){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toastr.warning("The User's Role is not correct!")
+                    }
+                    break;
+                case 'sfx':
+                    if(type != 'type' && type != 'sfx'){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toastr.warning("The User's Role is not correct!")
+                    }
+                    break;
+                case 'check':
+                    if(type != 'check' && type != 'sfx'){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toastr.warning("The User's Role is not correct!")
+                    }
+                    break;
+                default:
             }
+            
         })
     }
     $(document).on('click','#task-btn',function(e){
@@ -371,6 +433,8 @@ $(document).ready(function(event){
             // flagShow=true;
             loadingCheck(false);
             loading(false);
+        }).fail(function(){
+            toastr.error("There were errors. Please try again.");
         });
         }else{
             toastr.options = {
@@ -409,6 +473,8 @@ $(document).ready(function(event){
                 // flagShow=true;
                 loadingCheck(false);
                 loading(false);
+            }).fail(function(){
+                toastr.error("There were errors. Please try again.");
             });
         }else{
             toastr.options = {

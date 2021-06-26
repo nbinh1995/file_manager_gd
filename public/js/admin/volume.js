@@ -1,4 +1,18 @@
 $(document).ready(function(){
+    var fetchData = function (data, ajaxUrl, method = 'post', beforeSend = null) {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        return $.ajax({
+            data: data,
+            dataType: 'json',
+            url: ajaxUrl,
+            method: method,
+            beforeSend: beforeSend,
+        });
+    };
     let volumeTable = $('#volume-table').DataTable({
         processing: true,
         serverSide: true,
@@ -20,10 +34,30 @@ $(document).ready(function(){
             {data: 'bookname',class: 'mw-160 text-truncate'},
             {data: 'status', class: 'mw-160 text-truncate'},
             {data: 'Action',  class: 'mw-160 text-truncate'},
+            {data: 'is_hide',class: 'mw-160 text-truncate'},
         ],
         columnDefs: [
             {targets: 4, searchable: false, orderable: false},
         ],
+    });
+
+    $(document).on('click','.is_hide',function(e){
+        console.log($(this).is(':checked'));
+        var hide = $(this).is(':checked') ? 1 : 0;
+        fetchData({hide:hide,id:$(this).val()},url_ajax_hide).done(function(data){
+            switch(true){
+                case (data.code == 200):
+                    toastr.success("Update success!");
+                break;
+                case (data.code == 404):
+                    toastr.warning("Not Found!");
+                break;
+                default:
+                    toastr.error("There were errors. Please try again.");
+            }
+        }).fail(function(){
+            toastr.error("There were errors. Please try again.");
+        });;
     });
     $('html body').on('click', '.delete', function(event){
         event.preventDefault();

@@ -47,16 +47,27 @@
                                             <div class="form-group">
                                                 <label for="password_confirmation">{{__('Password Confirmation')}}</label>
                                                 <input type="password" class="form-control" id="password_confirmation"
-                                                       name="password_confirmation">
+                                                        name="password_confirmation">
                                                 @if($errors->has('password_confirmation'))
                                                     <label class="text-danger">{{$errors->get('password_confirmation')[0]}}</label>
                                                 @endif
                                             </div>
                                             <div class="form-group">
-                                                <label for="role">{{__('Role')}}</label>
-                                                <select class="form-control" name="role" id="role" >
+                                                <label for="role_multi">{{__('Roles')}}</label>
+                                                <div id="role_multi" class="d-flex justify-content-between">
                                                     @foreach (config('lfm.volume') as $item)
-                                                        <option value="{{$item}}">{{$item}}</option>
+                                                    <label class="text-muted text-monospace"><input type="checkbox" name="role_multi[]" value="{{$item}}" {{in_array($item,old('role_multi',[])) ? 'checked' : ''}} > {{$item}}</label>
+                                                    @endforeach
+                                                </div>
+                                                @if($errors->has('role_multi[]'))
+                                                    <label class="text-danger">{{$errors->get('role')[0]}}</label>
+                                                @endif
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="role">{{__('Default Role')}}</label>
+                                                <select class="form-control" name="role" id="role" >
+                                                    @foreach (old('role_multi',[]) as $item)
+                                                        <option value="{{$item}}" {{old('role',$user->role) === $item ? 'selected' : ''}}>{{$item}}</option>
                                                     @endforeach
                                                 </select>
                                                 @if($errors->has('role'))

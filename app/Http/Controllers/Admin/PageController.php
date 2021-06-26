@@ -20,8 +20,11 @@ class PageController extends Controller
         $eloquent = Page::with(['rawUser','cleanUser','typeUser','sfxUser','checkUser'])->where('volume_id',$request->volume)->selectRaw('*,CAST( filename AS unsigned) AS id_filename ');
         return DataTables::eloquent($eloquent)
             ->editColumn('id', function ($page) use ($request) {
-                $column = $request->type_down ?? 'raw';
+                $column = $request->type_down ?? '';
                 switch($column){
+                    case 'Raw':
+                        $status = $page->raw;
+                    break;
                     case 'Clean':
                         $status = $page->clean;
                     break;
@@ -35,7 +38,7 @@ class PageController extends Controller
                         $status = $page->check;
                     break;
                     default:
-                        $status = $page->raw;
+                        $status = '';
                 }
 
                 return  $status == 'done' ? '<input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom download-page-id">' : 'N/E';

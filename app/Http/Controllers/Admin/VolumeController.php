@@ -20,10 +20,13 @@ class VolumeController extends Controller
     }
 
     public function ajaxGetVolumes(){
-        $eloquent = Volume::leftJoin('books','volumes.book_id','books.id')->select('volumes.id','volumes.filename','volumes.status','books.filename as bookname');
+        $eloquent = Volume::leftJoin('books','volumes.book_id','books.id')->select('volumes.id','volumes.filename','volumes.status','books.filename as bookname','volumes.is_hide');
         return DataTables::eloquent($eloquent)
+            ->editColumn('is_hide', function ($volume) {
+                return '<input type="checkbox" value="'.$volume->id.'"  class="is_hide"'.($volume->is_hide ? 'checked' : '').'>';
+            })
             ->editColumn('filename', function ($volume) {
-                return '<a href="'.route('volumes.detail',['id'=>$volume->id]).'">'.$volume->filename.'</a>';
+                return '<a href="'.route('volumes.detail',['id'=>$volume->id]).'">'.$volume->filename.'</>';
             })
             ->editColumn('status', function ($volume) {
                 return '<span class="badge badge-primary py-1 px-2">'.$volume->status.'</span>';
@@ -36,7 +39,7 @@ class VolumeController extends Controller
                 }
                 return $btn;
             })
-            ->rawColumns(['Action', 'status','filename'])
+            ->rawColumns(['Action', 'status','filename','is_hide'])
             ->toJson();
     }
 
@@ -136,8 +139,26 @@ class VolumeController extends Controller
 
     public function ajaxGetVolumesByBookID(Request $request){
         $book_id = $request->book;
-        $volumes = Volume::where('book_id',$book_id)->get();
+        $volumes = Volume::where('book_id',$book_id)->where('is_hide',false)->get();
 
         return response()->json(['volumes'=> $volumes]);
+    }
+
+    public function ajaxChangeHideVolume(Request $request){
+        try{
+            $book_id = $request->id;
+            $volume = Volume::find($book_id);
+            if($volume instanceof Volume){
+                $data=[
+                    'is_hide' => $request->hide == 1 ? true : false
+                ];
+                $volume->update($data);
+                return response()->json(['code'=>200]);
+            }
+            return response()->json(['code'=>404]);
+        }catch(\Exception $e){
+            dd($e);
+            return response()->json(['code'=>500]);
+        }
     }
 }

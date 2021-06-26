@@ -51,9 +51,10 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         try{
-            $data = $request->except('password','active','is_admin');
-        $data['is_admin'] = $request->filled('is_admin') ? 1 : 0; 
-        $data['password'] = Hash::make($request->password);
+            $data = $request->except('password','active','is_admin','role_multi');
+            $data['role_multi'] = implode(',',$request->role_multi);
+            $data['is_admin'] = $request->filled('is_admin') ? 1 : 0; 
+            $data['password'] = Hash::make($request->password);
         $user = User::create($data);
         if ($user instanceof User) {
             //send mail
@@ -87,7 +88,8 @@ class UserController extends Controller
         $user = User::find($id);
 
         if($user instanceof User){
-            $data = $request->except('password','active','is_admin');
+            $data = $request->except('password','active','is_admin','email','role_multi');
+            $data['role_multi'] = implode(',',$request->role_multi);
             $data['active'] = $request->filled('active') ? 1 : 0; 
             $data['is_admin'] = $request->filled('is_admin') ? 1 : 0; 
             if($request->password){
