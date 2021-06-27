@@ -247,7 +247,54 @@
   <script src="{{ asset('AdminLTE/plugins/sweetalert2/sweetalert2.all.min.js')}}"></script>
   <script src="{{ asset('vendor/laravel-filemanager/js/cropper.min.js') }}"></script>
   <script src="{{ asset('vendor/laravel-filemanager/js/dropzone.min.js') }}"></script>
-
+  <script type="text/javascript">
+    @if(session()->has('flash_success') || isset($flashSuccess))
+        window.flashSuccess = '{{session()->get('flash_success') ?? $flashSuccess}}';
+    @endif
+    @if(session()->has('flash_danger') || isset($flashDanger))
+        window.flashDanger = '{{session()->get('flash_danger') ?? $flashDanger}}';
+    @endif
+    @if(session()->has('flash_info') || isset($flashInfo))
+        window.flashInfo = '{{session()->get('flash_info') ?? $flashInfo}}';
+    @endif
+    @if(session()->has('flash_warning') || isset($flashWarning))
+        window.flashWarning = '{{session()->get('flash_warning') ?? $flashWarning}}';
+    @endif
+    if (undefined !== window.flashSuccess) {
+      Swal.fire({
+            title:window.flashSuccess,
+            icon: 'success',
+            showCancelButton: false,
+            });
+    }
+    
+    if (undefined !== window.flashDanger) {
+      Swal.fire({
+            title:window.flashDanger,
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 800
+            });
+    }
+    
+    if (undefined !== window.flashInfo) {
+      Swal.fire({
+            title:window.flashInfo,
+            icon: 'info',
+            showConfirmButton: false,
+            timer: 800
+            });
+    }
+    
+    if (undefined !== window.flashWarning) {
+      Swal.fire({
+            title:window.flashInfo,
+            icon: 'warning',
+            showConfirmButton: false,
+            timer: 800
+            });
+    }
+  </script>
   <script>
     var isDownLoad = false
     if((new URL(location.href)).searchParams.get('dir') !== null){

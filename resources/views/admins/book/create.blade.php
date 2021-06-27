@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title','CREATE VOLUME')
-@section('header_page','Create Volume')
+@section('title','CREATE BOOK')
+@section('header_page','Create Book')
 
 @push('head')
 @endpush

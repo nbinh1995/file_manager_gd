@@ -22,6 +22,9 @@ class VolumeController extends Controller
     public function ajaxGetVolumes(){
         $eloquent = Volume::leftJoin('books','volumes.book_id','books.id')->select('volumes.id','volumes.filename','volumes.status','books.filename as bookname','volumes.is_hide');
         return DataTables::eloquent($eloquent)
+            ->filterColumn('bookname', function($query, $keyword) {
+                    $query->whereRaw('books.filename like ?', ["%{$keyword}%"]);
+            })
             ->editColumn('is_hide', function ($volume) {
                 return '<input type="checkbox" value="'.$volume->id.'"  class="is_hide"'.($volume->is_hide ? 'checked' : '').'>';
             })

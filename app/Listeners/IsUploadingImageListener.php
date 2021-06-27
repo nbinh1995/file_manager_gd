@@ -56,72 +56,92 @@ class IsUploadingImageListener
                 }
                 switch($type){
                     case 'clean':
-                        if($page instanceof Page && $page->raw === 'done'){
-                            $page->update([
-                                'clean' => 'done',
-                                'clean_id' => auth()->id()
-                            ]);
+                        if(strpos(auth()->user()->role_multi,'Clean') !== false || auth()->id() == 1){
+                            if($page instanceof Page && $page->raw === 'done'){
+                                $page->update([
+                                    'clean' => 'done',
+                                    'clean_id' => auth()->id()
+                                ]);
+                            }else{
+                                throw new \Exception('The file name "'.$filename.'" does not exist in "Raw" directory!');
+                            }
                         }else{
-                            throw new \Exception('The file name "'.$filename.'" does not exist in "Raw" directory!');
+                            throw new \Exception('Not permission!');
                         }
                     break;
                     case 'type':
-                        if($page instanceof Page && $page->clean === 'done'){
-                            $page->update([
-                                'type' => 'done',
-                                'type_id' => auth()->id()
-                            ]);
+                        if(strpos(auth()->user()->role_multi,'Type') !== false || auth()->id() == 1){
+                            if($page instanceof Page && $page->clean === 'done'){
+                                $page->update([
+                                    'type' => 'done',
+                                    'type_id' => auth()->id()
+                                ]);
+                            }else{
+                                throw new \Exception('The file name "'.$filename.'" does not exist in "Clean" directory!');
+                            }
                         }else{
-                            throw new \Exception('The file name "'.$filename.'" does not exist in "Clean" directory!');
+                            throw new \Exception('Not permission!');
                         }
                     break;
                     case 'sfx':
-                        if($page instanceof Page && $page->type === 'done'){
-                            if(Storage::disk(config('lfm.disk'))->exists($publicFilePath)){
-                                $lastModified = date('Ymd_His',Storage::disk(config('lfm.disk'))->lastModified($publicFilePath));
-                                $newPublicFilePath = explode('.',$publicFilePath);
-                                $newPublicFilePath[0] = $newPublicFilePath[0].'_'.$lastModified;
-                                $newPublicFilePath = implode('.',$newPublicFilePath);
-                                $page->update([
-                                    'check' => 'pending',
-                                    'check_id' => null,
-                                    'note' => null,
-                                ]);
-                                Storage::disk(config('lfm.disk'))->move($publicFilePath,$newPublicFilePath);
+                        if(strpos(auth()->user()->role_multi,'SFX') !== false || strpos(auth()->user()->role_multi,'Check') !== false || auth()->id() == 1){
+                            if($page instanceof Page && $page->type === 'done'){
+                                if(Storage::disk(config('lfm.disk'))->exists($publicFilePath)){
+                                    $lastModified = date('Ymd_His',Storage::disk(config('lfm.disk'))->lastModified($publicFilePath));
+                                    $newPublicFilePath = explode('.',$publicFilePath);
+                                    $newPublicFilePath[0] = $newPublicFilePath[0].'_'.$lastModified;
+                                    $newPublicFilePath = implode('.',$newPublicFilePath);
+                                    $page->update([
+                                        'check' => 'pending',
+                                        'check_id' => null,
+                                        'note' => null,
+                                    ]);
+                                    Storage::disk(config('lfm.disk'))->move($publicFilePath,$newPublicFilePath);
+                                }else{
+                                    $page->update([
+                                        'sfx' => 'done',
+                                        'sfx_id' => auth()->id()
+                                    ]);
+                                }
                             }else{
-                                $page->update([
-                                    'sfx' => 'done',
-                                    'sfx_id' => auth()->id()
-                                ]);
+                                throw new \Exception('The file name "'.$filename.'" does not exist in "SFX" directory!');
                             }
                         }else{
-                            throw new \Exception('The file name "'.$filename.'" does not exist in "SFX" directory!');
+                            throw new \Exception('Not permission!');
                         }
                     break;
                     case 'check':
-                        if($page instanceof Page && $page->sfx === 'done'){
-                            $page->update([
-                                'check' => 'done',
-                                'check_id' => auth()->id()
-                            ]);
+                        if(auth()->user()->is_admin){
+                            if($page instanceof Page && $page->sfx === 'done'){
+                                $page->update([
+                                    'check' => 'done',
+                                    'check_id' => auth()->id()
+                                ]);
+                            }else{
+                                throw new \Exception('The file name "'.$filename.'" does not exist in "Check" directory!');
+                            }
                         }else{
-                            throw new \Exception('The file name "'.$filename.'" does not exist in "Check" directory!');
+                            throw new \Exception('Not permission!');
                         }
                     break;
                     default:
-                    if(preg_match('/^[\d]{1,3}$/', $filename) == 0){
-                        throw new \Exception('The file name is numeric');
+                    if(strpos(auth()->user()->role_multi,'Raw') !== false || auth()->id() == 1){
+                        if(preg_match('/^[\d]{1,3}$/', $filename) == 0){
+                            throw new \Exception('The file name is numeric');
+                        }
+                        if(!($page instanceof Page) && $type === 'raw'){
+                            Page::create([
+                                'filename' => $filename,
+                                'volume_id' => $volume->id,
+                                'raw_id' => auth()->id(),
+                            ]);
+                        }
+                        // else{ 
+                        //     throw new \Exception('The file name "'.$filename.'" is exist in "Raw" directory!');
+                        // }
+                    }else{
+                        throw new \Exception('Not permission!');
                     }
-                    if(!($page instanceof Page) && $type === 'raw'){
-                        Page::create([
-                            'filename' => $filename,
-                            'volume_id' => $volume->id,
-                            'raw_id' => auth()->id(),
-                        ]);
-                    }
-                    // else{ 
-                    //     throw new \Exception('The file name "'.$filename.'" is exist in "Raw" directory!');
-                    // }
                 }
             }
         }

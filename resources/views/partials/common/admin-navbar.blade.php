@@ -25,7 +25,7 @@
             </a>
         </li>
         <li class="nav-item ">
-            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();sessionStorage.removeItem('authRole');
                     document.getElementById('logout-form').submit();">
                 {{ __('Logout') }}
             </a>

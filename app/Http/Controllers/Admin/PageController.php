@@ -19,6 +19,8 @@ class PageController extends Controller
         $volume = $request->volume;
         $eloquent = Page::with(['rawUser','cleanUser','typeUser','sfxUser','checkUser'])->where('volume_id',$request->volume)->selectRaw('*,CAST( filename AS unsigned) AS id_filename ');
         return DataTables::eloquent($eloquent)
+            ->filterColumn('id_filename', function($query, $keyword) {
+            })
             ->editColumn('id', function ($page) use ($request) {
                 $column = $request->type_down ?? '';
                 switch($column){
@@ -207,7 +209,33 @@ class PageController extends Controller
 
     public function downTask(Request $request,$idVolume){
         try{
-            ini_set('max_execution_time', 300); 
+            ini_set('max_execution_time', 300);
+            if(!auth()->user()->is_admin){
+                switch($request->type_task){
+                    case 'Raw':
+                        if(strpos(auth()->user()->role_multi,'Clean') === false){
+                            return redirect()->back()->withFlashDanger('Not permission!');
+                        } 
+                    break;
+                    case 'Clean':
+                        if(strpos(auth()->user()->role_multi,'Type') === false){
+                            return redirect()->back()->withFlashDanger('Not permission!');
+                        }  
+                    break;
+                    case 'Type':
+                        if(strpos(auth()->user()->role_multi,'SFX') === false){
+                            return redirect()->back()->withFlashDanger('Not permission!');
+                        }  
+                    break;
+                    case 'SFX':
+                        if(strpos(auth()->user()->role_multi,'Check') === false){
+                            return redirect()->back()->withFlashDanger('Not permission!');
+                        }  
+                    break;
+                    default:
+                    return redirect()->back()->withFlashDanger('Not permission!');
+                } 
+            }
             $volume = Volume::find($idVolume);
             $arrayPages = explode(',',$request->id_tasks);
             
