@@ -58,11 +58,55 @@ $(document).ready(function () {
     $('#main').css('width','100%');
     btn = btn.splice(0,1);
     $('[data-action=use]').hide();
-    if((new URL(location.href)).searchParams.get('dir').indexOf(sessionStorage.getItem('authRole')) !== -1){
-      isUpload =true;
+    if((new URL(location.href)).searchParams.get('dir').indexOf('Check') == -1){
+      switch(sessionStorage.getItem('authRole')){
+        case 'Raw':
+          if((new URL(location.href)).searchParams.get('dir').indexOf('Raw') !== -1){
+                isUpload =true;
+          }else{
+            $('#fab').remove();
+          }
+        break;
+        case 'Clean':
+          if((new URL(location.href)).searchParams.get('dir').indexOf('Clean') !== -1){
+                isUpload =true;
+          }else{
+            $('#fab').remove();
+          }
+        break;
+        case 'Type':
+          if((new URL(location.href)).searchParams.get('dir').indexOf('Type') !== -1){
+                isUpload =true;
+          }else{
+            $('#fab').remove();
+          }
+        break;
+        case 'SFX':
+          if((new URL(location.href)).searchParams.get('dir').indexOf('SFX') !== -1){
+                isUpload =true;
+          }else{
+            $('#fab').remove();
+          }
+        break;
+        case 'Check':
+          if((new URL(location.href)).searchParams.get('dir').indexOf('SFX') !== -1){
+                isUpload =true;
+          }else{
+            $('#fab').remove();
+          } 
+        break;
+        default:
+          isUpload =false;
+          $('#fab').remove();
+        }
     }else{
-      $('#fab').remove();
+      isUpload = true;
     }
+    // if((new URL(location.href)).searchParams.get('dir').indexOf(sessionStorage.getItem('authRole')) !== -1){
+    //   isUpload =true;
+    // }else{
+    //   $('#fab').remove();
+    // }
   }else{
     isUpload = true;
   }

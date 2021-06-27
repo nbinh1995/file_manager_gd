@@ -58,7 +58,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::get('/create-clean', 'PageController@createClean')->name('createClean');
         Route::get('/create-type', 'PageController@createType')->name('createType');
         Route::get('/create-sfx', 'PageController@createSFX')->name('createSFX');
-        Route::get('/create-check', 'PageController@createCheck')->name('createCheck');
+        Route::get('/create-check', 'PageController@createCheck')->name('createCheck')->middleware('admin');
         Route::get('/reject-check', 'PageController@rejectCheck')->name('rejectCheck');
         Route::get('/done-check', 'PageController@doneCheck')->name('doneCheck');
         Route::post('{idVolume}/add-task','PageController@addTask')->name('addTask');

@@ -251,7 +251,8 @@
   <script>
     var isDownLoad = false
     if((new URL(location.href)).searchParams.get('dir') !== null){
-      switch(sessionStorage.getItem('authRole')){
+      if((new URL(location.href)).searchParams.get('dir').indexOf('Check') == -1){
+        switch(sessionStorage.getItem('authRole')){
                 case 'Clean':
                   if((new URL(location.href)).searchParams.get('dir').indexOf('Raw') !== -1){
                       isDownLoad = true;
@@ -274,8 +275,10 @@
                 break;
                 default:
                     isDownLoad =false;
+        }
+      }else{
+        isDownLoad = true;
       }
-
     }else{
       isDownLoad =true;
     }

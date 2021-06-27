@@ -290,45 +290,52 @@ $(document).ready(function(event){
         var task_id = '#'+type+'-folder';
         $(document).on('click',task_id,function(e){
             var role = sessionStorage.getItem('authRole').toLowerCase();
-            switch(role){
-                case 'raw':
-                    if(type != 'raw'){
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toastr.warning("The User's Role is not '"+type+"'")
-                    }
-                    break;
-                case 'clean':
-                    if(type != 'raw' && type != 'clean'){
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toastr.warning("The User's Role is not correct!")
-                    }
-                    break;
-                case 'type':
-                    if(type != 'type' && type != 'clean'){
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toastr.warning("The User's Role is not correct!")
-                    }
-                    break;
-                case 'sfx':
-                    if(type != 'type' && type != 'sfx'){
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toastr.warning("The User's Role is not correct!")
-                    }
-                    break;
-                case 'check':
-                    if(type != 'check' && type != 'sfx'){
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toastr.warning("The User's Role is not correct!")
-                    }
-                    break;
-                default:
+            if(type != 'check'){
+                switch(role){
+                    case 'raw':
+                        if(type != 'raw'){
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toastr.warning("The User's Role is not '"+type+"'")
+                        }
+                        break;
+                    case 'clean':
+                        if(type != 'raw' && type != 'clean'){
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toastr.warning("The User's Role is not correct!")
+                        }
+                        break;
+                    case 'type':
+                        if(type != 'type' && type != 'clean'){
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toastr.warning("The User's Role is not correct!")
+                        }
+                        break;
+                    case 'sfx':
+                        if(type != 'type' && type != 'sfx'){
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toastr.warning("The User's Role is not correct!")
+                        }
+                        break;
+                    case 'check':
+                        if(type != 'sfx'){
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toastr.warning("The User's Role is not correct!")
+                        }
+                        break;
+                    default:
+                }
+            }else{
+                if(check == 0){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toastr.warning("The User's Role is not correct!")
+                }
             }
-            
         })
     }
     $(document).on('click','#task-btn',function(e){
