@@ -29,12 +29,12 @@ $(document).ready(function(){
             },
         },
         columns: [
-            {data: 'id', class: 'mw-50 text-truncate'},
+            {data: 'id', class: 'mw-50 text-truncate',searchable: false},
             {data: 'filename', class: 'mw-160 text-truncate'},
             {data: 'bookname',class: 'mw-160 text-truncate'},
-            {data: 'status', class: 'mw-160 text-truncate'},
+            {data: 'status', class: 'mw-160 text-truncate',searchable: false},
             {data: 'Action',  class: 'mw-160 text-truncate'},
-            {data: 'is_hide',class: 'mw-160 text-truncate'},
+            {data: 'is_hide',class: 'mw-160 text-truncate',searchable: false},
         ],
         columnDefs: [
             {targets: 4, searchable: false, orderable: false},

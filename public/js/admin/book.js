@@ -15,7 +15,7 @@ $(document).ready(function(){
             },
         },
         columns: [
-            {data: 'id',  class: 'mw-50 text-truncate'},
+            {data: 'id',  class: 'mw-50 text-truncate',searchable: false},
             {data: 'filename', class: 'mw-160 text-truncate'},
             {data: 'Action', class: 'mw-160 text-truncate'},
         ],

@@ -253,6 +253,7 @@ class PageController extends Controller
                     foreach ($filesDown as $key => $value) {
                         $relativeNameInZipFile = $value['basename'];
                         $zip->addFile(config('filesystems.disks.private.root').'/'.$value['path'], $relativeNameInZipFile);
+                        $zip->setCompressionName($relativeNameInZipFile, ZipArchive::CM_STORE);
                     }
                     $zip->close();
                 }

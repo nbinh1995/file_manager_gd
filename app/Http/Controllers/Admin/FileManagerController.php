@@ -195,6 +195,7 @@ class FileManagerController extends Controller
     public function downloadFile(Request $request){
         ini_set('max_execution_time', 300);
         $pathFolderDownload = $request->dir;
+        // $total = $request->total;
         if(auth()->id() != 1){
             switch(true){
                 case (strpos($pathFolderDownload,'Raw') !== false):
@@ -232,15 +233,19 @@ class FileManagerController extends Controller
                 foreach ($filesDown as $key => $value) {
                     $relativeNameInZipFile = $value['basename'];
                     $zip->addFile(config('filesystems.disks.private.root').'/'.$value['path'], $relativeNameInZipFile);
+                    $zip->setCompressionName($relativeNameInZipFile, ZipArchive::CM_STORE);
                 }
                 $zip->close();
             }
             return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$zipFileName);
+            // return response()->json(['path_download' => config('filesystems.disks.private.root').'/'.$zipFileName]);
         }else{
             if(count($filesDown) == 0){
                 return redirect()->back()->withFlashDanger('Can\'t find the file in the folder');
+                // return response()->json(['error'=>'Can\'t find the file in the folder'],404);
             }
             return redirect()->back()->withPathDownload(config('filesystems.disks.private.root').'/'.$filesDown->first()['path']);
+            // return response()->json(['path_download' => config('filesystems.disks.private.root').'/'.$filesDown->first()['path']]);
         }
     }
 }
