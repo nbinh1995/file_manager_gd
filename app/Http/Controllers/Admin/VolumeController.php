@@ -78,7 +78,7 @@ class VolumeController extends Controller
 
     public function detail($id){
         $volume = Volume::find($id);
-        if($volume instanceof Volume){
+        if($volume instanceof Volume && !$volume->is_hide){
             return view('admins.volume.detail',compact('volume'));
         }
         return redirect()->back()->withFlashDanger('Not Found!');
