@@ -247,13 +247,17 @@ class PageController extends Controller
             $filesDown = collect(Storage::disk(config('lfm.disk'))->listContents($pathFolderDownload,false))->whereIn('filename',$pagesSearch);
             if(count($filesDown) > 1){
                 $zip = new ZipArchive();
-                $zipFileName = 'download.zip';
+                $zipFileName = 'archive_'.auth()->id().'_'.time().'.zip';
                 if ($zip->open(config('filesystems.disks.private.root').'/'.$zipFileName, ZipArchive::CREATE) === TRUE)
                 {   
                     foreach ($filesDown as $key => $value) {
                         $relativeNameInZipFile = $value['basename'];
                         $zip->addFile(config('filesystems.disks.private.root').'/'.$value['path'], $relativeNameInZipFile);
                         $zip->setCompressionName($relativeNameInZipFile, ZipArchive::CM_STORE);
+                        if($key % 20 == 0){
+                            $zip->close();
+                            $zip->open(config('filesystems.disks.private.root').'/'.$zipFileName);
+                        }
                     }
                     $zip->close();
                 }
@@ -422,6 +426,51 @@ class PageController extends Controller
         } catch (\Exception $e){
             DB::rollBack();
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
+        }
+    }
+
+    public function noteType(Request $request){
+        try{
+            $fileName = $request->fileName;
+            $volume_id = $request->volume_id;
+            $note_type = $request->note_type;
+            $page = Page::with('volume')->where('volume_id',$volume_id)->where('filename',$fileName)->first();
+            if($page instanceof Page){
+                $data['note_type'] = '';
+                if($note_type){
+                    $data['note_type'] = $note_type;
+                }
+                $page->update($data);
+                return response()->json(['code'=> 200]);
+            }
+        }catch(\Exception $e){
+            return response()->json(['code'=> 500]);
+        }
+    }
+
+    public function passType(Request $request){
+        DB::beginTransaction();
+        try{
+            $fileName = $request->fileName;
+            $volume_id = $request->volume_id;
+
+            $page = Page::with('volume')->where('volume_id',$volume_id)->where('filename',$fileName)->first();
+        if($page instanceof Page){
+            $page->update([
+                'sfx' => 'done',
+                'sfx_id' => auth()->id()
+            ]);
+            $folderPath = $page->volume->path.'/'.config('lfm.vol.type');
+            $newFilePath = $page->volume->path.'/'.config('lfm.vol.sfx').'/'.$page->filename;
+            $filesDone = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->whereIn('filename',$page->filename)->first();
+            $publicFilePath = config('filesystems.disks.private.root').'/'.$filesDone['path'];
+            Storage::disk(config('lfm.disk'))->move($publicFilePath,$newFilePath.'.'.$filesDone['extension']);
+            DB::commit();
+            return response()->json(['code'=>200]);
+        }
+        }catch(\Exception $e){
+            DB::rollBack();
+            return response()->json(['code'=> 500]);
         }
     }
 }

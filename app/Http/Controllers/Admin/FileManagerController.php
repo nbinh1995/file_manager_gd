@@ -227,13 +227,17 @@ class FileManagerController extends Controller
     
         if(count($filesDown) > 1){
             $zip = new ZipArchive();
-            $zipFileName = 'download.zip'; 
+            $zipFileName = 'archive_'.auth()->id().'_'.time().'.zip'; 
             if ($zip->open(config('filesystems.disks.private.root').'/'.$zipFileName, ZipArchive::CREATE) === TRUE)
             {   
                 foreach ($filesDown as $key => $value) {
                     $relativeNameInZipFile = $value['basename'];
                     $zip->addFile(config('filesystems.disks.private.root').'/'.$value['path'], $relativeNameInZipFile);
                     $zip->setCompressionName($relativeNameInZipFile, ZipArchive::CM_STORE);
+                    if($key % 20 == 0){
+                        $zip->close();
+                        $zip->open(config('filesystems.disks.private.root').'/'.$zipFileName);
+                    }
                 }
                 $zip->close();
             }

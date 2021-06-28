@@ -92,6 +92,7 @@ class IsUploadingImageListener
                                     $newPublicFilePath[0] = $newPublicFilePath[0].'_'.$lastModified;
                                     $newPublicFilePath = implode('.',$newPublicFilePath);
                                     $page->update([
+                                        'sfx_id' => auth()->id(),
                                         'check' => 'pending',
                                         'check_id' => null,
                                         'note' => null,
