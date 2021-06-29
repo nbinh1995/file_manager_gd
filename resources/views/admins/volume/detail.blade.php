@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', __('PAGES'))
-@section('header_page', __('Pages'))
+@section('header_page', __($volume->book->filename.' - '.$volume->filename))
 @section('content')
     <div class="content">
         <div class="container-fluid">
@@ -23,10 +23,6 @@
                                     <a href="{{route('pages.createSFX',['volume' => $volume->id])}}" class="btn btn-danger btn-xs mb-1" id="sfx-folder"><i
                                         class="fas fa-folder-open mr-2"></i>{{__('SFX Folder')}}</a>
                                     @endif
-                                    {{-- @if (auth()->user()->is_admin)
-                                    <a href="{{route('pages.createCheck',['volume' => $volume->id])}}" class="btn btn-success btn-xs mb-1" id="check-folder"><i
-                                        class="fas fa-folder-open mr-2"></i>{{__('Check Folder')}}</a>
-                                    @endif --}}
                                 </div>
                             </div>
                         </div>

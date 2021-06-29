@@ -80,6 +80,9 @@ class PageController extends Controller
     }
 
     public function createRaw(Request $request){
+        if(strpos(auth()->user()->role_multi,'Clean') === false && strpos(auth()->user()->role_multi,'Raw') === false){
+            return redirect()->back()->withFlashDanger('Not permission!');
+        } 
         $volume = Volume::find($request->volume);
         
         return view('admins.page.create_raw',compact('volume'));
@@ -87,6 +90,9 @@ class PageController extends Controller
     }
 
     public function createClean(Request $request){
+        if(strpos(auth()->user()->role_multi,'Clean') === false && strpos(auth()->user()->role_multi,'Type') === false){
+            return redirect()->back()->withFlashDanger('Not permission!');
+        } 
         $volume = Volume::find($request->volume);
         
         return view('admins.page.create_clean',compact('volume'));
@@ -94,6 +100,9 @@ class PageController extends Controller
     }
 
     public function createType(Request $request){
+        if(strpos(auth()->user()->role_multi,'SFX') === false && strpos(auth()->user()->role_multi,'Type') === false){
+            return redirect()->back()->withFlashDanger('Not permission!');
+        } 
         $volume = Volume::find($request->volume);
         
         return view('admins.page.create_type',compact('volume'));
@@ -101,6 +110,9 @@ class PageController extends Controller
     }
 
     public function createSFX(Request $request){
+        if(strpos(auth()->user()->role_multi,'SFX') === false && strpos(auth()->user()->role_multi,'Check') === false){
+            return redirect()->back()->withFlashDanger('Not permission!');
+        } 
         $volume = Volume::find($request->volume);
         
         return view('admins.page.create_sfx',compact('volume'));
@@ -108,6 +120,9 @@ class PageController extends Controller
     }
 
     public function createCheck(Request $request){
+        if(!auth()->user()->is_admin){
+            return redirect()->back()->withFlashDanger('Not permission!');
+        } 
         $volume = Volume::find($request->volume);
         
         return view('admins.page.create_check',compact('volume'));
@@ -130,6 +145,9 @@ class PageController extends Controller
         $arrayKeyVol = array_keys(config('lfm.volume'));
         switch($request->type_task){
             case 'clean':
+                if(strpos(auth()->user()->role_multi,'Clean') === false){
+                    return redirect()->back()->withFlashDanger('Not permission!');
+                } 
                 // $subFolder = config('lfm.vol.raw');
                 $pages->update(
                     [
@@ -139,6 +157,9 @@ class PageController extends Controller
                     );
                 break;
             case 'type':
+                if(strpos(auth()->user()->role_multi,'Type') === false){
+                    return redirect()->back()->withFlashDanger('Not permission!');
+                } 
                 // $subFolder = config('lfm.vol.clean');
                 $pages->update(
                     [
@@ -148,13 +169,24 @@ class PageController extends Controller
                     );
                 break;
             case 'sfx':
+                if(strpos(auth()->user()->role_multi,'SFX') === false){
+                    return redirect()->back()->withFlashDanger('Not permission!');
+                } 
                 // $subFolder = config('lfm.vol.type');
                 $pages->update(
                     [
-                        $arrayKeyVol[3] => 'doing',
+                        $arrayKeyVol[3] => 'done',
                         $arrayKeyVol[3].'_id' => auth()->id()
                     ]
                     );
+                $pagesSearch = $pages->get()->pluck('filename');
+                $folderPath = $volume->path.'/'.config('lfm.vol.type').'/';
+                $newFilePath = $volume->path.'/'.config('lfm.vol.sfx').'/';
+                $filesDone = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->whereIn('filename',$pagesSearch);
+                foreach($filesDone as $file){
+                        $publicFilePath = '/'.$file['path'];
+                        Storage::disk(config('lfm.disk'))->move($publicFilePath,$newFilePath.$file['basename']);
+                }
                 break;
             // case 'check':
             //     // $subFolder = config('lfm.vol.sfx');
@@ -308,6 +340,9 @@ class PageController extends Controller
 
     public function rejectCheck(Request $request){
         try{
+            if(strpos(auth()->user()->role_multi,'Check') === false){
+                return response()->json(['code'=> 404]);
+            }  
             $fileName = $request->fileName;
             $volume_id = $request->volume_id;
             $note = $request->note;
@@ -331,6 +366,9 @@ class PageController extends Controller
     public function doneCheck(Request $request){
         DB::beginTransaction();
         try{
+            if(strpos(auth()->user()->role_multi,'Check') === false){
+                return response()->json(['code'=> 404]);
+            }  
             $fileName = $request->fileName;
             $volume_id = $request->volume_id;
 
@@ -342,11 +380,11 @@ class PageController extends Controller
             ]);
             $folderPath = $page->volume->path.'/'.config('lfm.vol.sfx');
             $newFilePath = $page->volume->path.'/'.config('lfm.vol.check').'/'.$page->filename;
-            $filesDone = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->whereIn('filename',$page->filename)->first();
-            $publicFilePath = config('filesystems.disks.private.root').'/'.$filesDone['path'];
+            $filesDone = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->where('filename',$page->filename)->first();
+            $publicFilePath = '/'.$filesDone['path'];
             if($filesDone['extension'] === 'psd'){
                 \Image::configure(array('driver' => 'imagick'));
-                $file = \Image::make($publicFilePath)->encode('png');
+                $file = \Image::make(config('filesystems.disks.private.root').$publicFilePath)->encode('png');
                 $file->save(config('filesystems.disks.private.root').'/'.$newFilePath.'.png');
             }else{
                 Storage::disk(config('lfm.disk'))->move($publicFilePath,$newFilePath.'.'.$filesDone['extension']);

@@ -397,7 +397,6 @@ $(document).ready(function(event){
             }
             $('#modal-show-images').modal('show');
             fetchData({},url,'GET',loading(true)).done(function(data){
-                console.log(data);
                 $('.image-page.prev').attr('src',data.src.prev);
                 $('.image-page.current').attr('src',data.src.current);
                 $('.image-page.next').attr('src',data.src.next);
@@ -439,7 +438,9 @@ $(document).ready(function(event){
             $('.image-page.prev').attr('src',data.src.prev);
             // flagShow=true;
             loadingCheck(false);
-            loading(false);
+            if(document.querySelector('.image-page.current').complete){
+                loading(false);
+            }
         }).fail(function(){
             toastr.error("There were errors. Please try again.");
         });
@@ -479,7 +480,9 @@ $(document).ready(function(event){
                 $('.image-page.next').attr('src',data.src.next);
                 // flagShow=true;
                 loadingCheck(false);
-                loading(false);
+                if(document.querySelector('.image-page.current').complete){
+                    loading(false);
+                }
             }).fail(function(){
                 toastr.error("There were errors. Please try again.");
             });
@@ -500,7 +503,7 @@ $(document).ready(function(event){
         }
     });
 
-    function loading(status){
+    var loading = function(status){
         if(status){
             flagShow = false;
             $('#skeleton').show();
@@ -550,6 +553,16 @@ $(document).ready(function(event){
                 if(data.code == 200){
                     $('.image-arrow.right:visible').trigger('click');
                 }
+                if(data.code == 404){
+                    toastr.error("Not permission!");
+                    loadingCheck(false);
+                    loading(false);
+                }
+                if(data.code == 500){
+                    toastr.error("There were errors. Please try again.");
+                    loadingCheck(false);
+                    loading(false);
+                }
             }).fail(function(){
                 toastr.error("There were errors. Please try again.");
             });
@@ -568,12 +581,22 @@ $(document).ready(function(event){
             if(data.code == 200){
                 $('.image-arrow.right:visible').trigger('click');
             }
+            if(data.code == 404){
+                toastr.error("Not permission!");
+                loadingCheck(false);
+                loading(false);
+            }
+            if(data.code == 500){
+                toastr.error("There were errors. Please try again.");
+                loadingCheck(false);
+                loading(false);
+            }
             }).fail(function(){
                 toastr.error("There were errors. Please try again.");
             });
     })
 
-    function loadingCheck(status){
+    var loadingCheck = function(status){
         if(status){
             flagReload = true;
             $('#modal-show-images').find('.close-check').prop('disabled',true);

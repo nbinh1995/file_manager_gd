@@ -71,13 +71,12 @@ class VolumeController extends Controller
                 return redirect()->route('volumes.detail',['id' => $volume->id])->withFlashSuccess('The Volume Added Success');
             }
         }catch(\Exception $e){
-            dd($e);
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
     }
 
     public function detail($id){
-        $volume = Volume::find($id);
+        $volume = Volume::with('book')->find($id);
         if($volume instanceof Volume && !$volume->is_hide){
             return view('admins.volume.detail',compact('volume'));
         }
@@ -160,7 +159,6 @@ class VolumeController extends Controller
             }
             return response()->json(['code'=>404]);
         }catch(\Exception $e){
-            dd($e);
             return response()->json(['code'=>500]);
         }
     }
