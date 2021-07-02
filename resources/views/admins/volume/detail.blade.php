@@ -76,6 +76,14 @@
         <div class="modal fade" id="modal-show-images">
             <div class="modal-dialog">
                 <div class="modal-content"  style="max-height:100vh;">
+                    <div class="box-tool-zoom">
+                        <div class="zoom-in">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                        <div class="zoom-out">
+                            <i class="fas fa-search-minus"></i>
+                        </div>
+                    </div>
                     <div class="modal-header bg-lightblue">
                         <h6 class="modal-title text-uppercase " id="title-show-image">ID ...</h6>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -199,6 +207,24 @@
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
     <style>
+        .box-tool-zoom{
+            position: absolute;
+            right: 100%;
+            top: 55px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            z-index: 99999;
+            color: white;
+            font-size: 20px;
+        }
+        .zoom-in{
+            cursor: zoom-in;
+            padding: 0px 5px;
+        }
+        .zoom-out{
+            cursor: zoom-out;
+            padding: 0px 5px;
+        }
         #image-page-show {
             width: 100%; 
             height:auto
@@ -210,6 +236,14 @@
         }
         .current{
             display: block;
+        }
+        @media screen and (max-width: 767px){
+            .box-tool-zoom{
+            display: flex;
+            right: 0;
+            color: black;
+            background-color: rgba(0, 0, 0, 0.4);
+            }
         }
         @media screen and (min-width: 767px){
             #container-pages-table #pages-table_wrapper .row:last-child{
