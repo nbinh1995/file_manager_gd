@@ -193,6 +193,27 @@
         var url_buffer_image = "{{route('file-manager.bufferImage')}}";
         // var url_check_process = "{{route('pages.checkProcessZip')}}";
         var url_done_check = "{{route('pages.doneCheck')}}";
+        var x, y;
+        $('#modal-show-images .modal-body').on('mousedown', function(e) {
+            e.preventDefault();
+            if (e.type == "mousedown") {
+                var x ,y;
+                $(this).on('mousemove',function(event){
+                    if (x && y) {
+                        // Scroll window by difference between current and previous positions
+                        this.scrollBy(x - event.clientX,y - event.clientY);
+                    }
+                    x= event.clientX;
+                    y= event.clientY;
+                })
+            }
+        });
+        $(document).on('mouseup', function(e) {
+            e.preventDefault();
+            if (e.type == "mouseup") {
+                $('#modal-show-images .modal-body').unbind('mousemove');
+            }
+        });
     </script>
     @if (session()->has('path_download'))
     <script>
@@ -207,6 +228,10 @@
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
     <style>
+        #modal-show-images img{
+            cursor:move;
+        }
+
         .box-tool-zoom{
             position: absolute;
             right: 100%;
