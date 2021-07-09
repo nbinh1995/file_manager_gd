@@ -199,22 +199,22 @@ class FileManagerController extends Controller
         if(auth()->id() != 1){
             switch(true){
                 case (strpos($pathFolderDownload,'Raw') !== false):
-                    if(strpos(auth()->user()->role_multi,'Clean') == false){
+                    if(strpos(auth()->user()->role_multi,'Clean') ===false){
                         return redirect()->back()->withFlashDanger('Not permission!');
                     } 
                 break;
                 case (strpos($pathFolderDownload,'Clean') !== false):
-                    if(strpos(auth()->user()->role_multi,'Type') == false){
+                    if(strpos(auth()->user()->role_multi,'Type') === false){
                         return redirect()->back()->withFlashDanger('Not permission!');
                     }  
                 break;
                 case (strpos($pathFolderDownload,'Type') !== false):
-                    if(strpos(auth()->user()->role_multi,'SFX') == false){
+                    if(strpos(auth()->user()->role_multi,'SFX') === false){
                         return redirect()->back()->withFlashDanger('Not permission!');
                     }  
                 break;
                 case (strpos($pathFolderDownload,'SFX') !== false):
-                    if(strpos(auth()->user()->role_multi,'Check') == false){
+                    if(strpos(auth()->user()->role_multi,'Check') === false){
                         return redirect()->back()->withFlashDanger('Not permission!');
                     }  
                 break;
