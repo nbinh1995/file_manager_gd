@@ -409,6 +409,12 @@ function loadItems() {
       var response = JSON.parse(data);
       var working_dir = response.working_dir;
       items = response.items;
+      items = items.filter(function(item){
+        if(item.is_file && item.is_image && item.url.search('SFX') !== -1 && item.name.search('_') !== -1){
+          return false;
+        }
+          return true
+      })
       var hasItems = items.length !== 0;
       $('#empty').toggleClass('d-none', hasItems);
       $('#content').html('').removeAttr('class');
