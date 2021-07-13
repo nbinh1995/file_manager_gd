@@ -61,7 +61,7 @@ $(document).ready(function () {
     if((new URL(location.href)).searchParams.get('dir').indexOf('Check') == -1){
       switch(sessionStorage.getItem('authRole')){
         case 'Raw':
-          if((new URL(location.href)).searchParams.get('dir').indexOf('Raw') !== -1){
+          if((new URL(location.href)).searchParams.get('dir').indexOf('Raw') !== -1 || (new URL(location.href)).searchParams.get('dir').indexOf('Reference') !== -1){
                 isUpload =true;
           }else{
             $('#fab').remove();

@@ -62,6 +62,19 @@ class FileManagerController extends Controller
         return $response;
     }
 
+    public function showNoteImage(Request $request){
+        $page_id = $request->page_id;
+        $page = Page::find($page_id);
+        $publicFilePath = config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image;
+        // dd($publicFilePath);
+        $file = File::get($publicFilePath);
+        $type = File::mimeType($publicFilePath);
+        $response = response()->make($file, 200);
+        $response->header("Content-Type", $type);
+
+        return $response;
+    }
+
     public function bufferImage(Request $request){
         $fileName = (int)$request->fileName;
         $fileNameText = $request->fileName;
@@ -217,6 +230,9 @@ class FileManagerController extends Controller
                     if(strpos(auth()->user()->role_multi,'Check') === false){
                         return redirect()->back()->withFlashDanger('Not permission!');
                     }  
+                break;
+                case (strpos($pathFolderDownload,'Reference') !== false):
+                    
                 break;
                 default:
                 return redirect()->back()->withFlashDanger('Not permission!');

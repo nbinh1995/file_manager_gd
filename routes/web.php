@@ -59,7 +59,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::get('/create-type', 'PageController@createType')->name('createType');
         Route::get('/create-sfx', 'PageController@createSFX')->name('createSFX');
         Route::get('/create-check', 'PageController@createCheck')->name('createCheck')->middleware('admin');
-        Route::get('/reject-check', 'PageController@rejectCheck')->name('rejectCheck');
+        Route::post('/reject-check', 'PageController@rejectCheck')->name('rejectCheck');
         Route::get('/done-check', 'PageController@doneCheck')->name('doneCheck');
         Route::post('{idVolume}/add-task','PageController@addTask')->name('addTask');
         Route::post('{idVolume}/down-task','PageController@downTask')->name('downTask');
@@ -72,6 +72,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::get('/', 'FileManagerController@index')->name('index')->middleware('super_admin');
         Route::get('/refresh-dir', 'FileManagerController@refreshDir')->name('refreshDir');
         Route::get('/get-image', 'FileManagerController@showImage')->name('showImage');
+        Route::get('/get-note-image', 'FileManagerController@showNoteImage')->name('showNoteImage');
         Route::get('/get-buffer-image', 'FileManagerController@bufferImage')->name('bufferImage');
         Route::get('/get-url-manager', 'FileManagerController@showUrlManager')->name('showUrlManager');
         Route::get('/get-prev-image', 'FileManagerController@showPrevImage')->name('showPrevImage');

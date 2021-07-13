@@ -31,7 +31,7 @@ class IsUploadingImageListener
      */
     public function handle(ImageIsUploading $event)
     {   
-        if(strpos($event->path(), 'Old') === false){
+        if(strpos($event->path(), 'Reference') === false){
                 $regex = null;
                 $type = 'raw';
         foreach(config('lfm.volume') as $key => $type){
@@ -91,11 +91,15 @@ class IsUploadingImageListener
                                     $newPublicFilePath = explode('.',$publicFilePath);
                                     $newPublicFilePath[0] = $newPublicFilePath[0].'_'.$lastModified;
                                     $newPublicFilePath = implode('.',$newPublicFilePath);
+                                    if($page->note_image && file_exists(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image)){
+                                        unlink(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image);
+                                    }
                                     $page->update([
                                         'sfx_id' => auth()->id(),
                                         'check' => 'pending',
                                         'check_id' => null,
                                         'note' => null,
+                                        'note_image' => null
                                     ]);
                                     Storage::disk(config('lfm.disk'))->move($publicFilePath,$newPublicFilePath);
                                 }else{
@@ -146,6 +150,13 @@ class IsUploadingImageListener
                 }
             }
         }
+        }
+        if(strpos($event->path(), 'Reference') !== false){
+            if(strpos(auth()->user()->role_multi,'Raw') !== false || auth()->id() == 1){
+
+            }else{
+                throw new \Exception('Not permission!');
+            }
         }
     }
 }

@@ -64,7 +64,7 @@ if (!function_exists('showRawStatus')) {
     
         switch($status){
             case 'doing':
-                $badge = $type === 'check' ? '<label class="btn btn-warning btn-xs text-monospace">Reject: '.$user.'</label> <label class="btn btn-xs btn-outline-danger border-0" data-toggle="popover" title="Reject Note" data-content="'.($page->note ?? '...').'"><i class="fas fa-question-circle"></i></label>' :'<label class="btn btn-warning btn-xs text-monospace"><input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom doing-task '.$type.'-undo-task"> Doing: '.$user.'</label>';
+                $badge = $type === 'check' ? '<label class="btn btn-warning btn-xs text-monospace">Reject: '.$user.'</label> <label class="btn btn-xs btn-outline-danger border-0" data-toggle="popover" title="Reject Note" data-html="true" data-content="'.($page->note_image ? "<img class='note_image_reject' src='".route('file-manager.showNoteImage',['page_id'=>$page->id])."' alt=''> <hr/>" : '').($page->note ? nl2br(e($page->note)) : '...').'"><i class="fas fa-question-circle"></i></label>' :'<label class="btn btn-warning btn-xs text-monospace"><input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom doing-task '.$type.'-undo-task"> Doing: '.$user.'</label>';
             break;
             case 'done': 
                 $badge = '<label class="btn btn-success btn-xs  text-monospace '.$type.'-detail" data-url="'.route('file-manager.bufferImage',['volume_id'=>$page->volume_id,'type'=>config('lfm.vol')[$type],'fileName'=>$page->filename]).'"><i class="fas fa-images"></i> Done: '.$user.' </label>';

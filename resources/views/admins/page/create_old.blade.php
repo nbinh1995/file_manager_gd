@@ -12,7 +12,11 @@ $dir = '/'.implode('/',$dir).'/'.config('lfm.vol.old');
 @endpush
 
 @push('script')
-    
+<script>
+    $('#auth-role').on('change',function(e){
+        document.querySelector('iframe').contentDocument.location.reload(true);
+    })
+</script>
 @endpush
 
 @section('content')

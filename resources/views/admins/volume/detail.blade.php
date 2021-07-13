@@ -122,13 +122,21 @@
 
         <div class="modal fade" id="modal-note-page">
             <div class="modal-dialog">
-                <form action="{{route('pages.rejectCheck')}}" id="reject-check-form" >
+                <form action="{{route('pages.rejectCheck')}}" id="reject-check-form" method="POST" enctype="multipart/form-data">
+                    {{ csrf_field() }}
                     <div class="modal-content">
+                            <input type="text" name="volume_id" value="{{$volume->id}}" hidden>
                             <input type="text" name="fileName" hidden>
                             <div class="modal-body">
                                 <div class="form-group">
                                     <h4 class="text-monospace" >{{__('Note')}}</h4>
                                     <textarea name="note" cols="30" rows="6" class="form-control"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="note_image_page" class="text-monospace text-muted" style="cursor: pointer"><i class="fas fa-paperclip"></i> Attach<i id="name_note_image"></i></label>
+                                    <input type="file" name="note_image" id="note_image_page" style="display: none">
+                                </div>
+                                <div class="form-group" id="note_image_preview">
                                 </div>
                             </div>
                             <div class="modal-footer justify-content-between">
@@ -208,6 +216,10 @@
                 })
             }
         });
+        $(document).on('click','.note_image_reject',function(){
+            var url_tab = $(this).attr('src');
+            window.open(url_tab, '_blank').focus();
+        })
         $(document).on('mouseup', function(e) {
             e.preventDefault();
             if (e.type == "mouseup") {
@@ -228,6 +240,23 @@
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
     <style>
+        .popover .popover-body{
+            overflow: auto;
+            max-height: 200px;
+        }
+        .note_image_reject{
+            width: 200px;
+            height: auto;
+            cursor: pointer;
+        }
+        #note_image_preview{
+            display: none;
+            width: 100%;
+            height: 200px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        }
         #modal-show-images img{
             cursor:move;
         }

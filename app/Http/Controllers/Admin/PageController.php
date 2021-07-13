@@ -345,15 +345,20 @@ class PageController extends Controller
             }  
             $fileName = $request->fileName;
             $volume_id = $request->volume_id;
-            $note = $request->note;
+            $note = $request->has('note') ? $request->note : ''; 
             $page = Page::with('volume')->where('volume_id',$volume_id)->where('filename',$fileName)->first();
             if($page instanceof Page){
                 $data = [
                     'check' => 'doing',
                     'check_id' => auth()->id(),
                 ];
-                if($note){
-                    $data['note'] = $note;
+                $data['note'] = str_replace('"',"'",$note);
+                if($request->hasFile('note_image')){
+                    if(!File::exists(config('filesystems.disks.private.root').'/note_images')){
+                        File::makeDirectory(config('filesystems.disks.private.root').'/note_images',0777);
+                    }
+                    $path = Storage::disk(config('lfm.disk'))->putFile(config('lfm.note_folder'),$request->file('note_image'),'public');
+                    $data['note_image'] = basename($path);
                 }
                 $page->update($data);
                 return response()->json(['code'=> 200]);
@@ -374,20 +379,31 @@ class PageController extends Controller
 
             $page = Page::with('volume')->where('volume_id',$volume_id)->where('filename',$fileName)->first();
         if($page instanceof Page){
+            if($page->note_image && file_exists(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image)){
+                unlink(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image);
+            }
             $page->update([
                 'check' => 'done',
-                'check_id' => auth()->id()
+                'check_id' => auth()->id(),
+                'note' => null,
+                'note_image' => null
             ]);
             $folderPath = $page->volume->path.'/'.config('lfm.vol.sfx');
             $newFilePath = $page->volume->path.'/'.config('lfm.vol.check').'/'.$page->filename;
             $filesDone = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->where('filename',$page->filename)->first();
             $publicFilePath = '/'.$filesDone['path'];
             if($filesDone['extension'] === 'psd'){
+                if(file_exists(config('filesystems.disks.private.root').'/'.$newFilePath.'.png')){
+                    unlink(config('filesystems.disks.private.root').'/'.$newFilePath.'.png');
+                }
                 \Image::configure(array('driver' => 'imagick'));
                 $file = \Image::make(config('filesystems.disks.private.root').$publicFilePath)->encode('png');
                 $file->save(config('filesystems.disks.private.root').'/'.$newFilePath.'.png');
             }else{
-                Storage::disk(config('lfm.disk'))->move($publicFilePath,$newFilePath.'.'.$filesDone['extension']);
+                if(file_exists(config('filesystems.disks.private.root').'/'.$newFilePath.'.'.$filesDone['extension'])){
+                    unlink(config('filesystems.disks.private.root').'/'.$newFilePath.'.'.$filesDone['extension']);
+                }
+                Storage::disk(config('lfm.disk'))->copy($publicFilePath,$newFilePath.'.'.$filesDone['extension']);
             }
             DB::commit();
             return response()->json(['code'=>200]);

@@ -46,6 +46,9 @@ return [
         'sfx'=>'SFX',
         'check'=>'Check'
     ],
+
+    'note_folder' => 'note_images',
+
     'allow_private_folder'     => false,
 
     // Flexible way to customize client folders accessibility

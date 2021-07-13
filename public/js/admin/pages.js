@@ -420,7 +420,7 @@ $(document).ready(function(event){
     })
 
     $('.image-arrow.left').on('click',function(e){
-        if(flagShow){
+        if(flagShow && !$('#modal-note-page').hasClass('show')){
         flagShow=false;
         var url = $(this).data('url');
         var prev = $('.image-page.prev');
@@ -462,7 +462,7 @@ $(document).ready(function(event){
     });
 
     $('.image-arrow.right').on('click',function(e){
-        if(flagShow){
+        if(flagShow && !$('#modal-note-page').hasClass('show')){
         flagShow = false
         var url = $(this).data('url');
         var prev = $('.image-page.prev');
@@ -538,6 +538,10 @@ $(document).ready(function(event){
         if(type === 'SFX' && role === 'check'){
             $('#reject-check-form').find('[name=note]').val('');
             $('#reject-check-form').find('[name=fileName]').val(fileName);
+            $('#reject-check-form').find('#note_image_preview').removeAttr('style');
+            $('#reject-check-form').find('#name_note_image').text('');
+            $('#reject-check-form').find('#note_image_page').val('');
+            
             $('#modal-note-page').modal('show');
         }else{
             toastr.error("Roles user or file is not correct!");
@@ -573,11 +577,27 @@ $(document).ready(function(event){
 
     $('#reject-check-form').on('submit',function(e){
         e.preventDefault();
-        var fileName = $(this).find('[name=fileName]').val();
-        var note = $(this).find('[name=note]').val();
         var url_reject_check = $(this).attr('action');
+        var allowImageType = ['image/jpeg','image/png'];
+        if(document.getElementById('note_image_page').files.length > 0){
+            var typeFile = document.getElementById('note_image_page').files[0].type
+            if($.inArray(typeFile,allowImageType)){
+                toastr.error("Must be a file of Image");
+                return false;
+            }
+        }
+        var data = new FormData(this);
         $('#modal-note-page').modal('hide');
-        fetchData({fileName:fileName,volume_id:volume_id_page,note:note},url_reject_check,'GET',loadingCheck(true)).done(function(data){
+        $.ajax({
+            url: url_reject_check,
+            method: "POST",
+            data: data,
+            dataType: "json",
+            contentType: false,
+            cache: false,
+            processData: false,
+            beforeSend:loadingCheck(true),
+        }).done(function(data){
             if(data.code == 200){
                 $('.image-arrow.right:visible').trigger('click');
             }
@@ -646,6 +666,32 @@ $(document).ready(function(event){
         }
         
     })
+
+    $('#note_image_page').on('change',function(e){
+        previewRejectCheck(e.target,$('#note_image_preview'));
+    });
+
+    function previewRejectCheck(element,imagePreview) {
+        let img = element.files[0];
+        $('#name_note_image').text(': '+img.name);
+        let reader = new FileReader();
+        reader.onloadend = function() {
+            imagePreview.css("background-image", "url('"+reader.result+"')").css('display','block');
+        };
+        reader.readAsDataURL(img);
+    };
+
+    $(document).mouseup(function(e) 
+    {
+        var container = $(".popover");
+        // if the target of the click isn't the container nor a descendant of the container
+        if (!container.is(e.target) && container.has(e.target).length === 0) 
+        {
+            if(!(($('[data-toggle="popover"]').is(e.target) || $('[data-toggle="popover"]').has(e.target).length > 0) && $(e.target).closest('[data-toggle=popover]').attr('aria-describedby') == container.attr('id'))){
+                $('[data-toggle="popover"]').popover('hide');
+            }
+        }
+    });
 
     // function checkProcess(){
     //     fetchData({},url_check_process,'GET').done(function(data){

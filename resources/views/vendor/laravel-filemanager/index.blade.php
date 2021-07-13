@@ -298,7 +298,7 @@
   <script>
     var isDownLoad = false
     if((new URL(location.href)).searchParams.get('dir') !== null){
-      if((new URL(location.href)).searchParams.get('dir').indexOf('Check') == -1){
+      if((new URL(location.href)).searchParams.get('dir').indexOf('Check') == -1 && (new URL(location.href)).searchParams.get('dir').indexOf('Reference') == -1){
         switch(sessionStorage.getItem('authRole')){
                 case 'Clean':
                   if((new URL(location.href)).searchParams.get('dir').indexOf('Raw') !== -1){
