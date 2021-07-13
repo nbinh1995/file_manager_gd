@@ -2,6 +2,7 @@ $(document).ready(function(event){
     var flagShift = false;
     var flagShow = true;
     var flagReload = false;
+    var blob = '';
     var fetchData = function (data, ajaxUrl, method = 'post', beforeSend = null) {
         return $.ajax({
             data: data,
@@ -540,6 +541,7 @@ $(document).ready(function(event){
             $('#reject-check-form').find('[name=fileName]').val(fileName);
             $('#reject-check-form').find('#note_image_preview').removeAttr('style');
             $('#reject-check-form').find('.container-nip').removeAttr('style');
+            blob = '';
             $('#reject-check-form').find('#name_note_image').text('');
             $('#reject-check-form').find('#note_image_page').val('');
             
@@ -588,6 +590,10 @@ $(document).ready(function(event){
             }
         }
         var data = new FormData(this);
+        if(blob){
+            data.append('note_image', blob);
+            blob ='';
+        }
         $('#modal-note-page').modal('hide');
         $.ajax({
             url: url_reject_check,
@@ -669,12 +675,13 @@ $(document).ready(function(event){
     })
 
     $('#note_image_page').on('change',function(e){
+        blob = '';
         previewRejectCheck(e.target,$('#note_image_preview'));
     });
 
     function previewRejectCheck(element,imagePreview) {
         let img = element.files[0];
-        $('#name_note_image').text(': '+img.name);
+        // $('#name_note_image').text(': '+img.name);
         let reader = new FileReader();
         reader.onloadend = function() {
             imagePreview.css("background-image", "url('"+reader.result+"')");
@@ -718,8 +725,8 @@ $(document).ready(function(event){
       $('#dropZ').on('drop', function (e) {
         e.preventDefault();
         $(this).removeClass('drag_over');
+        blob = '';
         var files = e.originalEvent.dataTransfer.files;
-        console.log(files);
         document.getElementById('note_image_page').files = files;
         $('#note_image_page').trigger('change');
     });
@@ -728,4 +735,18 @@ $(document).ready(function(event){
     //         console.log(data)
     //     })
     // }
+    document.onpaste = function(pasteEvent) {
+        var item = pasteEvent.clipboardData.items[0];
+        if (item.type.indexOf("image") === 0)
+        {
+            blob = item.getAsFile();
+            document.getElementById('note_image_page').value = '';
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                $('#note_image_preview').css("background-image", "url('"+event.target.result+"')");
+            };
+            $('#note_image_preview').closest('.container-nip').css('display','block');
+            reader.readAsDataURL(blob);
+        }
+    }
 });
