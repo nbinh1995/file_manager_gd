@@ -130,14 +130,19 @@
                             <div class="modal-body">
                                 <div class="form-group">
                                     <h4 class="text-monospace" >{{__('Note')}}</h4>
-                                    <textarea name="note" cols="30" rows="6" class="form-control"></textarea>
+                                    <div id="dropZ">
+                                        <div class="container-nip">
+                                            <div id="note_image_preview">
+                                            </div>
+                                        </div>
+                                        <textarea name="note" cols="30" rows="6" class="form-control" id="note_textarea"></textarea>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="note_image_page" class="text-monospace text-muted" style="cursor: pointer"><i class="fas fa-paperclip"></i> Attach<i id="name_note_image"></i></label>
-                                    <input type="file" name="note_image" id="note_image_page" style="display: none">
+                                    <input type="file" name="note_image" id="note_image_page" style="display: none" >
                                 </div>
-                                <div class="form-group" id="note_image_preview">
-                                </div>
+                                
                             </div>
                             <div class="modal-footer justify-content-between">
                                 <button type="button" class="btn btn-secondary close-check" data-dismiss="modal">Close</button>
@@ -240,22 +245,34 @@
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
     <link rel="stylesheet" href="{{asset('AdminLTE/plugins/sweetalert2/sweetalert2.min.css')}}">
     <style>
-        .popover .popover-body{
+        /* .popover .popover-body{
             overflow: auto;
             max-height: 200px;
+        } */
+        #note_textarea{
+            border: none;
         }
+        #dropZ{
+            padding: 20px;
+            box-shadow: inset 0px 0px 19px 8px rgb(0 0 0 / 27%);
+        }
+
         .note_image_reject{
             width: 200px;
             height: auto;
             cursor: pointer;
         }
-        #note_image_preview{
+        .container-nip{
             display: none;
+            padding: 10px;
+        }
+        #note_image_preview{
             width: 100%;
             height: 200px;
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain;
+            box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 20%);
         }
         #modal-show-images img{
             cursor:move;

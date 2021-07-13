@@ -539,6 +539,7 @@ $(document).ready(function(event){
             $('#reject-check-form').find('[name=note]').val('');
             $('#reject-check-form').find('[name=fileName]').val(fileName);
             $('#reject-check-form').find('#note_image_preview').removeAttr('style');
+            $('#reject-check-form').find('.container-nip').removeAttr('style');
             $('#reject-check-form').find('#name_note_image').text('');
             $('#reject-check-form').find('#note_image_page').val('');
             
@@ -581,7 +582,7 @@ $(document).ready(function(event){
         var allowImageType = ['image/jpeg','image/png'];
         if(document.getElementById('note_image_page').files.length > 0){
             var typeFile = document.getElementById('note_image_page').files[0].type
-            if($.inArray(typeFile,allowImageType)){
+            if($.inArray(typeFile,allowImageType) === -1){
                 toastr.error("Must be a file of Image");
                 return false;
             }
@@ -676,8 +677,9 @@ $(document).ready(function(event){
         $('#name_note_image').text(': '+img.name);
         let reader = new FileReader();
         reader.onloadend = function() {
-            imagePreview.css("background-image", "url('"+reader.result+"')").css('display','block');
+            imagePreview.css("background-image", "url('"+reader.result+"')");
         };
+        imagePreview.closest('.container-nip').css('display','block');
         reader.readAsDataURL(img);
     };
 
@@ -693,6 +695,34 @@ $(document).ready(function(event){
         }
     });
 
+    $("html").on("dragover", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+   
+      $("html").on("drop", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+   
+      $('#dropZ').on('dragover', function () {
+        $(this).addClass('drag_over');
+        return false;
+      });
+   
+      $('#dropZ').on('dragleave', function () {
+        $(this).removeClass('drag_over');
+        return false;
+      });
+
+      $('#dropZ').on('drop', function (e) {
+        e.preventDefault();
+        $(this).removeClass('drag_over');
+        var files = e.originalEvent.dataTransfer.files;
+        console.log(files);
+        document.getElementById('note_image_page').files = files;
+        $('#note_image_page').trigger('change');
+    });
     // function checkProcess(){
     //     fetchData({},url_check_process,'GET').done(function(data){
     //         console.log(data)
