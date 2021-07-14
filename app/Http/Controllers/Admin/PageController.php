@@ -185,7 +185,10 @@ class PageController extends Controller
                 $filesDone = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->whereIn('filename',$pagesSearch);
                 foreach($filesDone as $file){
                         $publicFilePath = '/'.$file['path'];
-                        Storage::disk(config('lfm.disk'))->move($publicFilePath,$newFilePath.$file['basename']);
+                        if(file_exists(config('filesystems.disks.private.root').'/'.$newFilePath.$file['basename'])){
+                            unlink(config('filesystems.disks.private.root').'/'.$newFilePath.$file['basename']);
+                        }
+                        Storage::disk(config('lfm.disk'))->copy($publicFilePath,$newFilePath.$file['basename']);
                 }
                 break;
             // case 'check':
@@ -518,7 +521,7 @@ class PageController extends Controller
             $newFilePath = $page->volume->path.'/'.config('lfm.vol.sfx').'/'.$page->filename;
             $filesDone = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->whereIn('filename',$page->filename)->first();
             $publicFilePath = config('filesystems.disks.private.root').'/'.$filesDone['path'];
-            Storage::disk(config('lfm.disk'))->move($publicFilePath,$newFilePath.'.'.$filesDone['extension']);
+            Storage::disk(config('lfm.disk'))->copy($publicFilePath,$newFilePath.'.'.$filesDone['extension']);
             DB::commit();
             return response()->json(['code'=>200]);
         }

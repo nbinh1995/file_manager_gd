@@ -107,9 +107,9 @@ return [
 
     'rename_file'              => false,
 
-    'alphanumeric_filename'    => true,
+    'alphanumeric_filename'    => false,
 
-    'alphanumeric_directory'   => true,
+    'alphanumeric_directory'   => false,
 
     'should_validate_size'     => false,
 
