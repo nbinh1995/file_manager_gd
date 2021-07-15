@@ -96,10 +96,10 @@ class IsUploadingImageListener
                                     }
                                     $page->update([
                                         'sfx_id' => auth()->id(),
-                                        'check' => 'pending',
-                                        'check_id' => null,
-                                        'note' => null,
-                                        'note_image' => null
+                                        // 'check' => 'pending',
+                                        // 'check_id' => null,
+                                        // 'note' => null,
+                                        // 'note_image' => null
                                     ]);
                                     Storage::disk(config('lfm.disk'))->move($publicFilePath,$newPublicFilePath);
                                 }else{
