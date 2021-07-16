@@ -91,9 +91,9 @@ class IsUploadingImageListener
                                     $newPublicFilePath = explode('.',$publicFilePath);
                                     $newPublicFilePath[0] = $newPublicFilePath[0].'_'.$lastModified;
                                     $newPublicFilePath = implode('.',$newPublicFilePath);
-                                    if($page->note_image && file_exists(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image)){
-                                        unlink(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image);
-                                    }
+                                    // if($page->note_image && file_exists(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image)){
+                                    //     unlink(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image);
+                                    // }
                                     $page->update([
                                         'sfx_id' => auth()->id(),
                                         // 'check' => 'pending',
