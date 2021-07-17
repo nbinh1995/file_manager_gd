@@ -2,6 +2,7 @@
 
 namespace App\Override\FileManager\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use UniSharp\LaravelFilemanager\Controllers\LfmController;
 use UniSharp\LaravelFilemanager\Events\FileIsMoving;
 use UniSharp\LaravelFilemanager\Events\FileWasMoving;
@@ -20,15 +21,21 @@ class ItemsController extends LfmController
         $folders = array_map(function ($item) {
             return $item->fill()->attributes;
             },$this->lfm->folders());
-        $files =  array_map(function ($item) {
-            return [
-            'name' => $item->__get('name'),
-            'url' => $item->__get('url'),
-            "is_file" => true,
-            "is_image" => true,
-            // "time" => $item->__get('time')
-            ];
-        },$this->lfm->files());
+        $files = [];
+        if(count($this->lfm->files()) > 0){
+            $tmp = str_replace($_SERVER['HTTP_HOST'].'/storage/','',$this->lfm->files()[0]->__get('url'));
+            $dir = str_replace('/'.$this->lfm->files()[0]->__get('name'),'',$tmp);
+            $tmpFiles = Storage::disk(config('lfm.disk'))->files($dir);
+            $files =array_map(function ($item) use($dir) {
+                $tmpName = str_replace($dir.'/','',$item);
+                return [
+                'name' => $tmpName,
+                'url' => $_SERVER['HTTP_HOST'].'/storage/'.$item,
+                "is_file" => true,
+                "is_image" => true,
+                ];
+            },$tmpFiles);
+        }
         return [
             'items' => array_merge($folders,$files),
             'display' => $this->helper->getDisplayMode(),
