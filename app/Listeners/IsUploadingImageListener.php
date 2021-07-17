@@ -86,21 +86,31 @@ class IsUploadingImageListener
                     case 'sfx':
                         if(strpos(auth()->user()->role_multi,'SFX') !== false || strpos(auth()->user()->role_multi,'Check') !== false || auth()->id() == 1){
                             if($page instanceof Page && $page->type === 'done'){
+                                $checkPublicFilePath = str_replace('SFX', "Check", $pathVolume[0]);
                                 if(Storage::disk(config('lfm.disk'))->exists($publicFilePath)){
                                     $lastModified = date('Ymd_His',Storage::disk(config('lfm.disk'))->lastModified($publicFilePath));
                                     $newPublicFilePath = explode('.',$publicFilePath);
                                     $newPublicFilePath[0] = $newPublicFilePath[0].'_'.$lastModified;
                                     $newPublicFilePath = implode('.',$newPublicFilePath);
-                                    // if($page->note_image && file_exists(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image)){
-                                    //     unlink(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image);
-                                    // }
-                                    $page->update([
-                                        'sfx_id' => auth()->id(),
-                                        // 'check' => 'pending',
-                                        // 'check_id' => null,
-                                        // 'note' => null,
-                                        // 'note_image' => null
-                                    ]);
+                                    if($page->check === 'done'){
+                                        if($page->note_image && file_exists(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image)){
+                                            unlink(config('filesystems.disks.private.root').'/'.config('lfm.note_folder').'/'.$page->note_image);
+                                        }
+                                        if(file_exists(config('filesystems.disks.private.root').'/'.$checkPublicFilePath.'/'.$filename.'.png')){
+                                            unlink(config('filesystems.disks.private.root').'/'.$checkPublicFilePath.'/'.$filename.'.png');
+                                        }
+                                        $page->update([
+                                            'sfx_id' => auth()->id(),
+                                            'check' => 'pending',
+                                            'check_id' => null,
+                                            'note' => null,
+                                            'note_image' => null
+                                        ]);
+                                    }else{
+                                        $page->update([
+                                            'sfx_id' => auth()->id(),
+                                        ]);
+                                    }
                                     Storage::disk(config('lfm.disk'))->move($publicFilePath,$newPublicFilePath);
                                 }else{
                                     $page->update([
