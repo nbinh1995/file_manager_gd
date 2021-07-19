@@ -53,6 +53,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::get('/{id}/detail', 'VolumeController@detail')->name('detail');
     });
     Route::group(['prefix' => 'pages', 'as' => 'pages.'], function () {
+        Route::get('/sync-preview', 'PageController@syncPreview')->name('syncPreview')->middleware('super_admin');
         Route::get('/create-old', 'PageController@createOld')->name('createOld');
         Route::get('/create-raw', 'PageController@createRaw')->name('createRaw');
         Route::get('/create-clean', 'PageController@createClean')->name('createClean');

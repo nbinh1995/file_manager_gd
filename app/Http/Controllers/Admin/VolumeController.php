@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Volume\VolumeRequest;
 use App\Models\Book;
+use App\Models\Page;
 use App\Models\Volume;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
@@ -90,14 +92,46 @@ class VolumeController extends Controller
     }
 
     public function update(Request $request , $id){
+        DB::beginTransaction();
         try{
             $volume = Volume::find($id);
-
+            $pages = Page::where('volume_id',$id);
             if($volume instanceof Volume){
                 if($request->status !== 'pending'){
                     Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.clean'));
                     Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.type'));
                     Storage::disk(config('lfm.disk'))->deleteDirectory($volume->path.'/'.config('lfm.vol.sfx'));
+                    $pages_list = $pages->get(['raw_image','clean_image','type_image','sfx_image']);
+                    foreach($pages_list as $page){
+                        if($page->raw_image){
+                            if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->raw_image)){
+                                unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->raw_image);
+                            }
+                        }
+                        if($page->clean_image){
+                            if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->clean_image)){
+                                unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->clean_image);
+                            }
+                        }
+                        if($page->type_image){
+                            if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->type_image)){
+                                unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->type_image);
+                            }
+                        }
+                        if($page->sfx_image){
+                            if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->sfx_image)){
+                                unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->sfx_image);
+                            }
+                        }
+                    }
+                    $pages->update([
+                        'raw_image'=>null,
+                        'clean_image' => null,
+                        'type_image' => null,
+                        'sfx_image' => null,
+                        'note' => null,
+                        'note_image' => null
+                    ]);
                 }else{
                     if(!File::exists(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.clean'))){
                         File::makeDirectory(config('filesystems.disks.private.root').'/'.$volume->path.'/'.config('lfm.vol.clean'),0777);
@@ -112,11 +146,17 @@ class VolumeController extends Controller
     
                 $volume->update($request->only('status'));
                 if($volume instanceof Volume){
+                    DB::commit();
                     return redirect()->route('volumes.index')->withFlashSuccess('The Volume Updated Success');
                 }
+                DB::rollBack();
+                return redirect()->back()->withFlashDanger('There were errors. Please try again.');
             }
+            DB::rollBack();
             return redirect()->back()->withFlashDanger('The Volume Not Found');
         }catch(\Exception $e){
+            DB::rollBack();
+            dd($e);
             return redirect()->back()->withFlashDanger('There were errors. Please try again.');
         }
     }

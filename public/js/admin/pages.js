@@ -765,4 +765,23 @@ $(document).ready(function(event){
             reader.readAsDataURL(blob);
         }
     }
+
+    $(document).on('click','.sync-preview',function(e){
+        e.preventDefault();
+        var url = $(e.target).data('sync');
+        fetchData({},url,'GET',function(){
+            $(e.target).find('i').addClass('fa-spin');
+        }).done(function(data){
+            if(data.code == '200'){
+                toastr.success("Sync preview image successfully!");
+            }
+            if(data.code == '500'){
+                toastr.error("There were errors. Please try again.");
+            }
+            $(e.target).find('i').removeClass('fa-spin');
+        }).fail(function(){
+                toastr.error("There were errors. Please try again.");
+                $(e.target).find('i').removeClass('fa-spin');
+        });
+    })
 });

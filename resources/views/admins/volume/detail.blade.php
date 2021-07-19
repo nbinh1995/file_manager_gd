@@ -249,6 +249,9 @@
             overflow: auto;
             max-height: 200px;
         } */
+        .sync-preview i {
+            pointer-events: none
+        }
         #note_textarea{
             border: none;
         }
