@@ -75,7 +75,7 @@
         <!-- /.container-fluid -->
         <div class="modal fade" id="modal-show-images">
             <div class="modal-dialog">
-                <div class="modal-content"  style="max-height:100vh;">
+                <div class="modal-content"  style="height:100vh;">
                     <div class="box-tool-zoom">
                         <div class="zoom-in">
                             <i class="fas fa-search-plus"></i>
@@ -90,7 +90,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body text-center" style="overflow: auto">
+                    <div class="modal-body text-center" style="overflow: auto;">
                         <div id="skeleton">
                             <div class="row">
                                 <div class="col-12  skeleton-block" >

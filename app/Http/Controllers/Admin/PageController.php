@@ -171,12 +171,20 @@ class PageController extends Controller
             case 'sfx':
                 if(strpos(auth()->user()->role_multi,'SFX') === false){
                     return redirect()->back()->withFlashDanger('Not permission!');
-                } 
+                }
+                foreach($pages as $item){
+                    if($item->sfx_image){
+                        if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$item->sfx_image)){
+                            unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$item->sfx_image);
+                        }
+                    }
+                }
                 // $subFolder = config('lfm.vol.type');
                 $pages->update(
                     [
                         $arrayKeyVol[3] => 'done',
-                        $arrayKeyVol[3].'_id' => auth()->id()
+                        $arrayKeyVol[3].'_id' => auth()->id(),
+                        $arrayKeyVol[3].'_image' => null
                     ]
                     );
                 $pagesSearch = $pages->get()->pluck('filename');
@@ -325,9 +333,15 @@ class PageController extends Controller
             if ($page instanceof Page) {
                 $directory = $page->volume->path;
                 foreach(config('lfm.volume') as $file ){
+                    $lowFile = strtolower($file);
                     $filesDelete = collect(Storage::disk(config('lfm.disk'))->listContents($directory.'/'.$file,false))->whereIn('filename',$page->filename)->first();
                     if(isset($filesDelete)){
                         Storage::disk(config('lfm.disk'))->delete($filesDelete['path']);
+                    }
+                    if($page[$lowFile.'_image']){
+                        if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page[$lowFile.'_image'])){
+                            unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page[$lowFile.'_image']);
+                        }
                     }
                 }
                 if($page->delete()){
@@ -400,7 +414,7 @@ class PageController extends Controller
                     unlink(config('filesystems.disks.private.root').'/'.$newFilePath.'.png');
                 }
                 \Image::configure(array('driver' => 'imagick'));
-                $file = \Image::make(config('filesystems.disks.private.root').$publicFilePath)->encode('png');
+                $file = \Image::make(config('filesystems.disks.private.root').$publicFilePath);
                 $file->save(config('filesystems.disks.private.root').'/'.$newFilePath.'.png');
             }else{
                 if(file_exists(config('filesystems.disks.private.root').'/'.$newFilePath.'.'.$filesDone['extension'])){

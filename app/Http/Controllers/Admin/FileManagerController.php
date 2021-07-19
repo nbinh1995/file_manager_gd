@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Volume;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use ZipArchive;
@@ -40,18 +41,36 @@ class FileManagerController extends Controller
     }
 
     public function showImage(Request $request){
+        try{
         $volume_id = $request->volume_id;
         $fileName = $request->fileName;
         $typeFolder = $request->type;
+        $lowTypeFolder = strtolower($typeFolder);
         $page = Page::with('volume')->where('volume_id',$volume_id)->where('filename',$fileName)->first();
         $folderPath = $page->volume->path.'/'.$typeFolder;
         $filesShow = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->sortByDesc('timestamp')->whereIn('filename',$page->filename)->first();
         $publicFilePath = config('filesystems.disks.private.root').'/'.$filesShow['path'];
         
         if($filesShow['extension'] === 'psd'){
-        \Image::configure(array('driver' => 'imagick'));
-        $file = \Image::make($publicFilePath)->encode('png');
-        $type = 'image/png';
+            if(!File::exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder'))){
+                File::makeDirectory(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder'),0777);
+            }
+            if($page[$lowTypeFolder.'_image']){
+                $pathPreview = config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page[$lowTypeFolder.'_image'];
+            }else{
+                DB::beginTransaction();
+                $previewBaseName = $lowTypeFolder.$page->id.time().'.png';
+                \Image::configure(array('driver' => 'imagick'));
+                $fileTmp = \Image::make($publicFilePath);
+                $fileTmp->save(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$previewBaseName);
+                $pathPreview = config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$previewBaseName;
+                $page->update([
+                    "{$typeFolder}_image" => $previewBaseName
+                ]);
+                DB::commit();
+            }
+            $file = File::get($pathPreview);
+            $type = 'image/png';
         }else{
             $file = File::get($publicFilePath);
             $type = File::mimeType($publicFilePath);
@@ -60,6 +79,11 @@ class FileManagerController extends Controller
         $response->header("Content-Type", $type);
 
         return $response;
+        }catch(\Exception $e){
+            dd($e);
+            DB::rollBack();
+            return response()->json(['code'=> 500],500);
+        }
     }
 
     public function showNoteImage(Request $request){
@@ -118,10 +142,34 @@ class FileManagerController extends Controller
     }
 
     public function showUrlManager(Request $request){
+        try{
+        $arrayPath = explode('/',$request->filename);
+        $filename = explode('.',array_pop($arrayPath))[0];
+        $typeFolder = strtolower(array_pop($arrayPath));
+        array_shift($arrayPath);
+        $arrayPath = implode('/',$arrayPath);
+        $volume = Volume::where('path',$arrayPath)->first();
+        $page = Page::where('volume_id',$volume->id)->where('filename',$filename)->first();
         $publicFilePath = config('filesystems.disks.private.root').$request->filename;
         if(strpos($publicFilePath,'psd') !== false){
-        \Image::configure(array('driver' => 'imagick'));
-        $file = \Image::make($publicFilePath)->encode('png');
+            if(!File::exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder'))){
+                File::makeDirectory(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder'),0777);
+            }
+            if($page[$typeFolder.'_image']){
+                $pathPreview = config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page[$typeFolder.'_image'];
+            }else{
+                DB::beginTransaction();
+                $previewBaseName = $typeFolder.$page->id.time().'.png';
+                \Image::configure(array('driver' => 'imagick'));
+                $fileTmp = \Image::make($publicFilePath);
+                $fileTmp->save(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$previewBaseName);
+                $pathPreview = config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$previewBaseName;
+                $page->update([
+                    "{$typeFolder}_image" => $previewBaseName
+                ]);
+                DB::commit();
+            }
+        $file = File::get($pathPreview);
         $type = 'image/png';
         }else{
             $file = File::get($publicFilePath);
@@ -131,6 +179,10 @@ class FileManagerController extends Controller
         $response->header("Content-Type", $type);
 
         return $response;
+        }catch(\Exception $e){
+            DB::rollBack();
+            return response()->json(['code'=> 500],500);
+        }
     }
 
     public function showPrevImage(Request $request){

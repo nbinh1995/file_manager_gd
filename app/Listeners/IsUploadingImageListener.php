@@ -58,9 +58,15 @@ class IsUploadingImageListener
                     case 'clean':
                         if(strpos(auth()->user()->role_multi,'Clean') !== false || auth()->id() == 1){
                             if($page instanceof Page && $page->raw === 'done'){
+                                if($page->clean_image){
+                                    if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->clean_image)){
+                                        unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->clean_image);
+                                    }
+                                }
                                 $page->update([
                                     'clean' => 'done',
-                                    'clean_id' => auth()->id()
+                                    'clean_id' => auth()->id(),
+                                    'clean_image'=>null
                                 ]);
                             }else{
                                 throw new \Exception('The file name "'.$filename.'" does not exist in "Raw" directory!');
@@ -72,9 +78,15 @@ class IsUploadingImageListener
                     case 'type':
                         if(strpos(auth()->user()->role_multi,'Type') !== false || auth()->id() == 1){
                             if($page instanceof Page && $page->clean === 'done'){
+                                if($page->type_image){
+                                    if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->type_image)){
+                                        unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->type_image);
+                                    }
+                                }
                                 $page->update([
                                     'type' => 'done',
-                                    'type_id' => auth()->id()
+                                    'type_id' => auth()->id(),
+                                    'type_image' => null
                                 ]);
                             }else{
                                 throw new \Exception('The file name "'.$filename.'" does not exist in "Clean" directory!');
@@ -86,6 +98,11 @@ class IsUploadingImageListener
                     case 'sfx':
                         if(strpos(auth()->user()->role_multi,'SFX') !== false || strpos(auth()->user()->role_multi,'Check') !== false || auth()->id() == 1){
                             if($page instanceof Page && $page->type === 'done'){
+                                if($page->sfx_image){
+                                    if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->sfx_image)){
+                                        unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->sfx_image);
+                                    }
+                                }
                                 $checkPublicFilePath = str_replace('SFX', "Check", $pathVolume[0]);
                                 if(Storage::disk(config('lfm.disk'))->exists($publicFilePath)){
                                     $lastModified = date('Ymd_His',Storage::disk(config('lfm.disk'))->lastModified($publicFilePath));
@@ -104,18 +121,21 @@ class IsUploadingImageListener
                                             'check' => 'pending',
                                             'check_id' => null,
                                             'note' => null,
-                                            'note_image' => null
+                                            'note_image' => null,
+                                            'sfx_image' => null
                                         ]);
                                     }else{
                                         $page->update([
                                             'sfx_id' => auth()->id(),
+                                            'sfx_image' => null
                                         ]);
                                     }
                                     Storage::disk(config('lfm.disk'))->move($publicFilePath,$newPublicFilePath);
                                 }else{
                                     $page->update([
                                         'sfx' => 'done',
-                                        'sfx_id' => auth()->id()
+                                        'sfx_id' => auth()->id(),
+                                        'sfx_image' => null
                                     ]);
                                 }
                             }else{
@@ -128,9 +148,15 @@ class IsUploadingImageListener
                     case 'check':
                         if(auth()->user()->is_admin){
                             if($page instanceof Page && $page->sfx === 'done'){
+                                if($page->check_image){
+                                    if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->check_image)){
+                                        unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->check_image);
+                                    }
+                                }
                                 $page->update([
                                     'check' => 'done',
-                                    'check_id' => auth()->id()
+                                    'check_id' => auth()->id(),
+                                    'check_image' => null
                                 ]);
                             }else{
                                 throw new \Exception('The file name "'.$filename.'" does not exist in "Check" directory!');
@@ -151,9 +177,9 @@ class IsUploadingImageListener
                                 'raw_id' => auth()->id(),
                             ]);
                         }
-                        // else{ 
-                        //     throw new \Exception('The file name "'.$filename.'" is exist in "Raw" directory!');
-                        // }
+                        else{ 
+                            throw new \Exception('The file name "'.$filename.'" is exist in "Raw" directory!');
+                        }
                     }else{
                         throw new \Exception('Not permission!');
                     }

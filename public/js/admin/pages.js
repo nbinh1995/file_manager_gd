@@ -383,6 +383,7 @@ $(document).ready(function(event){
         var folderImage = '.'+type+'-detail';
         $(document).on('click',folderImage,function(e){
             e.preventDefault();
+            loading(false);
             var role = sessionStorage.getItem('authRole').toLowerCase();
             var url = $(this).data('url');
             var fileName = (new URL(url)).searchParams.get('fileName');
@@ -401,7 +402,9 @@ $(document).ready(function(event){
                 $('.image-page.prev').attr('src',data.src.prev);
                 $('.image-page.current').attr('src',data.src.current);
                 $('.image-page.next').attr('src',data.src.next);
-                 // loading(true);
+                if(document.querySelector('.image-page.current').complete){
+                    loading(false);
+                }
             });
         })
     }
@@ -439,9 +442,10 @@ $(document).ready(function(event){
             $('.image-page.prev').attr('src',data.src.prev);
             // flagShow=true;
             loadingCheck(false);
-            if(document.querySelector('.image-page.current').complete){
-                loading(false);
-            }
+            // if(document.querySelector('.image-page.current').complete){
+            //     loading(false);
+            // }
+            loading(false);
         }).fail(function(){
             toastr.error("There were errors. Please try again.");
         });
@@ -481,9 +485,10 @@ $(document).ready(function(event){
                 $('.image-page.next').attr('src',data.src.next);
                 // flagShow=true;
                 loadingCheck(false);
-                if(document.querySelector('.image-page.current').complete){
-                    loading(false);
-                }
+                loading(false);
+                // if(document.querySelector('.image-page.current').complete){
+                //     loading(false);
+                // }
             }).fail(function(){
                 toastr.error("There were errors. Please try again.");
             });
@@ -558,21 +563,26 @@ $(document).ready(function(event){
         if(type === 'SFX' && role === 'check'){
             fetchData({fileName:fileName,volume_id:volume_id_page},url_done_check,'GET',loadingCheck(true)).done(function(data){
                 if(data.code == 200){
-                    $('.image-arrow.right:visible').trigger('click');
                 }
                 if(data.code == 404){
                     toastr.error("Not permission!");
                     loadingCheck(false);
                     loading(false);
+                    $('.image-arrow.left:visible').trigger('click');
                 }
                 if(data.code == 500){
                     toastr.error("There were errors. Please try again.");
                     loadingCheck(false);
                     loading(false);
+                    $('.image-arrow.left:visible').trigger('click');
                 }
             }).fail(function(){
                 toastr.error("There were errors. Please try again.");
+                loadingCheck(false);
+                loading(false);
+                $('.image-arrow.left:visible').trigger('click');
             });
+            $('.image-arrow.right:visible').trigger('click');
         }else{
             toastr.error("Roles user or file is not correct!");
         }
@@ -612,15 +622,21 @@ $(document).ready(function(event){
                 toastr.error("Not permission!");
                 loadingCheck(false);
                 loading(false);
+                $('.image-arrow.left:visible').trigger('click');
             }
             if(data.code == 500){
                 toastr.error("There were errors. Please try again.");
                 loadingCheck(false);
                 loading(false);
+                $('.image-arrow.left:visible').trigger('click');
             }
             }).fail(function(){
                 toastr.error("There were errors. Please try again.");
+                loadingCheck(false);
+                loading(false);
+                $('.image-arrow.left:visible').trigger('click');
             });
+            $('.image-arrow.right:visible').trigger('click');
     })
 
     var loadingCheck = function(status){

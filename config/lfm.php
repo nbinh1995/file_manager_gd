@@ -46,7 +46,7 @@ return [
         'sfx'=>'SFX',
         'check'=>'Check'
     ],
-
+    'preview_folder' => 'preview',
     'note_folder' => 'note_images',
 
     'allow_private_folder'     => false,
