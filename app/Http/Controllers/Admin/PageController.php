@@ -549,34 +549,40 @@ class PageController extends Controller
         DB::beginTransaction();
         try{
         $page_id = $request->page_id;
+        $type = $request->type;
         $page = Page::with('volume')->find($page_id);
-        if($page->sfx_image){
-            if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->sfx_image)){
-                unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page->sfx_image);
+        if($page instanceof Page){
+            $folderPath = $page->volume->path.'/'.config('lfm.vol')[$type];
+            $fileShow = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->sortByDesc('timestamp')->where('filename',$page->filename)->first();
+            if($fileShow['extension'] === 'psd'){
+                if($page[$type.'_image']){
+                    if(file_exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page[$type.'_image'])){
+                        unlink(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$page[$type.'_image']);
+                    }
+                }
+                if(!File::exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder'))){
+                    File::makeDirectory(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder'),0777);
+                }
+                $previewBaseName = $type.$page_id.time().'.png';
+                $publicFilePath = config('filesystems.disks.private.root').'/'.$fileShow['path'];
+                \Image::configure(array('driver' => 'imagick'));
+                $fileTmp = \Image::make($publicFilePath);
+                $fileTmp->save(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$previewBaseName);
+        
+                $page->update([
+                    $type."_image" => $previewBaseName
+                ]);
+            }else{
+                $page->update([
+                    $type."_image" => null
+                ]);
             }
+                DB::commit();
+                return response()->json(['code'=>200],200);
         }
-
-        $folderPath = $page->volume->path.'/'.config('lfm.vol.sfx');
-        $fileShow = collect(Storage::disk(config('lfm.disk'))->listContents($folderPath,false))->sortByDesc('timestamp')->where('filename',$page->filename)->first();
-        if($fileShow['extension'] === 'psd'){
-            if(!File::exists(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder'))){
-                File::makeDirectory(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder'),0777);
-            }
-            $previewBaseName = 'sfx'.$page_id.time().'.png';
-            $publicFilePath = config('filesystems.disks.private.root').'/'.$fileShow['path'];
-            \Image::configure(array('driver' => 'imagick'));
-            $fileTmp = \Image::make($publicFilePath);
-            $fileTmp->save(config('filesystems.disks.private.root').'/'.config('lfm.preview_folder').'/'.$previewBaseName);
-    
-            $page->update([
-                "sfx_image" => $previewBaseName
-            ]);
-        }
-            DB::commit();
-            return response()->json(['code'=>200],200);
+        return response()->json(['code'=> 500]);
         }catch(\Exception $e){
             DB::rollBack();
-            dd($e);
             return response()->json(['code'=> 500]);
         }
     }

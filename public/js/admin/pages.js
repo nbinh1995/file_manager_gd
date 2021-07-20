@@ -774,6 +774,7 @@ $(document).ready(function(event){
         }).done(function(data){
             if(data.code == '200'){
                 toastr.success("Sync preview image successfully!");
+                pageTable.ajax.reload(null, false);
             }
             if(data.code == '500'){
                 toastr.error("There were errors. Please try again.");
