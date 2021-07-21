@@ -399,9 +399,14 @@ $(document).ready(function(event){
             }
             $('#modal-show-images').modal('show');
             fetchData({},url,'GET',loading(true)).done(function(data){
-                $('.image-page.prev').attr('src',data.src.prev);
-                $('.image-page.current').attr('src',data.src.current);
-                $('.image-page.next').attr('src',data.src.next);
+                var time = '&time='+new Date().getTime();
+                var img_current = (data.src.current ? (data.src.current+time) : data.src.current);
+                var img_prev = (data.src.prev ? (data.src.prev+time) : data.src.prev); 
+                var img_next = (data.src.next ? (data.src.next+time) : data.src.next); 
+
+                $('.image-page.prev').attr('src',img_prev);
+                $('.image-page.current').attr('src',img_current);
+                $('.image-page.next').attr('src',img_next);
                 if(document.querySelector('.image-page.current').complete){
                     loading(false);
                 }
@@ -439,7 +444,9 @@ $(document).ready(function(event){
             next.addClass('prev').removeClass('next');
             current.addClass('next').removeClass('current');
             prev.addClass('current').removeClass('prev');
-            $('.image-page.prev').attr('src',data.src.prev);
+            var time = '&time='+new Date().getTime();
+            var img_prev = data.src.prev ? data.src.prev+time : data.src.prev;
+            $('.image-page.prev').attr('src',img_prev);
             // flagShow=true;
             loadingCheck(false);
             // if(document.querySelector('.image-page.current').complete){
@@ -482,7 +489,9 @@ $(document).ready(function(event){
                 prev.addClass('next').removeClass('prev');
                 current.addClass('prev').removeClass('current');
                 next.addClass('current').removeClass('next');
-                $('.image-page.next').attr('src',data.src.next);
+                var time = '&time='+new Date().getTime();
+                var img_next = data.src.next ? data.src.next+time : data.src.next;
+                $('.image-page.next').attr('src',img_next);
                 // flagShow=true;
                 loadingCheck(false);
                 loading(false);
@@ -563,26 +572,27 @@ $(document).ready(function(event){
         if(type === 'SFX' && role === 'check'){
             fetchData({fileName:fileName,volume_id:volume_id_page},url_done_check,'GET',loadingCheck(true)).done(function(data){
                 if(data.code == 200){
+                    $('.image-arrow.right:visible').trigger('click');
                 }
                 if(data.code == 404){
                     toastr.error("Not permission!");
                     loadingCheck(false);
                     loading(false);
-                    $('.image-arrow.left:visible').trigger('click');
+                    // $('.image-arrow.left:visible').trigger('click');
                 }
                 if(data.code == 500){
                     toastr.error("There were errors. Please try again.");
                     loadingCheck(false);
                     loading(false);
-                    $('.image-arrow.left:visible').trigger('click');
+                    // $('.image-arrow.left:visible').trigger('click');
                 }
             }).fail(function(){
                 toastr.error("There were errors. Please try again.");
                 loadingCheck(false);
                 loading(false);
-                $('.image-arrow.left:visible').trigger('click');
+                // $('.image-arrow.left:visible').trigger('click');
             });
-            $('.image-arrow.right:visible').trigger('click');
+            // $('.image-arrow.right:visible').trigger('click');
         }else{
             toastr.error("Roles user or file is not correct!");
         }
@@ -617,26 +627,26 @@ $(document).ready(function(event){
         }).done(function(data){
             if(data.code == 200){
                 $('.image-arrow.right:visible').trigger('click');
+                // $('.image-arrow.right:visible').trigger('click');
             }
             if(data.code == 404){
                 toastr.error("Not permission!");
                 loadingCheck(false);
                 loading(false);
-                $('.image-arrow.left:visible').trigger('click');
+                // $('.image-arrow.left:visible').trigger('click');
             }
             if(data.code == 500){
                 toastr.error("There were errors. Please try again.");
                 loadingCheck(false);
                 loading(false);
-                $('.image-arrow.left:visible').trigger('click');
+                // $('.image-arrow.left:visible').trigger('click');
             }
             }).fail(function(){
                 toastr.error("There were errors. Please try again.");
                 loadingCheck(false);
                 loading(false);
-                $('.image-arrow.left:visible').trigger('click');
+                // $('.image-arrow.left:visible').trigger('click');
             });
-            $('.image-arrow.right:visible').trigger('click');
     })
 
     var loadingCheck = function(status){
@@ -774,7 +784,6 @@ $(document).ready(function(event){
         }).done(function(data){
             if(data.code == '200'){
                 toastr.success("Sync preview image successfully!");
-                pageTable.ajax.reload(null, false);
             }
             if(data.code == '500'){
                 toastr.error("There were errors. Please try again.");
