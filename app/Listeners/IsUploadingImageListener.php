@@ -127,6 +127,8 @@ class IsUploadingImageListener
                                     }else{
                                         $page->update([
                                             'sfx_id' => auth()->id(),
+                                            'check' => 'pending',
+                                            'check_id' => null,
                                             'sfx_image' => null
                                         ]);
                                     }

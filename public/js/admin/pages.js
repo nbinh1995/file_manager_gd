@@ -549,7 +549,6 @@ $(document).ready(function(event){
     $('.reject-check').on('click',function(e){
         var role = sessionStorage.getItem('authRole').toLowerCase();
         var fileName = (new URL($('#modal-show-images').find('.image-page.current:visible').attr('src'))).searchParams.get('fileName');
-        console.log(fileName);
         var type = (new URL($('#modal-show-images').find('.image-page.current:visible').attr('src'))).searchParams.get('type');
         if(type === 'SFX' && role === 'check'){
             $('#reject-check-form').find('[name=note]').val('');
