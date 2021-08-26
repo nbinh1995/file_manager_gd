@@ -3,9 +3,8 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
 
-class AlterPagesTable extends Migration
+class AlterPagesTwoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,7 +15,7 @@ class AlterPagesTable extends Migration
     {
         Schema::table('pages', function($table)
         {
-            $table->text('note')->nullable()->after('check');
+            $table->string('note_image')->nullable()->after('note');
         });
     }
 

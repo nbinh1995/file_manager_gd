@@ -25,6 +25,15 @@
                         </p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{route('logs')}}"
+                        class="nav-link font-weight-light {{Request::is('logs*') ? 'active': ''}}">
+                        <i class="nav-icon fab fa-twitch text-purple"></i>
+                        <p>
+                            {{__('Logs')}}
+                        </p>
+                    </a>
+                </li>
                 @if (auth()->user()->is_admin === 1)
                 @if (auth()->id() === 1)
                 <li class="nav-item">

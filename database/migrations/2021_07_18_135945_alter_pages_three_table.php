@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterPagesTable extends Migration
+class AlterPagesThreeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,7 +15,11 @@ class AlterPagesTable extends Migration
     {
         Schema::table('pages', function($table)
         {
-            $table->string('note_image')->nullable()->after('note');
+            $table->string('raw_image')->nullable()->after('check');
+            $table->string('clean_image')->nullable()->after('check');
+            $table->string('type_image')->nullable()->after('check');
+            $table->string('sfx_image')->nullable()->after('check');
+            // $table->string('check_image')->nullable()->after('check');
         });
     }
 

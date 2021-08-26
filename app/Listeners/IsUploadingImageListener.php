@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Models\HistoryUF;
 use App\Models\Page;
 use App\Models\Volume;
 use Carbon\Carbon;
@@ -186,6 +187,17 @@ class IsUploadingImageListener
                         throw new \Exception('Not permission!');
                     }
                 }
+            }
+
+            $history = HistoryUF::create([
+                'user_id' => auth()->id(),
+                'book' => $volume->book->filename,
+                'volume' => $volume->filename,
+                'page' => $filename,
+                'type' => config('lfm.vol')[$type]
+            ]);
+            if(!$history instanceof HistoryUF){
+                throw new \Exception('Server Error!');
             }
         }
         }

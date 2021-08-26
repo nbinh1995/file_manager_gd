@@ -16,4 +16,11 @@ class Volume extends Model
     public function pages(){
         return $this->hasMany(Page::class,'volume_id','id');
     }
+
+    public function pages_sfx_done(){
+        return $this->hasMany(Page::class,'volume_id','id')->where('sfx', 'done');
+    }
+    public function pages_check_done(){
+        return $this->hasMany(Page::class,'volume_id','id')->where('check', 'done');
+    }
 }
