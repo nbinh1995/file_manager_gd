@@ -27,6 +27,9 @@ $(document).ready(function(){
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
             },
+            data:{
+                book_id:book_id
+            },
         },
         columns: [
             {data: 'id', class: 'mw-50 text-truncate',searchable: false},
@@ -40,6 +43,10 @@ $(document).ready(function(){
             {targets: 4, searchable: false, orderable: false},
         ],
     });
+
+    $('[name=book_id]').on('change',function(e){
+        $(this).closest('form').trigger('submit');
+    })
 
     $(document).on('click','.is_hide',function(e){
         console.log($(this).is(':checked'));

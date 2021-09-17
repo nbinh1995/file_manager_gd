@@ -18,11 +18,15 @@ class VolumeController extends Controller
 {
     public function index(Request $request)
     {
-        return view('admins.volume.index');
+        $books = Book::all();
+        $book_id = $request->has('book_id') ? $request->book_id : '';
+        return view('admins.volume.index',compact('books','book_id'));
     }
 
-    public function ajaxGetVolumes(){
-        $eloquent = Volume::leftJoin('books','volumes.book_id','books.id')->select('volumes.id','volumes.filename','volumes.status','books.filename as bookname','volumes.is_hide');
+    public function ajaxGetVolumes(Request $request){
+        $eloquent = Volume::leftJoin('books','volumes.book_id','books.id')->select('volumes.id','volumes.filename','volumes.status','books.filename as bookname','volumes.is_hide')->when($request->book_id,function($query) use($request){
+            $query->where('volumes.book_id',$request->book_id);
+        });
         return DataTables::eloquent($eloquent)
             ->filterColumn('bookname', function($query, $keyword) {
                     $query->whereRaw('books.filename like ?', ["%{$keyword}%"]);
@@ -79,7 +83,7 @@ class VolumeController extends Controller
 
     public function detail($id){
         $volume = Volume::with('book')->find($id);
-        if($volume instanceof Volume && !$volume->is_hide){
+        if($volume instanceof Volume &&(auth()->user()->is_admin || !$volume->is_hide)){
             return view('admins.volume.detail',compact('volume'));
         }
         return redirect()->back()->withFlashDanger('Not Found!');

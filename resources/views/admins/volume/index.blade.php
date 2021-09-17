@@ -9,8 +9,20 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <div class="row">
-                                <div class="col-12">
+                            <div class="row justify-content-center">
+                                <div class="col-md-3 col-12 mb-2">
+                                    <form action="{{route('volumes.index')}}">
+                                        <div class="form-group">
+                                            <select name="book_id"  class="form-control" id="select2">
+                                                <option value=""></option>
+                                                @foreach ($books as $book)
+                                                    <option value="{{$book->id}}" {{$book_id == $book->id ? 'selected' : ''}}>{{$book->filename}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="ml-md-auto" >
                                     <a href="{{route('volumes.create')}}" class="btn btn-primary"><i
                                                 class="fas fa-plus-circle mr-2"></i>{{__('Add Volume')}}</a>
                                 </div>
@@ -90,6 +102,7 @@
     <script src="{{asset('/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{ asset('AdminLTE/plugins/sweetalert2/sweetalert2.all.min.js')}}"></script>
     <script>
+        var book_id = "{{$book_id}}";
         var url_ajax_hide = "{{route('ajaxChangeHideVolume')}}";
         var url_volume_table = "{{route('ajaxGetVolumes')}}";
         var show_pw = document.getElementById('show_pw');

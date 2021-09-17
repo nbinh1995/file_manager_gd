@@ -12,7 +12,7 @@ use Yajra\DataTables\Facades\DataTables;
 class HistoryUFController extends Controller
 {
     public function index(Request $request){
-        $users = User::all(['id','username']);
+        $users = User::withTrashed()->get(['id','username']);
         $now = Carbon::now();
         if ($request->filled('firstTime') && preg_match('/([0-9]{4}-([0-9]{2})-([0-9]{2}))/', $request->firstTime)) {
             $firstTime = Carbon::createFromFormat('Y-m-d', $request->firstTime)->format('Y-m-d');
@@ -39,7 +39,7 @@ class HistoryUFController extends Controller
         })->select('id','user_id','book','volume','page','type','created_at');
         return DataTables::eloquent($eloquent)
         ->editColumn('user_id',function($history){
-            return $history->user->username;
+            return $history->user->username ?? 'Not Found';
         })->toJson();
     }
 }

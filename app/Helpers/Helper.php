@@ -39,27 +39,27 @@ if (!function_exists('showRawStatus')) {
             case 'clean':
                 $status = $page->clean;
                 $hasDownFile = $page->raw === 'done' ? true : false;
-                $user = $page->cleanUser->username ?? '';
+                $user = $page->cleanUser->username ?? 'Not Found';
             break;
             case 'type': 
                 $status = $page->type;
                 $hasDownFile = $page->clean === 'done' ? true : false;
-                $user = $page->typeUser->username ?? '';
+                $user = $page->typeUser->username ?? 'Not Found';
             break;
             case 'sfx': 
                 $status = $page->sfx;
                 $hasDownFile = $page->type === 'done' ? true : false;
-                $user = $page->sfxUser->username ?? '';
+                $user = $page->sfxUser->username ?? 'Not Found';
             break;
             case 'check': 
                 $status = $page->check;
                 $hasDownFile = false;
-                $user = $page->checkUser->username ?? '';
+                $user = $page->checkUser->username ?? 'Not Found';
             break;
             default:
             $status = $page->raw;
             $hasDownFile = false;
-            $user = $page->rawUser->username ?? '';
+            $user = $page->rawUser->username ?? 'Not Found';
         }
     
         switch($status){
