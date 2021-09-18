@@ -33,4 +33,15 @@ class Page extends Model
     public function volume(){
         return $this->belongsTo(Volume::class,'volume_id','id');
     }
+
+    static function updatePendingPages($array_id,$type){
+        
+        $pages = self::whereIn('id',$array_id);
+
+        return $pages->update(
+            [
+                $type=>'pending'
+            ]
+            );
+    }
 }

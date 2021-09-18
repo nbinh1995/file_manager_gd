@@ -35,6 +35,8 @@ if (!function_exists('showRawStatus')) {
         $user = '';
         $badge = '';
         $hasDownFile = false;
+        $syncData = ($type === 'sfx' || $type === 'type') && auth()->id() === 1;
+        $checkHasNoteCheck = ($page->note || $page->note_image) && $type === 'check';
         switch($type){
             case 'clean':
                 $status = $page->clean;
@@ -61,18 +63,21 @@ if (!function_exists('showRawStatus')) {
             $hasDownFile = false;
             $user = $page->rawUser->username ?? 'Not Found';
         }
-    
+        // <input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom doing-task '.$type.'-undo-task">
         switch($status){
             case 'doing':
                 $badge = $type === 'check' ? '<label class="btn btn-warning btn-xs text-monospace">Reject: '.$user.'</label> <label class="btn btn-xs btn-outline-danger border-0" data-toggle="popover" title="Reject Note" data-html="true" data-content="'.($page->note_image ? "<img class='note_image_reject' src='".route('file-manager.showNoteImage',['page_id'=>$page->id])."' alt=''> <hr/>" : '').($page->note ? nl2br(e($page->note)) : '...').'"><i class="fas fa-question-circle"></i></label>' :'<label class="btn btn-warning btn-xs text-monospace"><input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom doing-task '.$type.'-undo-task"> Doing: '.$user.'</label>';
             break;
             case 'done': 
-                $badge = (($type === 'sfx' || $type === 'type') && auth()->id() === 1) ? '<label class="btn btn-success btn-xs  text-monospace '.$type.'-detail" data-url="'.route('file-manager.bufferImage',['volume_id'=>$page->volume_id,'type'=>config('lfm.vol')[$type],'fileName'=>$page->filename]).'"><i class="fas fa-images"></i> Done: '.$user.' </label><label class="btn btn-xs btn-outline-primary border-0 sync-preview" data-sync="'.route('pages.syncPreview',['page_id'=>$page->id,'type'=>$type]).'"><i class="fas fa-sync"></i></label>' : '<label class="btn btn-success btn-xs  text-monospace '.$type.'-detail" data-url="'.route('file-manager.bufferImage',['volume_id'=>$page->volume_id,'type'=>config('lfm.vol')[$type],'fileName'=>$page->filename]).'"><i class="fas fa-images"></i> Done: '.$user.' </label>' ;
+                $badge = $syncData ? '<label class="btn btn-success btn-xs  text-monospace '.$type.'-detail" data-url="'.route('file-manager.bufferImage',['volume_id'=>$page->volume_id,'type'=>config('lfm.vol')[$type],'fileName'=>$page->filename]).'"><i class="fas fa-images"></i> Done: '.$user.' </label><label class="btn btn-xs btn-outline-primary border-0 sync-preview" data-sync="'.route('pages.syncPreview',['page_id'=>$page->id,'type'=>$type]).'"><i class="fas fa-sync"></i></label>' : '<label class="btn btn-success btn-xs  text-monospace '.$type.'-detail" data-url="'.route('file-manager.bufferImage',['volume_id'=>$page->volume_id,'type'=>config('lfm.vol')[$type],'fileName'=>$page->filename]).'"><i class="fas fa-images"></i> Done: '.$user.' </label>' ;
             break;
             default:
-            $badge = ($hasDownFile ? '<label class="btn btn-danger btn-xs text-monospace"><input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom pending-task '.$type.'-task-id"> Pending</label>' : '<label class="btn btn-danger btn-xs text-monospace">Pending</label>').((($page->note || $page->note_image) && $type === 'check')  ? ' <label class="btn btn-xs btn-outline-danger border-0" data-toggle="popover" title="Reject Note" data-html="true" data-content="'.($page->note_image ? "<img class='note_image_reject' src='".route('file-manager.showNoteImage',['page_id'=>$page->id])."' alt=''> <hr/>" : '').($page->note ? nl2br(e($page->note)) : '...').'"><i class="fas fa-question-circle"></i></label>': '') ;
+            $badge = ($hasDownFile ? '<label class="btn btn-danger btn-xs text-monospace"><input type="checkbox" value="'.$page->id.'" class="task-checkbox align-text-bottom pending-task '.$type.'-task-id"> Pending</label>' : '<label class="btn btn-danger btn-xs text-monospace">Pending</label>').(($checkHasNoteCheck)  ? ' <label class="btn btn-xs btn-outline-danger border-0" data-toggle="popover" title="Reject Note" data-html="true" data-content="'.($page->note_image ? "<img class='note_image_reject' src='".route('file-manager.showNoteImage',['page_id'=>$page->id])."' alt=''> <hr/>" : '').($page->note ? nl2br(e($page->note)) : '...').'"><i class="fas fa-question-circle"></i></label>': '') ;
         }
-        
+
+        if(auth()->user()->is_admin){
+            $badge ='<input class="reset-'.$type.'-task reset-task" type="checkbox" value="'.$page->id.'" /> '.$badge;
+        }
         return $badge;
     }
 }

@@ -167,6 +167,19 @@
         {{ csrf_field() }}
         {{ method_field('delete') }}
     </form>
+    @if (auth()->user()->is_admin)
+    <div style="position: fixed; right:0; top: 20%; display:none; z-index: 9999;" id="reset-box">
+        <form action="{{route('pages.resetTasks')}}"  id="reset-page-task" method="POST"  style="height: 50px;width: 130px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
+            {{ csrf_field() }}
+            <input type="text" hidden name="raw_tasks"> 
+            <input type="text" hidden name="clean_tasks" >
+            <input type="text" hidden name="type_tasks"> 
+            <input type="text" hidden name="sfx_tasks" >
+            <input type="text" hidden name="check_tasks"> 
+            <button type="submit" class="btn btn-sm btn-warning mr-2" id="reset-task-btn" title="Reset Task"><i class="fas fa-caret-square-left"></i></button><span class="text-monospace text-get-task">Reset Tasks</span>
+        </form>
+    </div>
+    @endif
     <div style="position: fixed; right:0; bottom: 28%; display:none;z-index: 9999;" id="download-box">
         <form action="{{route('pages.downTask',['idVolume' => $volume->id])}}"  id="download-page-task" method="POST"  style="height: 50px;width: 130px;background-color: #69696969;display: flex;align-items: center;padding-left: 10px;">
             {{ csrf_field() }}
@@ -249,6 +262,9 @@
             overflow: auto;
             max-height: 200px;
         } */
+        .reset-task{
+            vertical-align: middle;
+        }
         .sync-preview i {
             pointer-events: none
         }
@@ -338,7 +354,7 @@
             transform: translateY(-50%);
         }
         #pages-table td {
-            padding: 0.25rem 0 0.25rem 0.5rem;
+            padding: 0.25rem 0.25rem 0.25rem 0.25rem;
             vertical-align: middle;
         }
 
@@ -378,6 +394,9 @@
         animation: blinker 1s linear infinite;
         }
         #undo-task-btn + span  {
+        animation: blinker 1s linear infinite;
+        }
+        #reset-task-btn + span  {
         animation: blinker 1s linear infinite;
         }
         .text-get-task{

@@ -71,6 +71,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => 'auth
         Route::get('/check-process-zip','PageController@checkProcessZip')->name('checkProcessZip');
         Route::delete('/{id}/destroy', 'PageController@destroy')->name('destroy')->middleware('admin');
         Route::post('/{idVolume}/undo-task', 'PageController@undoTask')->name('undoTask');
+        Route::post('/reset-task', 'PageController@resetTasks')->name('resetTasks')->middleware('admin');
     });
     Route::group(['prefix' => 'file-manager','as'=>'file-manager.'], function () {
         Route::get('/', 'FileManagerController@index')->name('index')->middleware('super_admin');

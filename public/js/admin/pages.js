@@ -132,7 +132,7 @@ $(document).ready(function(event){
     checkRoleTask('clean');
     checkRoleTask('type');
     checkRoleTask('sfx');
-    // checkRoleTask('check');
+    checkRoleTask('check');
     
     $(document).on('click','.download-page-id',function(e){
         var current = this;
@@ -143,6 +143,10 @@ $(document).ready(function(event){
             if($('.doing-task:checked').length > 0){
                 $('.doing-task').prop('checked',false);
                 $('#undo-box').hide();
+            }
+            if($('.reset-task:checked').length > 0){
+                $('.reset-task').prop('checked',false);
+                $('#reset-box').hide();
             }
             if($('.download-page-id:checked').length > 0){
                 $('#download-box').show();
@@ -190,60 +194,111 @@ $(document).ready(function(event){
     function checkRoleTask(type){
         var task_id = '.'+type+'-task-id';
         var undo_task_id = '.'+type+'-undo-task';
-        $(document).on('click',task_id,function(e){
-            var current = this;
-            var role = sessionStorage.getItem('authRole').toLowerCase();
-            if(role !== type){
-                e.preventDefault();
-                e.stopPropagation();
-                toastr.warning("The User's Role is not '"+type+"'")
-            }else{
-                if($('.download-page-id:checked').length > 0){
-                    $('.download-page-id').prop('checked',false);
-                    $('#download-box').hide();
-                }
-                if($('.doing-task:checked').length > 0){
-                    $('.doing-task').prop('checked',false);
-                    $('#undo-box').hide();
-                }
-                if($(task_id+':checked').length > 0){
-                    $('#receive-box').show();
-                    if(flagShift){
-                        var firstValue = 0;
-                        var lastValue = 0;
-                        $(task_id).each(function(index,ele){
-                            if($(ele).val() == $(task_id+':checked').first().val()){
-                                firstValue = index;
-                            }
-                            if($(ele).val() == $(current).val()){
-                                lastValue = index;
-                            }
-                        });
-                        if(firstValue < lastValue){
-                            for(var i = firstValue ; i < lastValue ; i++){
-                                $($(task_id)[i]).prop('checked',true);
-                            }
-                        }else{
-                            for(var i = lastValue ; i < firstValue ; i++){
-                                $($(task_id)[i]).prop('checked',true);
+        var reset_task_id = '.reset-'+type+'-task';
+        if(type !== 'check'){
+            $(document).on('click',task_id,function(e){
+                var current = this;
+                var role = sessionStorage.getItem('authRole').toLowerCase();
+                if(role !== type){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toastr.warning("The User's Role is not '"+type+"'")
+                }else{
+                    if($('.download-page-id:checked').length > 0){
+                        $('.download-page-id').prop('checked',false);
+                        $('#download-box').hide();
+                    }
+                    if($('.doing-task:checked').length > 0){
+                        $('.doing-task').prop('checked',false);
+                        $('#undo-box').hide();
+                    }
+                    if($('.reset-task:checked').length > 0){
+                        $('.reset-task').prop('checked',false);
+                        $('#reset-box').hide();
+                    }
+                    if($(task_id+':checked').length > 0){
+                        $('#receive-box').show();
+                        if(flagShift){
+                            var firstValue = 0;
+                            var lastValue = 0;
+                            $(task_id).each(function(index,ele){
+                                if($(ele).val() == $(task_id+':checked').first().val()){
+                                    firstValue = index;
+                                }
+                                if($(ele).val() == $(current).val()){
+                                    lastValue = index;
+                                }
+                            });
+                            if(firstValue < lastValue){
+                                for(var i = firstValue ; i < lastValue ; i++){
+                                    $($(task_id)[i]).prop('checked',true);
+                                }
+                            }else{
+                                for(var i = lastValue ; i < firstValue ; i++){
+                                    $($(task_id)[i]).prop('checked',true);
+                                }
                             }
                         }
+                    }else{
+                        $('#receive-box').hide();
+                        
                     }
-                }else{
-                    $('#receive-box').hide();
-                    
                 }
-            }
-        })
-        $(document).on('click',undo_task_id,function(e){
-            var current = this;
-            var role = sessionStorage.getItem('authRole').toLowerCase();
-            if(role !== type){
-                e.preventDefault();
-                e.stopPropagation();
-                toastr.warning("The User's Role is not '"+type+"'")
-            }else{
-                if($('.download-page-id:checked').length > 0){
+            })
+            $(document).on('click',undo_task_id,function(e){
+                var current = this;
+                var role = sessionStorage.getItem('authRole').toLowerCase();
+                if(role !== type){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toastr.warning("The User's Role is not '"+type+"'")
+                }else{
+                    if($('.download-page-id:checked').length > 0){
+                        $('.download-page-id').prop('checked',false);
+                        $('#download-box').hide();
+                    }
+                    if($('.pending-task:checked').length > 0){
+                        $('.pending-task').prop('checked',false);
+                        $('#receive-box').hide();
+                    }
+                    if($('.reset-task:checked').length > 0){
+                        $('.reset-task').prop('checked',false);
+                        $('#reset-box').hide();
+                    }
+                    if($(undo_task_id+':checked').length > 0){
+                        $('#undo-box').show();
+                        if(flagShift){
+                            var firstValue = 0;
+                            var lastValue = 0;
+                            $(undo_task_id).each(function(index,ele){
+                                if($(ele).val() == $(undo_task_id+':checked').first().val()){
+                                    firstValue = index;
+                                }
+                                if($(ele).val() == $(current).val()){
+                                    lastValue = index;
+                                }
+                            });
+                            if(firstValue < lastValue){
+                                for(var i = firstValue ; i < lastValue ; i++){
+                                    $($(undo_task_id)[i]).prop('checked',true);
+                                }
+                            }else{
+                                for(var i = lastValue ; i < firstValue ; i++){
+                                    $($(undo_task_id)[i]).prop('checked',true);
+                                }
+                            }
+                        }
+                    }else{
+                        $('#undo-box').hide();
+                    }
+                }
+            })
+        }
+
+        if($('#reset-box').length){
+            $(document).on('click',reset_task_id,function(e){
+                var current = this;
+                if($('.reset-task:checked').length > 0){
                     $('.download-page-id').prop('checked',false);
                     $('#download-box').hide();
                 }
@@ -251,13 +306,17 @@ $(document).ready(function(event){
                     $('.pending-task').prop('checked',false);
                     $('#receive-box').hide();
                 }
-                if($(undo_task_id+':checked').length > 0){
-                    $('#undo-box').show();
+                if($('.doing-task:checked').length > 0){
+                    $('.doing-task').prop('checked',false);
+                    $('#undo-box').hide();
+                }
+                if($(reset_task_id+':checked').length > 0){
+                    $('#reset-box').show();
                     if(flagShift){
                         var firstValue = 0;
                         var lastValue = 0;
-                        $(undo_task_id).each(function(index,ele){
-                            if($(ele).val() == $(undo_task_id+':checked').first().val()){
+                        $(reset_task_id).each(function(index,ele){
+                            if($(ele).val() == $(reset_task_id+':checked').first().val()){
                                 firstValue = index;
                             }
                             if($(ele).val() == $(current).val()){
@@ -266,19 +325,20 @@ $(document).ready(function(event){
                         });
                         if(firstValue < lastValue){
                             for(var i = firstValue ; i < lastValue ; i++){
-                                $($(undo_task_id)[i]).prop('checked',true);
+                                $($(reset_task_id)[i]).prop('checked',true);
                             }
                         }else{
                             for(var i = lastValue ; i < firstValue ; i++){
-                                $($(undo_task_id)[i]).prop('checked',true);
+                                $($(reset_task_id)[i]).prop('checked',true);
                             }
                         }
                     }
                 }else{
-                    $('#undo-box').hide();
+                    $('#reset-box').hide();
                 }
-            }
-        })
+            })
+        }
+        
     }
 
     checkRoleFolder('raw');
@@ -372,6 +432,24 @@ $(document).ready(function(event){
 
         $('#undo-page-task').trigger('submit');
     });
+
+    if($('#reset-box').length){
+        $(document).on('click','#reset-task-btn',function(e){
+            e.preventDefault();
+            $(this).attr('disabled', true).html('<i class="fas fa-sync fa-spin"></i>');
+            var raw_tasks = $('.reset-raw-task:checked').map(function(){return $(this).val();}).get().join(',');
+            var clean_tasks = $('.reset-clean-task:checked').map(function(){return $(this).val();}).get().join(',');
+            var type_tasks = $('.reset-type-task:checked').map(function(){return $(this).val();}).get().join(',');
+            var sfx_tasks = $('.reset-sfx-task:checked').map(function(){return $(this).val();}).get().join(',');
+            var check_tasks = $('.reset-check-task:checked').map(function(){return $(this).val();}).get().join(',');
+            $('#reset-page-task [name=raw_tasks]').val(raw_tasks);
+            $('#reset-page-task [name=clean_tasks]').val(clean_tasks);
+            $('#reset-page-task [name=type_tasks]').val(type_tasks);
+            $('#reset-page-task [name=sfx_tasks]').val(sfx_tasks);
+            $('#reset-page-task [name=check_tasks]').val(check_tasks);
+            $('#reset-page-task').trigger('submit');
+        });
+    }
 
     showImages('raw');
     showImages('clean');
@@ -794,4 +872,8 @@ $(document).ready(function(event){
                 $(e.target).find('i').removeClass('fa-spin');
         });
     })
+
+    if($('#reset-box').length){
+
+    }
 });

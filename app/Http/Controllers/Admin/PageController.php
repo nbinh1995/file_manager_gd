@@ -586,4 +586,40 @@ class PageController extends Controller
             return response()->json(['code'=> 500]);
         }
     }
+
+    public function resetTasks(Request $request){
+        try{
+            DB::beginTransaction();
+            if($request->raw_tasks){
+                $raw_tasks = explode(',',$request->raw_tasks);
+                Page::updatePendingPages($raw_tasks,'raw');
+            }
+    
+            if($request->clean_tasks){
+                $clean_tasks = explode(',',$request->clean_tasks);
+                Page::updatePendingPages($clean_tasks,'clean');
+            }
+    
+            if($request->type_tasks){
+                $type_tasks = explode(',',$request->type_tasks);
+                Page::updatePendingPages($type_tasks,'type');
+            }
+    
+            if($request->sfx_tasks){
+                $sfx_tasks = explode(',',$request->sfx_tasks);
+                Page::updatePendingPages($sfx_tasks,'sfx');
+            }
+    
+            if($request->check_tasks){
+                $check_tasks = explode(',',$request->check_tasks);
+                Page::updatePendingPages($check_tasks,'check');
+            }
+            DB::commit();
+            return redirect()->back()->withFlashSuccess('Reset Tasks Successfully!');
+        }catch(\Exception $e){
+            DB::rollBack();
+            dd($e);
+            return redirect()->back()->withFlashDanger('Server Errors!');
+        }
+    }
 }
