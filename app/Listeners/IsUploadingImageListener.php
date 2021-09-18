@@ -181,7 +181,11 @@ class IsUploadingImageListener
                             ]);
                         }
                         else{ 
-                            throw new \Exception('The file name "'.$filename.'" is exist in "Raw" directory!');
+                            $page->update([
+                                'raw' => 'done',
+                                'raw_id' => auth()->id(),
+                            ]);
+                            // throw new \Exception('The file name "'.$filename.'" is exist in "Raw" directory!');
                         }
                     }else{
                         throw new \Exception('Not permission!');
