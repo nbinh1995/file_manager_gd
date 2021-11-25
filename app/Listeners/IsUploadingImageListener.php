@@ -105,7 +105,7 @@ class IsUploadingImageListener
                                     }
                                 }
                                 $checkPublicFilePath = str_replace('SFX', "Check", $pathVolume[0]);
-                                if(Storage::disk(config('lfm.disk'))->exists($publicFilePath)){
+                                if(Storage::disk(config('lfm.disk'))->exists($publicFilePath) && $page->sfx !== 'pending'){
                                     $lastModified = date('Ymd_His',Storage::disk(config('lfm.disk'))->lastModified($publicFilePath));
                                     $newPublicFilePath = explode('.',$publicFilePath);
                                     $newPublicFilePath[0] = $newPublicFilePath[0].'_'.$lastModified;
