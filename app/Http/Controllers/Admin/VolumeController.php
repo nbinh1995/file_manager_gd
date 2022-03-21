@@ -185,8 +185,8 @@ class VolumeController extends Controller
 
     public function ajaxGetVolumesByBookID(Request $request){
         $book_id = $request->book;
-        $volumes = Volume::withCount(['pages','pages_sfx_done','pages_check_done'])->where('book_id',$book_id)->where('is_hide',false)->get();
-        
+        $volumes = Volume::withCount(['pages','pages_sfx_done','pages_check_done'])->where('book_id',$book_id)->where('is_hide',false)->get()->sortBy('filename', SORT_NATURAL)->values()->all();
+
         return response()->json(['volumes'=> $volumes]);
     }
 

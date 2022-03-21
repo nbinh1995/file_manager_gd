@@ -29,10 +29,12 @@ class HomeController extends Controller
     {   
         $volumes = [];
         if(old('volume')){
-        $volumes = Volume::where('book_id',old('volume'))->get();
+            
+        $volumes = Volume::withCount(['pages','pages_sfx_done','pages_check_done'])->orderBy('filename')->where('book_id',old('volume'))->where('is_hide',false)->get()->sortBy('filename', SORT_NATURAL)->values()->all();
         }
 
-        $books = Book::all();
+        $books = Book::all()->sortBy('filename', SORT_NATURAL)->values()->all();
+        
         return view('home',compact('books','volumes'));
     }
 
