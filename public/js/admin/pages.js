@@ -26,8 +26,6 @@ $(document).ready(function(event){
                     typeDown = pending == 1 ?  'Type' : '';
                 break;
                 case 'Check':
-                    typeDown = pending == 1 ? 'SFX' : '';
-                break;
                 default:
                     typeDown = '';
             }

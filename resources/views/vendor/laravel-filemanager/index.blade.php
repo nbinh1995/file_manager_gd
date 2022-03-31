@@ -317,7 +317,7 @@
                 break;
                 case 'Check':
                   if((new URL(location.href)).searchParams.get('dir').indexOf('SFX') !== -1){
-                      isDownLoad = true;
+                      isDownLoad = false;
                   }
                 break;
                 default:
